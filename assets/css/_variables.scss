@@ -1,0 +1,91 @@
+// Swiss Wayfinding Design System - Variables
+// Based on German road signage and Rudy Bauer CGN wayfinding
+
+:root {
+  /* Typography */
+  --font-primary: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;
+  --font-mono: 'SF Mono', Consolas, 'Liberation Mono', monospace;
+  
+  --font-size-base: 14px;
+  --line-height-base: 1.4;
+  
+  /* Type Scale (ratio 1.25) */
+  --text-xs: 0.64rem;    /* 9px */
+  --text-sm: 0.8rem;     /* 11px */
+  --text-base: 1rem;     /* 14px */
+  --text-md: 1.25rem;    /* 17.5px */
+  --text-lg: 1.563rem;   /* 22px */
+  --text-xl: 1.953rem;   /* 27px */
+  --text-2xl: 2.441rem;  /* 34px */
+  --text-3xl: 3.052rem;  /* 43px */
+  
+  /* Colors - Base */
+  --color-background: #FFFFFF;
+  --color-surface: #F5F5F5;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #666666;
+  --color-border: #E0E0E0;
+  --color-border-strong: #CCCCCC;
+  
+  /* Colors - Status (Functional) */
+  --color-status-active: #0066CC;
+  --color-status-planned: #666666;
+  --color-status-complete: #2E7D32;
+  --color-status-blocked: #C62828;
+  --color-status-archived: #9E9E9E;
+  
+  /* Colors - Accent */
+  --color-accent-primary: #FFCC00;
+  --color-accent-secondary: #0066CC;
+  
+  /* Colors - Notation Badge */
+  --color-notation-bg: #1A1A1A;
+  --color-notation-text: #FFFFFF;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* Grid System */
+  --grid-columns: 12;
+  --grid-gutter: 16px;
+  --grid-margin: 24px;
+  --container-max-width: 1536px;
+  
+  /* Breakpoints */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
+  
+  /* Navigation */
+  --nav-height: 48px;
+  
+  /* Border Radius (minimal) */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #121212;
+    --color-surface: #1E1E1E;
+    --color-text-primary: #F5F5F5;
+    --color-text-secondary: #A0A0A0;
+    --color-border: #333333;
+    --color-border-strong: #444444;
+    --color-notation-bg: #FFCC00;
+    --color-notation-text: #1A1A1A;
+  }
+}
+

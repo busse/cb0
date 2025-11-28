@@ -4,34 +4,55 @@ title: Ideas
 permalink: /ideas/
 ---
 
-<!-- UI_SPEC_PLACEHOLDER: Array visualization style -->
-<div class="ideas-index">
-  <header class="ideas-index__header">
-    <h1>Ideas Array</h1>
-    <p class="ideas-index__description">All ideas organized by number</p>
-  </header>
-
-  {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
-  {%- if sorted_ideas.size > 0 -%}
-    <div class="ideas-index__filters">
-      <button class="filter-button filter-button--active" data-filter="all">All ({{ sorted_ideas.size }})</button>
-      {%- assign active = sorted_ideas | where: "status", "active" -%}
-      <button class="filter-button" data-filter="active">Active ({{ active.size }})</button>
-      {%- assign planned = sorted_ideas | where: "status", "planned" -%}
-      <button class="filter-button" data-filter="planned">Planned ({{ planned.size }})</button>
-      {%- assign completed = sorted_ideas | where: "status", "completed" -%}
-      <button class="filter-button" data-filter="completed">Completed ({{ completed.size }})</button>
-      {%- assign archived = sorted_ideas | where: "status", "archived" -%}
-      <button class="filter-button" data-filter="archived">Archived ({{ archived.size }})</button>
+<main class="page-ideas container">
+  <section class="header-region">
+    <div class="header-primary">
+      <h1 class="page-title">IDEAS</h1>
+      <p class="page-description">
+        All ideas tracked in this system. i0 is this site itself.
+      </p>
+      
+      {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
+      {%- if sorted_ideas.size > 0 -%}
+        <div class="filter-bar">
+          <button class="filter-btn filter-btn--active" data-filter="all">ALL ({{ sorted_ideas.size }})</button>
+          {%- assign active = sorted_ideas | where: "status", "active" -%}
+          <button class="filter-btn" data-filter="active">ACTIVE ({{ active.size }})</button>
+          {%- assign planned = sorted_ideas | where: "status", "planned" -%}
+          <button class="filter-btn" data-filter="planned">PLANNED ({{ planned.size }})</button>
+          {%- assign completed = sorted_ideas | where: "status", "completed" -%}
+          <button class="filter-btn" data-filter="completed">COMPLETED ({{ completed.size }})</button>
+          {%- assign archived = sorted_ideas | where: "status", "archived" -%}
+          <button class="filter-btn" data-filter="archived">ARCHIVED ({{ archived.size }})</button>
+        </div>
+      {%- endif -%}
     </div>
-
-    <div class="idea-grid">
-      {%- for idea in sorted_ideas -%}
-        {% include idea-card.html idea=idea %}
-      {%- endfor -%}
-    </div>
-  {%- else -%}
-    <p class="ideas-index__empty">No ideas yet. Create your first idea to get started.</p>
-  {%- endif -%}
-</div>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">ARTICLES</h2>
+      {%- if site.posts.size > 0 -%}
+        <div class="article-list">
+          {%- for post in site.posts limit:5 -%}
+            {% include article-item.html post=post %}
+          {%- endfor -%}
+        </div>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+      {%- else -%}
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
+      {%- endif -%}
+    </aside>
+  </section>
+  
+  <section class="content-section">
+    {%- if sorted_ideas.size > 0 -%}
+      <div class="card-grid">
+        {%- for idea in sorted_ideas -%}
+          {% include idea-card.html idea=idea %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="ideas-index__empty">No ideas yet. Create your first idea to get started.</p>
+    {%- endif -%}
+  </section>
+</main>
 

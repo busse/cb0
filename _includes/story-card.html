@@ -5,28 +5,25 @@
 {%- endcomment -%}
 {%- assign story = include.story -%}
 
-<!-- UI_SPEC_PLACEHOLDER: Story card styling and layout -->
 <article class="story-card story-card--{{ story.status }}" data-priority="{{ story.priority }}" data-story="{{ story.idea_number }}.{{ story.story_number }}">
   <header class="story-card__header">
-    {% include notation-badge.html idea=story.idea_number story=story.story_number %}
-    <span class="story-card__priority story-card__priority--{{ story.priority }}">{{ story.priority }}</span>
+    {% include notation-badge.html idea=story.idea_number story=story.story_number size="sm" %}
+    <span class="priority-indicator priority-indicator--{{ story.priority }}">{{ story.priority | upcase }}</span>
   </header>
   
-  <div class="story-card__body">
-    <h3 class="story-card__title">
-      <a href="{{ story.url | relative_url }}">{{ story.title }}</a>
-    </h3>
-    <p class="story-card__description">{{ story.description | truncate: 120 }}</p>
-  </div>
+  <h4 class="story-card__title">
+    <a href="{{ story.url | relative_url }}">{{ story.title }}</a>
+  </h4>
   
-  <footer class="story-card__footer">
-    <span class="story-card__status" data-status="{{ story.status }}">{{ story.status }}</span>
+  <p class="story-card__description">{{ story.description | truncate: 120 }}</p>
+  
+  <footer class="story-card__meta">
+    <span class="status-indicator status-indicator--{{ story.status }}">{{ story.status | replace: "-", " " | upcase }}</span>
     {%- if story.assigned_sprint -%}
-      <span class="story-card__sprint">Sprint: {{ story.assigned_sprint }}</span>
+      <span class="story-card__sprint">{% include notation-badge.html sprint=story.assigned_sprint size="sm" %}</span>
     {%- else -%}
       <span class="story-card__sprint story-card__sprint--backlog">Backlog</span>
     {%- endif -%}
-    <time class="story-card__date" datetime="{{ story.created }}">{{ story.created | date: "%Y-%m-%d" }}</time>
   </footer>
 </article>
 

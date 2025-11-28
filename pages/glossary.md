@@ -4,9 +4,13 @@ title: Glossary
 permalink: /glossary/
 ---
 
-# Notation Glossary
+<main class="page-glossary container">
+  <header class="page-header" style="margin-bottom: var(--spacing-xl);">
+    <h1 class="page-title">NOTATION GLOSSARY</h1>
+    <p class="page-description">This site uses a systematic notation for tracking Ideas, Stories, and Sprints.</p>
+  </header>
 
-This site uses a systematic notation for tracking Ideas, Stories, and Sprints.
+<div class="glossary-content" markdown="1">
 
 ## Notation Formats
 
@@ -99,3 +103,5 @@ make new-sprint      # Create new sprint
 
 Or manually create files following the taxonomy structure in `_ideas/`, `_stories/`, `_sprints/`, and `_updates/`.
 
+</div>
+</main>

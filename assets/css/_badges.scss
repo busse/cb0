@@ -1,0 +1,106 @@
+// Badge Components
+
+// Notation Badge
+.notation-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  background: var(--color-notation-bg);
+  color: var(--color-notation-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.notation-badge--lg {
+  padding: 4px 10px;
+  font-size: var(--text-base);
+}
+
+.notation-badge--sm {
+  padding: 1px 4px;
+  font-size: var(--text-xs);
+}
+
+// Status Indicator
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  white-space: nowrap;
+}
+
+.status-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-indicator--active::before {
+  background: var(--color-status-active);
+}
+
+.status-indicator--planned::before {
+  background: var(--color-status-planned);
+}
+
+.status-indicator--complete::before,
+.status-indicator--completed::before,
+.status-indicator--done::before {
+  background: var(--color-status-complete);
+}
+
+.status-indicator--blocked::before {
+  background: var(--color-status-blocked);
+}
+
+.status-indicator--archived::before {
+  background: var(--color-status-archived);
+}
+
+.status-indicator--backlog::before {
+  background: var(--color-text-secondary);
+}
+
+.status-indicator--in-progress::before {
+  background: var(--color-status-active);
+}
+
+// Priority Indicator
+.priority-indicator {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.priority-indicator--critical {
+  color: var(--color-status-blocked);
+}
+
+.priority-indicator--high {
+  color: #E65100;
+}
+
+.priority-indicator--medium {
+  color: var(--color-text-secondary);
+}
+
+.priority-indicator--low {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+

@@ -7,31 +7,29 @@
 {%- include helpers/stories-for-sprint.html sprint_id=sprint.sprint_id -%}
 {%- assign story_count = sprint_stories.size -%}
 
-<!-- UI_SPEC_PLACEHOLDER: Sprint card styling and layout -->
 <article class="sprint-card sprint-card--{{ sprint.status }}" data-sprint="{{ sprint.sprint_id }}">
   <header class="sprint-card__header">
-    {% include notation-badge.html sprint=sprint.sprint_id %}
-    <h3 class="sprint-card__title">
-      <a href="{{ sprint.url | relative_url }}">Sprint {{ sprint.sprint_number }}</a>
-    </h3>
+    {% include notation-badge.html sprint=sprint.sprint_id size="lg" %}
+    <span class="status-indicator status-indicator--{{ sprint.status }}">{{ sprint.status | upcase }}</span>
   </header>
   
-  <div class="sprint-card__body">
-    <p class="sprint-card__dates">
-      {{ sprint.start_date | date: "%b %d" }} – {{ sprint.end_date | date: "%b %d, %Y" }}
-    </p>
-    {%- if sprint.goals.size > 0 -%}
-      <ul class="sprint-card__goals">
-        {%- for goal in sprint.goals limit:3 -%}
-          <li>{{ goal }}</li>
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
+  <div class="sprint-card__dates">
+    <time>{{ sprint.start_date | date: "%b %d" }}</time>
+    <span class="sprint-card__date-separator">→</span>
+    <time>{{ sprint.end_date | date: "%b %d, %Y" }}</time>
   </div>
   
-  <footer class="sprint-card__footer">
-    <span class="sprint-card__status" data-status="{{ sprint.status }}">{{ sprint.status }}</span>
-    <span class="sprint-card__story-count">{{ story_count }} {% if story_count == 1 %}story{% else %}stories{% endif %}</span>
+  {%- if sprint.goals.size > 0 -%}
+    <ul class="sprint-card__goals">
+      {%- for goal in sprint.goals limit:3 -%}
+        <li>{{ goal }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+  
+  <footer class="sprint-card__meta">
+    <span>{{ story_count }} {% if story_count == 1 %}story{% else %}stories{% endif %}</span>
+    <a href="{{ sprint.url | relative_url }}">VIEW BOARD →</a>
   </footer>
 </article>
 
