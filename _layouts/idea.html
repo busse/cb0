@@ -1,40 +1,63 @@
 ---
 layout: default
 ---
-<!-- UI_SPEC_PLACEHOLDER: Idea detail page layout -->
-<article class="idea-detail">
-  <header class="idea-detail__header">
-    <div class="idea-detail__notation">
-      {% include notation-badge.html idea=page.idea_number %}
+<main class="page-idea container">
+  <section class="header-region">
+    <div class="header-primary">
+      <header class="idea-header">
+        {% include notation-badge.html idea=page.idea_number size="lg" %}
+        <span class="status-indicator status-indicator--{{ page.status }}">
+          {{ page.status | upcase }}
+        </span>
+      </header>
+      
+      <h1 class="page-title">{{ page.title }}</h1>
+      
+      <div class="idea-detail__meta">
+        <time class="idea-detail__date" datetime="{{ page.created }}">Created: {{ page.created | date: "%B %d, %Y" }}</time>
+        {%- if page.tags.size > 0 -%}
+          <ul class="idea-detail__tags">
+            {%- for tag in page.tags -%}
+              <li class="tag">{{ tag }}</li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+      
+      <div class="idea-content">
+        {{ content }}
+      </div>
     </div>
-    <h1 class="idea-detail__title">{{ page.title }}</h1>
-    <div class="idea-detail__meta">
-      <span class="idea-detail__status" data-status="{{ page.status }}">{{ page.status }}</span>
-      <time class="idea-detail__date" datetime="{{ page.created }}">Created: {{ page.created | date: "%B %d, %Y" }}</time>
-      {%- if page.tags.size > 0 -%}
-        <ul class="idea-detail__tags">
-          {%- for tag in page.tags -%}
-            <li class="tag">{{ tag }}</li>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">ARTICLES</h2>
+      {%- if site.posts.size > 0 -%}
+        <div class="article-list">
+          {%- for post in site.posts limit:5 -%}
+            {% include article-item.html post=post %}
           {%- endfor -%}
-        </ul>
+        </div>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+      {%- else -%}
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
       {%- endif -%}
-    </div>
-  </header>
-
-  <div class="idea-detail__content">
-    {{ content }}
-  </div>
-
+    </aside>
+  </section>
+  
   {%- include helpers/stories-for-idea.html idea_number=page.idea_number -%}
   {%- if stories_list.size > 0 -%}
-    <section class="idea-detail__stories">
-      <h2>Stories ({{ stories_list.size }})</h2>
-      <div class="story-grid">
+    <section class="content-section">
+      <header class="section-header">
+        <h2 class="section-title">STORIES</h2>
+        <span class="section-count">{{ stories_list.size }} total</span>
+      </header>
+      
+      <div class="card-grid">
         {%- for story in stories_list -%}
           {% include story-card.html story=story %}
         {%- endfor -%}
       </div>
     </section>
   {%- endif -%}
-</article>
+</main>
 

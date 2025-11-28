@@ -1,27 +1,16 @@
-<!-- UI_SPEC_PLACEHOLDER: Navigation header with Swiss wayfinding design -->
-<header class="site-header">
-  <div class="site-header__container">
-    <div class="site-header__brand">
-      <a href="{{ '/' | relative_url }}" class="site-header__title">{{ site.title | escape }}</a>
-      {% include notation-badge.html idea=0 size="sm" %}
-    </div>
+<nav class="nav-bar" role="navigation" aria-label="Primary navigation">
+  <div class="nav-container">
+    <a href="{{ '/' | relative_url }}" class="nav-brand">
+      {% include notation-badge.html idea=0 %}
+      <span class="nav-site-name">{{ site.title | upcase }}</span>
+    </a>
     
-    <nav class="site-nav" aria-label="Primary navigation">
-      <ul class="site-nav__list">
-        <li class="site-nav__item">
-          <a href="{{ '/ideas/' | relative_url }}" class="site-nav__link">IDEAS</a>
-        </li>
-        <li class="site-nav__item">
-          <a href="{{ '/sprints/' | relative_url }}" class="site-nav__link">SPRINTS</a>
-        </li>
-        <li class="site-nav__item">
-          <a href="{{ '/glossary/' | relative_url }}" class="site-nav__link">GLOSSARY</a>
-        </li>
-        <li class="site-nav__item">
-          <a href="{{ '/blog/' | relative_url }}" class="site-nav__link">BLOG</a>
-        </li>
-      </ul>
-    </nav>
+    <ul class="nav-links">
+      <li><a href="{{ '/ideas/' | relative_url }}" class="nav-link">IDEAS</a></li>
+      <li><a href="{{ '/sprints/' | relative_url }}" class="nav-link">SPRINTS</a></li>
+      <li><a href="{{ '/backlog/' | relative_url }}" class="nav-link">BACKLOG</a></li>
+      <li><a href="{{ '/glossary/' | relative_url }}" class="nav-link">GLOSSARY</a></li>
+    </ul>
   </div>
-</header>
+</nav>
 

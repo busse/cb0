@@ -1,31 +1,32 @@
 ---
 layout: default
 ---
-<!-- UI_SPEC_PLACEHOLDER: Update entry layout -->
-<article class="update-detail">
-  <header class="update-detail__header">
-    <div class="update-detail__notation">
-      {% include notation-badge.html sprint=page.sprint_id idea=page.idea_number story=page.story_number %}
-    </div>
-    <h1 class="update-detail__title">Update: {{ page.notation }}</h1>
-    <div class="update-detail__meta">
-      <span class="update-detail__type" data-type="{{ page.type }}">{{ page.type }}</span>
-      <time class="update-detail__date" datetime="{{ page.date }}">{{ page.date | date: "%B %d, %Y" }}</time>
-    </div>
-    <div class="update-detail__context">
-      {%- assign parent_sprint = site.sprints | where: "sprint_id", page.sprint_id | first -%}
-      {%- assign parent_story = site.stories | where: "idea_number", page.idea_number | where: "story_number", page.story_number | first -%}
-      {%- if parent_sprint -%}
-        <p>Sprint: <a href="{{ parent_sprint.url | relative_url }}">{{ page.sprint_id }}</a></p>
-      {%- endif -%}
-      {%- if parent_story -%}
-        <p>Story: <a href="{{ parent_story.url | relative_url }}">{% include notation-badge.html idea=page.idea_number story=page.story_number %} {{ parent_story.title }}</a></p>
-      {%- endif -%}
-    </div>
-  </header>
+<main class="container page-update">
+  <article class="update-detail">
+    <header class="update-detail__header">
+      <div class="update-detail__notation">
+        {% include notation-badge.html sprint=page.sprint_id idea=page.idea_number story=page.story_number size="lg" %}
+      </div>
+      <h1 class="page-title">Update: {{ page.notation }}</h1>
+      <div class="update-detail__meta">
+        <span class="update-timeline__type">{{ page.type | upcase }}</span>
+        <time class="update-detail__date" datetime="{{ page.date }}">{{ page.date | date: "%B %d, %Y" }}</time>
+      </div>
+      <div class="update-detail__context">
+        {%- assign parent_sprint = site.sprints | where: "sprint_id", page.sprint_id | first -%}
+        {%- assign parent_story = site.stories | where: "idea_number", page.idea_number | where: "story_number", page.story_number | first -%}
+        {%- if parent_sprint -%}
+          <p>Sprint: <a href="{{ parent_sprint.url | relative_url }}">{% include notation-badge.html sprint=page.sprint_id size="sm" %} Sprint {{ parent_sprint.sprint_number }}</a></p>
+        {%- endif -%}
+        {%- if parent_story -%}
+          <p>Story: <a href="{{ parent_story.url | relative_url }}">{% include notation-badge.html idea=page.idea_number story=page.story_number size="sm" %} {{ parent_story.title }}</a></p>
+        {%- endif -%}
+      </div>
+    </header>
 
-  <div class="update-detail__content">
-    {{ content }}
-  </div>
-</article>
+    <div class="update-detail__content">
+      {{ content }}
+    </div>
+  </article>
+</main>
 

@@ -1,20 +1,24 @@
-// UI_SPEC_PLACEHOLDER: JavaScript for interactive features
-// This file will contain client-side interactivity for the site
+// Swiss Wayfinding Design - Client-side Interactivity
+// Ideas/Stories/Sprints Taxonomy System
 
 (function() {
   'use strict';
   
   // Filter functionality for ideas/sprints pages
   function initFilters() {
-    const filterButtons = document.querySelectorAll('.filter-button');
+    const filterButtons = document.querySelectorAll('.filter-btn, .filter-button');
+    
+    if (filterButtons.length === 0) return;
     
     filterButtons.forEach(button => {
       button.addEventListener('click', function() {
         const filter = this.dataset.filter;
         
         // Update active button
-        filterButtons.forEach(btn => btn.classList.remove('filter-button--active'));
-        this.classList.add('filter-button--active');
+        filterButtons.forEach(btn => {
+          btn.classList.remove('filter-btn--active', 'filter-button--active');
+        });
+        this.classList.add('filter-btn--active');
         
         // Filter cards
         const cards = document.querySelectorAll('.idea-card, .story-card, .sprint-card');
@@ -22,25 +26,41 @@
           if (filter === 'all') {
             card.style.display = '';
           } else {
-            const status = card.classList.toString().match(/--(\w+)/);
-            if (status && status[1] === filter) {
-              card.style.display = '';
-            } else {
-              card.style.display = 'none';
-            }
+            // Check if card has the matching status class
+            const hasStatus = card.classList.contains(`idea-card--${filter}`) ||
+                            card.classList.contains(`story-card--${filter}`) ||
+                            card.classList.contains(`sprint-card--${filter}`);
+            card.style.display = hasStatus ? '' : 'none';
           }
         });
       });
     });
   }
   
-  // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFilters);
-  } else {
-    initFilters();
+  // Set current page in navigation
+  function setCurrentNav() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const currentPath = window.location.pathname;
+    
+    navLinks.forEach(link => {
+      const linkPath = link.getAttribute('href');
+      if (currentPath.includes(linkPath) && linkPath !== '/') {
+        link.setAttribute('aria-current', 'page');
+      }
+    });
   }
   
-  console.log('Ideas Array taxonomy system initialized');
+  // Initialize when DOM is ready
+  function init() {
+    initFilters();
+    setCurrentNav();
+    console.log('Swiss Wayfinding System - Initialized');
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 

@@ -1,0 +1,338 @@
+// Card Components
+
+// Base Card Styles
+.idea-card,
+.story-card,
+.sprint-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+// Idea Card
+.idea-card {
+  padding: 12px;
+  border-left: 3px solid var(--color-status-active);
+}
+
+.idea-card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.idea-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.idea-card__title {
+  font-size: var(--text-md);
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0 0 6px 0;
+}
+
+.idea-card__title a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.idea-card__title a:hover {
+  text-decoration: underline;
+}
+
+.idea-card__description {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  margin: 0 0 auto 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.idea-card__meta,
+.idea-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  gap: 8px;
+}
+
+.idea-card__stories,
+.idea-card__story-count {
+  flex-shrink: 0;
+}
+
+.idea-card__date {
+  font-family: var(--font-mono);
+}
+
+// Status-based border colors
+.idea-card--planned {
+  border-left-color: var(--color-status-planned);
+}
+
+.idea-card--active {
+  border-left-color: var(--color-status-active);
+}
+
+.idea-card--complete,
+.idea-card--completed {
+  border-left-color: var(--color-status-complete);
+}
+
+.idea-card--archived {
+  border-left-color: var(--color-status-archived);
+}
+
+// Story Card
+.story-card {
+  padding: 10px;
+  background: var(--color-surface);
+  border-left: 3px solid var(--color-text-secondary);
+}
+
+.story-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 6px;
+}
+
+.story-card__title {
+  font-size: var(--text-base);
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.story-card__title a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.story-card__title a:hover {
+  text-decoration: underline;
+}
+
+.story-card__description {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-card__meta,
+.story-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.story-card__sprint {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.story-card__sprint--backlog {
+  font-style: italic;
+}
+
+.story-card__date {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.story-card__status {
+  margin-right: auto;
+}
+
+// Status-based border colors for stories
+.story-card--backlog {
+  border-left-color: var(--color-text-secondary);
+}
+
+.story-card--planned {
+  border-left-color: var(--color-status-planned);
+}
+
+.story-card--in-progress {
+  border-left-color: var(--color-status-active);
+}
+
+.story-card--done {
+  border-left-color: var(--color-status-complete);
+}
+
+// Sprint Card
+.sprint-card {
+  padding: 12px;
+  border-left: 3px solid var(--color-status-planned);
+}
+
+.sprint-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.sprint-card__title {
+  font-size: var(--text-md);
+  font-weight: 500;
+  margin: 0;
+}
+
+.sprint-card__title a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.sprint-card__dates {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.sprint-card__date-separator {
+  color: var(--color-text-secondary);
+}
+
+.sprint-card__goals {
+  font-size: var(--text-sm);
+  padding-left: 16px;
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.sprint-card__goals li {
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sprint-card__meta,
+.sprint-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.sprint-card__story-count {
+  flex-shrink: 0;
+}
+
+// Sprint status colors
+.sprint-card--planned {
+  border-left-color: var(--color-status-planned);
+}
+
+.sprint-card--active {
+  border-left-color: var(--color-status-active);
+}
+
+.sprint-card--completed,
+.sprint-card--complete {
+  border-left-color: var(--color-status-complete);
+}
+
+// Article Item (Sidebar)
+.article-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.article-item:last-child {
+  border-bottom: none;
+}
+
+.article-item__date {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  margin-bottom: 2px;
+}
+
+.article-item__title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.article-item__title a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.article-item__title a:hover {
+  text-decoration: underline;
+}
+
+.article-list {
+  margin-bottom: var(--spacing-md);
+}
+
+// Progress Bar (for sprint cards)
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--color-status-active);
+  transition: width var(--transition-base);
+}
+
+.sprint-card__progress {
+  margin: 8px 0;
+}
+
+.sprint-card__progress-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+

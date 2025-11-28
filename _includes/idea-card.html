@@ -7,22 +7,20 @@
 {%- include helpers/stories-for-idea.html idea_number=idea.idea_number -%}
 {%- assign story_count = stories_list.size -%}
 
-<!-- UI_SPEC_PLACEHOLDER: Idea card styling and layout -->
 <article class="idea-card idea-card--{{ idea.status }}" data-idea="{{ idea.idea_number }}">
   <header class="idea-card__header">
     {% include notation-badge.html idea=idea.idea_number %}
-    <h3 class="idea-card__title">
-      <a href="{{ idea.url | relative_url }}">{{ idea.title }}</a>
-    </h3>
+    <span class="status-indicator status-indicator--{{ idea.status }}">{{ idea.status | upcase }}</span>
   </header>
   
-  <div class="idea-card__body">
-    <p class="idea-card__description">{{ idea.description }}</p>
-  </div>
+  <h3 class="idea-card__title">
+    <a href="{{ idea.url | relative_url }}">{{ idea.title }}</a>
+  </h3>
   
-  <footer class="idea-card__footer">
-    <span class="idea-card__status" data-status="{{ idea.status }}">{{ idea.status }}</span>
-    <span class="idea-card__story-count">{{ story_count }} {% if story_count == 1 %}story{% else %}stories{% endif %}</span>
+  <p class="idea-card__description">{{ idea.description }}</p>
+  
+  <footer class="idea-card__meta">
+    <span class="idea-card__stories">{{ story_count }} {% if story_count == 1 %}story{% else %}stories{% endif %}</span>
     <time class="idea-card__date" datetime="{{ idea.created }}">{{ idea.created | date: "%Y-%m-%d" }}</time>
   </footer>
 </article>

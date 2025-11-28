@@ -1,11 +1,41 @@
-<!-- UI_SPEC_PLACEHOLDER: Footer with minimal design -->
 <footer class="site-footer">
-  <div class="site-footer__container">
-    <p class="site-footer__description">{{ site.description | escape }}</p>
-    <p class="site-footer__meta">
-      Built with Jekyll. Notation system: Ideas/Stories/Sprints.
-      <a href="{{ '/glossary/' | relative_url }}">Learn the notation</a>.
-    </p>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h3 class="footer-heading">NOTATION</h3>
+        <ul class="footer-list">
+          <li><code>i{n}</code> — Idea</li>
+          <li><code>s{n}</code> — Story</li>
+          <li><code>{i}.{s}</code> — Combined</li>
+          <li><code>{sprint}.{i}.{s}</code> — Full</li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3 class="footer-heading">NAVIGATION</h3>
+        <ul class="footer-list">
+          <li><a href="{{ '/ideas/' | relative_url }}">Ideas</a></li>
+          <li><a href="{{ '/sprints/' | relative_url }}">Sprints</a></li>
+          <li><a href="{{ '/backlog/' | relative_url }}">Backlog</a></li>
+          <li><a href="{{ '/glossary/' | relative_url }}">Glossary</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3 class="footer-heading">META</h3>
+        <ul class="footer-list">
+          <li><a href="{{ '/i/0/' | relative_url }}">About (i0)</a></li>
+          <li><a href="{{ '/blog/' | relative_url }}">Articles</a></li>
+          <li><a href="{{ '/feed.xml' | relative_url }}">RSS Feed</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p class="footer-copyright">
+        {{ site.description | escape }} • {% include notation-badge.html idea=0 size="sm" %}
+      </p>
+    </div>
   </div>
 </footer>
 

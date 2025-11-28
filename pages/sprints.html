@@ -4,37 +4,56 @@ title: Sprints
 permalink: /sprints/
 ---
 
-<!-- UI_SPEC_PLACEHOLDER: Sprint visualization -->
-<div class="sprints-index">
-  <header class="sprints-index__header">
-    <h1>Sprint Calendar</h1>
-    <p class="sprints-index__description">Two-week sprint cycles (26 sprints per year)</p>
-  </header>
-
-  {%- assign sorted_sprints = site.sprints | sort: "sprint_id" | reverse -%}
-  {%- if sorted_sprints.size > 0 -%}
-    <div class="sprints-index__filters">
-      <button class="filter-button filter-button--active" data-filter="all">All ({{ sorted_sprints.size }})</button>
-      {%- assign active = sorted_sprints | where: "status", "active" -%}
-      <button class="filter-button" data-filter="active">Active ({{ active.size }})</button>
-      {%- assign planned = sorted_sprints | where: "status", "planned" -%}
-      <button class="filter-button" data-filter="planned">Planned ({{ planned.size }})</button>
-      {%- assign completed = sorted_sprints | where: "status", "completed" -%}
-      <button class="filter-button" data-filter="completed">Completed ({{ completed.size }})</button>
+<main class="page-sprints container">
+  <section class="header-region">
+    <div class="header-primary">
+      <h1 class="page-title">SPRINT CALENDAR</h1>
+      <p class="page-description">Two-week sprint cycles (26 sprints per year)</p>
+      
+      {%- assign sorted_sprints = site.sprints | sort: "sprint_id" | reverse -%}
+      {%- if sorted_sprints.size > 0 -%}
+        <div class="filter-bar">
+          <button class="filter-btn filter-btn--active" data-filter="all">ALL ({{ sorted_sprints.size }})</button>
+          {%- assign active = sorted_sprints | where: "status", "active" -%}
+          <button class="filter-btn" data-filter="active">ACTIVE ({{ active.size }})</button>
+          {%- assign planned = sorted_sprints | where: "status", "planned" -%}
+          <button class="filter-btn" data-filter="planned">PLANNED ({{ planned.size }})</button>
+          {%- assign completed = sorted_sprints | where: "status", "completed" -%}
+          <button class="filter-btn" data-filter="completed">COMPLETED ({{ completed.size }})</button>
+        </div>
+      {%- endif -%}
     </div>
-
-    <div class="sprint-grid">
-      {%- for sprint in sorted_sprints -%}
-        {% include sprint-card.html sprint=sprint %}
-      {%- endfor -%}
-    </div>
-  {%- else -%}
-    <p class="sprints-index__empty">No sprints yet. Create your first sprint to get started.</p>
-  {%- endif -%}
-
-  <section class="sprints-index__calendar">
-    <h2>Sprint Calendar Reference</h2>
-    <p>Each sprint is identified by YYSS format (YY = year, SS = sprint number 01-26)</p>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">ARTICLES</h2>
+      {%- if site.posts.size > 0 -%}
+        <div class="article-list">
+          {%- for post in site.posts limit:5 -%}
+            {% include article-item.html post=post %}
+          {%- endfor -%}
+        </div>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+      {%- else -%}
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
+      {%- endif -%}
+    </aside>
+  </section>
+  
+  <section class="content-section">
+    {%- if sorted_sprints.size > 0 -%}
+      <div class="card-grid">
+        {%- for sprint in sorted_sprints -%}
+          {% include sprint-card.html sprint=sprint %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="sprints-index__empty">No sprints yet. Create your first sprint to get started.</p>
+    {%- endif -%}
+  </section>
+  
+  <section class="content-section">
+    <h2 class="section-title">SPRINT CALENDAR REFERENCE</h2>
+    <p class="page-description">Each sprint is identified by YYSS format (YY = year, SS = sprint number 01-26)</p>
     <table class="sprint-calendar">
       <thead>
         <tr>
@@ -59,5 +78,5 @@ permalink: /sprints/
       </tbody>
     </table>
   </section>
-</div>
+</main>
 
