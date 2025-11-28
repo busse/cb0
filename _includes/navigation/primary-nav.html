@@ -1,0 +1,74 @@
+<!--
+  Primary Navigation
+  Fixed header, always visible
+  Highlights current section
+  
+  Required data: 
+    - site.ideas (for count badge)
+    - current sprint (derived from date)
+-->
+
+<nav class="primary-nav" role="navigation" aria-label="Primary">
+  <div class="primary-nav__container">
+    
+    <!-- Brand / Home -->
+    <a href="{{ '/' | relative_url }}" class="primary-nav__brand">
+      {% include notation-badge.html idea=0 %}
+      <span class="primary-nav__site-name">{{ site.title | upcase }}</span>
+    </a>
+    
+    <!-- Main Links -->
+    <ul class="primary-nav__links" role="menubar">
+      <li role="none">
+        <a href="{{ '/ideas/' | relative_url }}" 
+           role="menuitem"
+           class="primary-nav__link {% if page.url contains '/ideas' or page.url contains '/i/' or page.layout == 'idea' %}is-active{% endif %}"
+           {% if page.url contains '/ideas' or page.url contains '/i/' %}aria-current="page"{% endif %}>
+          IDEAS
+          <span class="primary-nav__count">{{ site.ideas | size }}</span>
+        </a>
+      </li>
+      <li role="none">
+        <a href="{{ '/sprints/' | relative_url }}"
+           role="menuitem" 
+           class="primary-nav__link {% if page.url contains '/sprint' %}is-active{% endif %}"
+           {% if page.url contains '/sprint' %}aria-current="page"{% endif %}>
+          SPRINTS
+        </a>
+      </li>
+      <li role="none">
+        <a href="{{ '/backlog/' | relative_url }}"
+           role="menuitem"
+           class="primary-nav__link {% if page.url contains '/backlog' %}is-active{% endif %}"
+           {% if page.url contains '/backlog' %}aria-current="page"{% endif %}>
+          BACKLOG
+          {%- assign backlog_count = site.stories | where: "assigned_sprint", nil | size -%}
+          {% if backlog_count > 0 %}<span class="primary-nav__count">{{ backlog_count }}</span>{% endif %}
+        </a>
+      </li>
+      <li role="none">
+        <a href="{{ '/timeline/' | relative_url }}"
+           role="menuitem"
+           class="primary-nav__link {% if page.url contains '/timeline' %}is-active{% endif %}"
+           {% if page.url contains '/timeline' %}aria-current="page"{% endif %}>
+          TIMELINE
+        </a>
+      </li>
+    </ul>
+    
+    <!-- Notation Search -->
+    <div class="primary-nav__search">
+      {% include navigation/notation-search.html %}
+    </div>
+    
+    <!-- Mobile Toggle -->
+    <button class="primary-nav__mobile-toggle" 
+            aria-expanded="false" 
+            aria-controls="mobile-nav"
+            aria-label="Toggle navigation">
+      <span class="primary-nav__hamburger"></span>
+    </button>
+    
+  </div>
+</nav>
+

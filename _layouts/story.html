@@ -2,6 +2,9 @@
 layout: default
 ---
 <main class="container page-story">
+  {%- assign parent_idea = site.ideas | where: "idea_number", page.idea_number | first -%}
+  {% include navigation/breadcrumbs.html idea=parent_idea %}
+  
   <article class="story-detail">
     <header class="story-detail__header">
       <div class="story-header">
@@ -59,6 +62,8 @@ layout: default
         </ul>
       </section>
     {%- endif -%}
+    
+    {% include navigation/related-items.html story=page %}
   </article>
 </main>
 

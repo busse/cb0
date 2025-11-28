@@ -1,0 +1,30 @@
+<!--
+  Notation Search
+  Direct navigation via notation input (i5, 5.23, 2609.5.56)
+-->
+
+<div class="notation-search">
+  <form class="notation-search__form" role="search">
+    <label for="notation-input" class="visually-hidden">Jump to notation</label>
+    <input type="text" 
+           id="notation-input"
+           name="q"
+           class="notation-search__input"
+           placeholder="i5, 5.23, 2609..."
+           autocomplete="off"
+           autocapitalize="off"
+           spellcheck="false"
+           pattern="[iIsS]?\d+(\.\d+)?(\.\d+)?"
+           aria-describedby="notation-hint">
+    <button type="submit" class="notation-search__submit" aria-label="Go">
+      →
+    </button>
+  </form>
+  <div id="notation-hint" class="notation-search__hint" hidden>
+    Enter: i5 (idea), 5.23 (story), 2609 (sprint)
+  </div>
+  
+  <!-- Autocomplete Results -->
+  <ul class="notation-search__results" role="listbox" hidden></ul>
+</div>
+
