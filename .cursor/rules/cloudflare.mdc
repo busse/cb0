@@ -1,0 +1,146 @@
+---
+description: Cloudflare Pages deployment requirements and constraints
+globs:
+  - "_config.yml"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "_headers"
+  - "_redirects"
+  - "netlify.toml"
+  - "wrangler.toml"
+alwaysApply: false
+---
+
+# Cloudflare Pages Deployment
+
+## Build Configuration
+
+```
+Build command:        bundle exec jekyll build
+Output directory:     _site
+Root directory:       /
+Ruby version:         3.2
+Environment:          JEKYLL_ENV=production
+```
+
+## Allowed Plugins (Static-Compatible Only)
+
+These plugins work with Cloudflare Pages:
+```ruby
+# Gemfile
+group :jekyll_plugins do
+  gem "jekyll-feed", "~> 0.17"
+  gem "jekyll-sitemap", "~> 1.4"
+  gem "jekyll-seo-tag", "~> 2.8"
+  gem "jekyll-redirect-from", "~> 0.16"
+end
+```
+
+## Prohibited
+
+DO NOT use plugins requiring:
+- Server-side Ruby execution at request time
+- External API calls during page requests
+- Dynamic server rendering
+- Database connections
+
+## Custom Logic Constraints
+
+All custom functionality must be:
+- Pure Liquid templates (in `_includes/helpers/`)
+- Client-side JavaScript
+- Build-time data transformations only
+
+NO Ruby plugins, NO custom Liquid tags written in Ruby.
+
+## Required Files
+
+### `_headers`
+```
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+```
+
+### `_redirects` (if needed)
+```
+# Example redirects
+/old-path    /new-path    301
+/ideas/:id   /i/:id       301
+```
+
+## Gemfile Requirements
+
+```ruby
+source "https://rubygems.org"
+
+ruby "~> 3.2"
+
+gem "jekyll", "~> 4.3"
+
+group :jekyll_plugins do
+  gem "jekyll-feed", "~> 0.17"
+  gem "jekyll-sitemap", "~> 1.4"
+  gem "jekyll-seo-tag", "~> 2.8"
+  gem "jekyll-redirect-from", "~> 0.16"
+end
+
+# Required for Ruby 3+
+gem "webrick", "~> 1.8"
+```
+
+Always commit `Gemfile.lock` for reproducible builds.
+
+## URL Handling
+
+Cloudflare Pages is sensitive to trailing slashes. Choose ONE approach:
+
+**Option A: With trailing slashes (recommended for Jekyll)**
+```yaml
+# _config.yml
+permalink: pretty    # Generates /path/index.html → /path/
+```
+
+**Option B: Without trailing slashes**
+```yaml
+# _config.yml
+permalink: /:categories/:title.html
+```
+
+Ensure all internal links match your chosen style.
+
+## Testing Locally
+
+Always test with production environment before deploying:
+
+```bash
+# Clean build
+bundle exec jekyll clean
+
+# Production build (matches Cloudflare)
+JEKYLL_ENV=production bundle exec jekyll build
+
+# Serve locally to verify
+bundle exec jekyll serve --no-watch
+```
+
+## Common Issues
+
+### Build fails with plugin error
+→ Remove the plugin; it's not static-compatible
+
+### 404 on collection pages
+→ Check `output: true` is set for the collection in `_config.yml`
+
+### Assets not loading
+→ Ensure `baseurl` is set correctly (empty string for root domain)
+
+### Redirects not working
+→ `_redirects` must be in root and copied to `_site` during build

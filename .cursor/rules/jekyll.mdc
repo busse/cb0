@@ -1,0 +1,79 @@
+---
+description: Jekyll development guidelines and best practices
+globs:
+  - "**/*.html"
+  - "**/*.md"
+  - "**/*.yml"
+  - "_config.yml"
+  - "_layouts/**"
+  - "_includes/**"
+alwaysApply: true
+---
+
+# Jekyll Development Rules
+
+## Liquid Syntax
+- Use `{%- -%}` and `{{- -}}` for whitespace control in production code
+- Always provide fallbacks: `{{ variable | default: "" }}`
+- Use `assign` for complex operations rather than chained inline filters
+- Wrap collection iterations in `{% if collection.size > 0 %}` checks
+
+## File Organization
+```
+_layouts/       → Page templates (default, idea, story, sprint, etc.)
+_includes/      → Reusable components and partials
+_data/          → YAML/JSON data files
+_ideas/         → Idea collection items
+_stories/       → Story collection items (nested by idea)
+_sprints/       → Sprint collection items
+_updates/       → Update collection items
+assets/css/     → Stylesheets (SCSS)
+assets/js/      → JavaScript files
+pages/          → Static pages
+```
+
+## Front Matter
+- Every content file MUST have valid YAML front matter
+- Use collection defaults in `_config.yml` to reduce repetition
+- Required fields should be validated in layouts
+
+## Includes Best Practices
+- Pass variables explicitly: `{% include card.html item=idea %}`
+- Document expected parameters in a comment at top of include
+- Keep includes focused on single responsibility
+
+## Performance
+- Minimize Liquid loops within loops
+- Use `limit` and `offset` for pagination
+- Cache expensive operations with `{% capture %}` when reused
+
+## Build Commands
+```bash
+# Development
+bundle exec jekyll serve --livereload --drafts
+
+# Production (matches Cloudflare)
+JEKYLL_ENV=production bundle exec jekyll build
+```
+
+## Common Patterns
+
+### Safe iteration over collection
+```liquid
+{%- if site.ideas.size > 0 -%}
+  {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
+  {%- for idea in sorted_ideas -%}
+    {% include idea-card.html idea=idea %}
+  {%- endfor -%}
+{%- endif -%}
+```
+
+### Filtering collection by front matter value
+```liquid
+{%- assign active_ideas = site.ideas | where: "status", "active" -%}
+```
+
+### Getting related items across collections
+```liquid
+{%- assign idea_stories = site.stories | where: "idea_number", page.idea_number | sort: "story_number" -%}
+```

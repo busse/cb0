@@ -1,0 +1,132 @@
+---
+description: Ideas/Stories/Sprints taxonomy system and notation conventions
+globs:
+  - "_ideas/**"
+  - "_stories/**"
+  - "_sprints/**"
+  - "_updates/**"
+  - "_data/notation.yml"
+  - "_data/sprint_calendar.yml"
+  - "_includes/**/notation*"
+  - "_includes/**/idea*"
+  - "_includes/**/story*"
+  - "_includes/**/sprint*"
+alwaysApply: false
+---
+
+# Taxonomy & Notation System
+
+## Notation Reference
+
+| Format | Meaning | Example |
+|--------|---------|---------|
+| `i{n}` | Idea n | i5 = Idea 5 |
+| `s{n}` | Story n | s56 = Story 56 |
+| `{idea}.{story}` | Combined (no prefixes) | 5.56 = Idea 5, Story 56 |
+| `{sprint}.{idea}.{story}` | Full reference | 2609.5.56 |
+
+## Sprint Format: YYSS
+- YY = 2-digit year (e.g., 26 = 2026)
+- SS = Sprint number, 01-26 (each sprint = 2 weeks)
+- Example: 2603 = Year 2026, Sprint 3 (calendar weeks 5-6)
+
+## Reserved Values
+- `i0` = The site itself (meta-idea documenting this system)
+- `s0` = Intent/purpose story for any idea (why the idea exists)
+
+## Collection Relationships
+
+```
+Ideas (i{n})
+  └── Stories (i{n}.s{m})
+        └── Updates ({sprint}.{idea}.{story})
+              └── Sprints ({YYSS})
+```
+
+## Front Matter Requirements
+
+### Ideas (`_ideas/{n}.md`)
+```yaml
+---
+layout: idea
+idea_number: 5          # Required: integer, unique
+title: ""               # Required: string
+description: ""         # Required: string
+status: active          # Required: planned | active | completed | archived
+created: 2025-01-15     # Required: ISO date
+tags: []                # Optional: array of strings
+---
+```
+
+### Stories (`_stories/{idea}/{story}.md`)
+```yaml
+---
+layout: story
+idea_number: 5          # Required: integer, parent idea
+story_number: 56        # Required: integer, unique within idea
+title: ""               # Required: string
+description: ""         # Recommended: user story format
+status: backlog         # Required: backlog | planned | in-progress | done
+priority: medium        # Required: low | medium | high | critical
+created: 2025-01-15     # Required: ISO date
+assigned_sprint:        # Optional: YYSS format (e.g., 2609)
+---
+```
+
+### Sprints (`_sprints/{YYSS}.md`)
+```yaml
+---
+layout: sprint
+sprint_id: 2609         # Required: YYSS format
+year: 2026              # Required: 4-digit year
+sprint_number: 9        # Required: 1-26
+start_date: 2026-04-20  # Required: ISO date
+end_date: 2026-05-03    # Required: ISO date
+status: planned         # Required: planned | active | completed
+goals: []               # Optional: array of strings
+---
+```
+
+### Updates (`_updates/{sprint}-{idea}-{story}.md`)
+```yaml
+---
+layout: update
+sprint_id: 2609         # Required: YYSS format
+idea_number: 5          # Required: integer
+story_number: 56        # Required: integer
+notation: "2609.5.56"   # Required: formatted string
+date: 2026-04-22        # Required: ISO date
+type: progress          # Required: progress | completion | blocker | note
+---
+```
+
+## Implicit Backlog Logic
+
+The backlog is DERIVED, not stored:
+- **Backlog** = Stories where `assigned_sprint` is nil/empty
+- **Planned** = Stories where `assigned_sprint` exists AND `status` != "done"
+- **Done** = Stories where `status` == "done"
+
+When displaying backlog, group by parent idea:
+```liquid
+{%- for idea in site.ideas -%}
+  {%- assign backlog = site.stories | where: "idea_number", idea.idea_number | where: "assigned_sprint", nil -%}
+  {%- if backlog.size > 0 -%}
+    <!-- Render idea group with its backlog stories -->
+  {%- endif -%}
+{%- endfor -%}
+```
+
+## Notation Helper Include
+
+Always use `_includes/helpers/notation-format.html` for consistent formatting:
+```liquid
+{% include helpers/notation-format.html sprint=2609 idea=5 story=56 %}
+<!-- Outputs: 2609.5.56 -->
+
+{% include helpers/notation-format.html idea=5 story=56 %}
+<!-- Outputs: 5.56 -->
+
+{% include helpers/notation-format.html idea=5 %}
+<!-- Outputs: i5 -->
+```
