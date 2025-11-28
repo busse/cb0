@@ -1,0 +1,9 @@
+{%- comment -%}
+  Usage: {% include helpers/updates-for-story.html idea_number=5 story_number=56 %}
+  Sets: story_updates variable
+  Parameters:
+    - idea_number: The idea number
+    - story_number: The story number
+{%- endcomment -%}
+{%- assign story_updates = site.updates | where: "idea_number", include.idea_number | where: "story_number", include.story_number | sort: "date" | reverse -%}
+

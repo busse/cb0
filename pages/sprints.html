@@ -1,0 +1,63 @@
+---
+layout: default
+title: Sprints
+permalink: /sprints/
+---
+
+<!-- UI_SPEC_PLACEHOLDER: Sprint visualization -->
+<div class="sprints-index">
+  <header class="sprints-index__header">
+    <h1>Sprint Calendar</h1>
+    <p class="sprints-index__description">Two-week sprint cycles (26 sprints per year)</p>
+  </header>
+
+  {%- assign sorted_sprints = site.sprints | sort: "sprint_id" | reverse -%}
+  {%- if sorted_sprints.size > 0 -%}
+    <div class="sprints-index__filters">
+      <button class="filter-button filter-button--active" data-filter="all">All ({{ sorted_sprints.size }})</button>
+      {%- assign active = sorted_sprints | where: "status", "active" -%}
+      <button class="filter-button" data-filter="active">Active ({{ active.size }})</button>
+      {%- assign planned = sorted_sprints | where: "status", "planned" -%}
+      <button class="filter-button" data-filter="planned">Planned ({{ planned.size }})</button>
+      {%- assign completed = sorted_sprints | where: "status", "completed" -%}
+      <button class="filter-button" data-filter="completed">Completed ({{ completed.size }})</button>
+    </div>
+
+    <div class="sprint-grid">
+      {%- for sprint in sorted_sprints -%}
+        {% include sprint-card.html sprint=sprint %}
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <p class="sprints-index__empty">No sprints yet. Create your first sprint to get started.</p>
+  {%- endif -%}
+
+  <section class="sprints-index__calendar">
+    <h2>Sprint Calendar Reference</h2>
+    <p>Each sprint is identified by YYSS format (YY = year, SS = sprint number 01-26)</p>
+    <table class="sprint-calendar">
+      <thead>
+        <tr>
+          <th>Sprint</th>
+          <th>Weeks</th>
+          <th>Sprint</th>
+          <th>Weeks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for i in (1..13) -%}
+          {%- assign sprint1 = site.data.sprint_calendar.sprints[i] -%}
+          {%- assign j = i | plus: 13 -%}
+          {%- assign sprint2 = site.data.sprint_calendar.sprints[j] -%}
+          <tr>
+            <td>Sprint {{ i }}</td>
+            <td>Weeks {{ sprint1.weeks[0] }}-{{ sprint1.weeks[1] }}</td>
+            <td>Sprint {{ j }}</td>
+            <td>Weeks {{ sprint2.weeks[0] }}-{{ sprint2.weeks[1] }}</td>
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  </section>
+</div>
+

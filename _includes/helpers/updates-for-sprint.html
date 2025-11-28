@@ -1,0 +1,8 @@
+{%- comment -%}
+  Usage: {% include helpers/updates-for-sprint.html sprint_id=2609 %}
+  Sets: sprint_updates variable
+  Parameters:
+    - sprint_id: The sprint ID (YYSS format) to filter updates by
+{%- endcomment -%}
+{%- assign sprint_updates = site.updates | where: "sprint_id", include.sprint_id | sort: "date" -%}
+

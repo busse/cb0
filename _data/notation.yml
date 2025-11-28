@@ -1,0 +1,28 @@
+formats:
+  idea: "i{n}"
+  story: "s{n}"
+  idea_story: "{idea}.{story}"
+  full: "{sprint}.{idea}.{story}"
+
+examples:
+  - notation: "i5"
+    meaning: "Idea 5"
+  - notation: "s56"
+    meaning: "Story 56"
+  - notation: "5.56"
+    meaning: "Idea 5, Story 56"
+  - notation: "2609.5.56"
+    meaning: "Sprint 2609, Idea 5, Story 56"
+
+special:
+  - notation: "i0"
+    meaning: "The site itself (meta-idea)"
+  - notation: "s0"
+    meaning: "Intent/purpose of parent idea"
+
+sprint_format:
+  pattern: "YYSS"
+  description: "YY = 2-digit year, SS = sprint number (01-26)"
+  example: "2603 = Year 2026, Sprint 3 (weeks 5-6)"
+  duration: "2 weeks per sprint"
+

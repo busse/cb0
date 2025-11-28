@@ -1,0 +1,15 @@
+{%- comment -%}
+  Usage: {% include notation-badge.html sprint=2609 idea=5 story=56 %}
+  Renders a styled notation badge
+  Parameters:
+    - sprint: Sprint ID (optional)
+    - idea: Idea number (optional)
+    - story: Story number (optional)
+    - size: Badge size variant (sm, default, lg)
+{%- endcomment -%}
+{%- assign size_class = include.size | default: "" -%}
+{%- if size_class != "" -%}
+  {%- assign size_class = " notation-badge--" | append: size_class -%}
+{%- endif -%}
+<span class="notation-badge{{ size_class }}">{% include helpers/notation-format.html sprint=include.sprint idea=include.idea story=include.story %}</span>
+

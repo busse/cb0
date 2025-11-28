@@ -1,0 +1,74 @@
+title: "Ideas Array"
+description: "A taxonomy system for tracking Ideas, Stories, and Sprints"
+baseurl: ""
+url: ""
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+
+# Collections
+collections:
+  ideas:
+    output: true
+    permalink: /i/:slug/
+  stories:
+    output: true
+    permalink: /s/:path/
+  sprints:
+    output: true
+    permalink: /sprint/:name/
+  updates:
+    output: true
+    permalink: /updates/:path/
+
+# Collection defaults
+defaults:
+  - scope:
+      path: ""
+      type: "ideas"
+    values:
+      layout: "idea"
+  - scope:
+      path: ""
+      type: "stories"
+    values:
+      layout: "story"
+  - scope:
+      path: ""
+      type: "sprints"
+    values:
+      layout: "sprint"
+  - scope:
+      path: ""
+      type: "updates"
+    values:
+      layout: "update"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-redirect-from
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - Makefile
+  - README.md
+  - .ruby-version
+  - vendor/
+  - .cursor/
+
+# Include files
+include:
+  - _headers
+  - _redirects
+

@@ -1,0 +1,56 @@
+---
+layout: default
+---
+<!-- UI_SPEC_PLACEHOLDER: Story detail page layout -->
+<article class="story-detail">
+  <header class="story-detail__header">
+    <div class="story-detail__notation">
+      {% include notation-badge.html idea=page.idea_number story=page.story_number %}
+    </div>
+    <h1 class="story-detail__title">{{ page.title }}</h1>
+    <div class="story-detail__meta">
+      <span class="story-detail__status" data-status="{{ page.status }}">{{ page.status }}</span>
+      <span class="story-detail__priority" data-priority="{{ page.priority }}">{{ page.priority }} priority</span>
+      {%- if page.assigned_sprint -%}
+        <span class="story-detail__sprint">Sprint: <a href="{{ '/sprint/' | append: page.assigned_sprint | append: '/' | relative_url }}">{{ page.assigned_sprint }}</a></span>
+      {%- else -%}
+        <span class="story-detail__sprint story-detail__sprint--backlog">Backlog</span>
+      {%- endif -%}
+      <time class="story-detail__date" datetime="{{ page.created }}">Created: {{ page.created | date: "%B %d, %Y" }}</time>
+    </div>
+    {%- assign parent_idea = site.ideas | where: "idea_number", page.idea_number | first -%}
+    {%- if parent_idea -%}
+      <p class="story-detail__parent">
+        Part of: <a href="{{ parent_idea.url | relative_url }}">{% include notation-badge.html idea=parent_idea.idea_number %} {{ parent_idea.title }}</a>
+      </p>
+    {%- endif -%}
+  </header>
+
+  <div class="story-detail__content">
+    {%- if page.description -%}
+      <div class="story-detail__description">
+        <h2>Description</h2>
+        <p>{{ page.description }}</p>
+      </div>
+    {%- endif -%}
+    {{ content }}
+  </div>
+
+  {%- include helpers/updates-for-story.html idea_number=page.idea_number story_number=page.story_number -%}
+  {%- if story_updates.size > 0 -%}
+    <section class="story-detail__updates">
+      <h2>Updates ({{ story_updates.size }})</h2>
+      <ul class="update-timeline">
+        {%- for update in story_updates -%}
+          <li class="update-timeline__item">
+            <span class="update-timeline__notation">{% include notation-badge.html sprint=update.sprint_id idea=update.idea_number story=update.story_number size="sm" %}</span>
+            <time class="update-timeline__date" datetime="{{ update.date }}">{{ update.date | date: "%b %d, %Y" }}</time>
+            <span class="update-timeline__type">{{ update.type }}</span>
+            <a href="{{ update.url | relative_url }}" class="update-timeline__link">View update</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </section>
+  {%- endif -%}
+</article>
+

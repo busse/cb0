@@ -1,0 +1,60 @@
+---
+layout: default
+title: Home
+---
+
+<!-- UI_SPEC_PLACEHOLDER: Homepage layout and featured content -->
+<div class="homepage">
+  <section class="homepage__hero">
+    <h1 class="homepage__title">Ideas Array</h1>
+    <p class="homepage__description">A systematic taxonomy for tracking Ideas, Stories, and Sprints</p>
+    <div class="homepage__notation">
+      <p>Navigate by notation: {% include notation-badge.html idea=0 %} {% include notation-badge.html idea=1 %} or browse <a href="{{ '/ideas/' | relative_url }}">all ideas</a></p>
+    </div>
+  </section>
+
+  {%- assign active_sprints = site.sprints | where: "status", "active" | sort: "sprint_id" | reverse -%}
+  {%- if active_sprints.size > 0 -%}
+    <section class="homepage__current-sprint">
+      <h2>Current Sprint</h2>
+      {%- for sprint in active_sprints limit:1 -%}
+        {% include sprint-card.html sprint=sprint %}
+      {%- endfor -%}
+    </section>
+  {%- endif -%}
+
+  {%- assign recent_updates = site.updates | sort: "date" | reverse -%}
+  {%- if recent_updates.size > 0 -%}
+    <section class="homepage__recent-updates">
+      <h2>Recent Updates</h2>
+      <ul class="update-timeline">
+        {%- for update in recent_updates limit:5 -%}
+          <li class="update-timeline__item">
+            <span class="update-timeline__notation">{% include notation-badge.html sprint=update.sprint_id idea=update.idea_number story=update.story_number size="sm" %}</span>
+            <time class="update-timeline__date" datetime="{{ update.date }}">{{ update.date | date: "%b %d, %Y" }}</time>
+            <span class="update-timeline__type">{{ update.type }}</span>
+            <a href="{{ update.url | relative_url }}" class="update-timeline__link">View update</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </section>
+  {%- endif -%}
+
+  {%- assign active_ideas = site.ideas | where: "status", "active" | sort: "idea_number" -%}
+  {%- if active_ideas.size > 0 -%}
+    <section class="homepage__active-ideas">
+      <h2>Active Ideas</h2>
+      <div class="idea-grid">
+        {%- for idea in active_ideas -%}
+          {% include idea-card.html idea=idea %}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  <section class="homepage__getting-started">
+    <h2>Getting Started</h2>
+    <p>New to the notation system? Visit the <a href="{{ '/glossary/' | relative_url }}">glossary</a> to learn how the taxonomy works.</p>
+  </section>
+</div>
+

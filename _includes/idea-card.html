@@ -1,0 +1,29 @@
+{%- comment -%}
+  Card component for displaying an idea in list/grid views
+  Parameters:
+    - idea: The idea object from site.ideas
+{%- endcomment -%}
+{%- assign idea = include.idea -%}
+{%- include helpers/stories-for-idea.html idea_number=idea.idea_number -%}
+{%- assign story_count = stories_list.size -%}
+
+<!-- UI_SPEC_PLACEHOLDER: Idea card styling and layout -->
+<article class="idea-card idea-card--{{ idea.status }}" data-idea="{{ idea.idea_number }}">
+  <header class="idea-card__header">
+    {% include notation-badge.html idea=idea.idea_number %}
+    <h3 class="idea-card__title">
+      <a href="{{ idea.url | relative_url }}">{{ idea.title }}</a>
+    </h3>
+  </header>
+  
+  <div class="idea-card__body">
+    <p class="idea-card__description">{{ idea.description }}</p>
+  </div>
+  
+  <footer class="idea-card__footer">
+    <span class="idea-card__status" data-status="{{ idea.status }}">{{ idea.status }}</span>
+    <span class="idea-card__story-count">{{ story_count }} {% if story_count == 1 %}story{% else %}stories{% endif %}</span>
+    <time class="idea-card__date" datetime="{{ idea.created }}">{{ idea.created | date: "%Y-%m-%d" }}</time>
+  </footer>
+</article>
+

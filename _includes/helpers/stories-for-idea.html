@@ -1,0 +1,8 @@
+{%- comment -%}
+  Usage: {% include helpers/stories-for-idea.html idea_number=5 %}
+  Sets: stories_list variable
+  Parameters:
+    - idea_number: The idea number to filter stories by
+{%- endcomment -%}
+{%- assign stories_list = site.stories | where: "idea_number", include.idea_number | sort: "story_number" -%}
+

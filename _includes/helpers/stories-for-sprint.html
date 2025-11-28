@@ -1,0 +1,8 @@
+{%- comment -%}
+  Usage: {% include helpers/stories-for-sprint.html sprint_id=2609 %}
+  Sets: sprint_stories variable
+  Parameters:
+    - sprint_id: The sprint ID (YYSS format) to filter stories by
+{%- endcomment -%}
+{%- assign sprint_stories = site.stories | where: "assigned_sprint", include.sprint_id | sort: "idea_number" -%}
+

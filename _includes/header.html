@@ -1,0 +1,27 @@
+<!-- UI_SPEC_PLACEHOLDER: Navigation header with Swiss wayfinding design -->
+<header class="site-header">
+  <div class="site-header__container">
+    <div class="site-header__brand">
+      <a href="{{ '/' | relative_url }}" class="site-header__title">{{ site.title | escape }}</a>
+      {% include notation-badge.html idea=0 size="sm" %}
+    </div>
+    
+    <nav class="site-nav" aria-label="Primary navigation">
+      <ul class="site-nav__list">
+        <li class="site-nav__item">
+          <a href="{{ '/ideas/' | relative_url }}" class="site-nav__link">IDEAS</a>
+        </li>
+        <li class="site-nav__item">
+          <a href="{{ '/sprints/' | relative_url }}" class="site-nav__link">SPRINTS</a>
+        </li>
+        <li class="site-nav__item">
+          <a href="{{ '/glossary/' | relative_url }}" class="site-nav__link">GLOSSARY</a>
+        </li>
+        <li class="site-nav__item">
+          <a href="{{ '/blog/' | relative_url }}" class="site-nav__link">BLOG</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
