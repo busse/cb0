@@ -1,0 +1,16 @@
+{
+  "name": "jekyll-ideas-taxonomy",
+  "version": "1.0.0",
+  "description": "Jekyll Ideas Taxonomy System with Playwright MCP support",
+  "private": true,
+  "scripts": {
+    "mcp:playwright": "npx @playwright/mcp@latest"
+  },
+  "devDependencies": {
+    "@playwright/mcp": "latest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

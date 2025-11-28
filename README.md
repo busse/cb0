@@ -38,18 +38,31 @@ This Jekyll site implements a custom taxonomy for project management:
 ### Prerequisites
 - Ruby 3.2+
 - Bundler
+- Node.js 18+ (for Playwright MCP support)
 
 ### Setup
 
 ```bash
-# Install dependencies
+# Install Ruby dependencies
 make install
+
+# Install Node.js dependencies (for Playwright MCP)
+npm install
 
 # Start development server
 make serve
 ```
 
 Visit `http://localhost:4000` to view the site.
+
+### Playwright MCP Setup
+
+This project includes Playwright MCP for browser automation in Cursor. See [`.cursor/MCP_SETUP.md`](.cursor/MCP_SETUP.md) for detailed configuration instructions.
+
+Quick setup:
+1. Open Cursor Settings → MCP → Add new MCP Server
+2. Configure with command: `npm`, args: `run`, `mcp:playwright`
+3. Restart Cursor
 
 ### Available Commands
 
