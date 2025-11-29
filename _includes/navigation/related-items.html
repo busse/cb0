@@ -1,0 +1,117 @@
+<!--
+  Related Items
+  Cross-references for contextual navigation
+  
+  Parameters:
+    - include.idea: current idea object
+    - include.story: current story object
+    - include.sprint: current sprint object
+    - include.limit: max items to show (default: 5)
+-->
+
+{%- assign limit = include.limit | default: 5 -%}
+
+<aside class="related-items" aria-labelledby="related-heading">
+  <h3 id="related-heading" class="related-items__heading">RELATED</h3>
+  
+  <div class="related-items__sections">
+    
+    <!-- If viewing a Story, show sibling stories and parent idea -->
+    {%- if include.story -%}
+      {%- assign siblings = site.stories | where: "idea_number", include.story.idea_number | where_exp: "s", "s.story_number != include.story.story_number" | limit: limit -%}
+      
+      {%- if siblings.size > 0 -%}
+      <div class="related-items__section">
+        <h4 class="related-items__subheading">SAME IDEA</h4>
+        <ul class="related-items__list">
+          {%- for story in siblings -%}
+          <li>
+            <a href="{{ story.url | relative_url }}">
+              <span class="notation-badge notation-badge--sm">{{ story.idea_number }}.{{ story.story_number }}</span>
+              {{ story.title | truncate: 30 }}
+            </a>
+          </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+      {%- endif -%}
+      
+      <!-- Show sprint if assigned -->
+      {%- if include.story.assigned_sprint -%}
+        {%- assign sprint = site.sprints | where: "sprint_id", include.story.assigned_sprint | first -%}
+        {%- if sprint -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">SPRINT</h4>
+          <a href="{{ sprint.url | relative_url }}" class="related-items__sprint-link">
+            <span class="notation-badge">{{ sprint.sprint_id }}</span>
+            <span class="related-items__sprint-dates">
+              {{ sprint.start_date | date: "%b %d" }} – {{ sprint.end_date | date: "%b %d" }}
+            </span>
+          </a>
+        </div>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+    
+    <!-- If viewing an Idea, show related ideas by tag -->
+    {%- if include.idea and include.idea.tags.size > 0 -%}
+      {%- assign related_ideas = "" | split: "" -%}
+      {%- for tag in include.idea.tags -%}
+        {%- assign tagged = site.ideas | where_exp: "i", "i.tags contains tag" | where_exp: "i", "i.idea_number != include.idea.idea_number" -%}
+        {%- assign related_ideas = related_ideas | concat: tagged -%}
+      {%- endfor -%}
+      {%- assign related_ideas = related_ideas | uniq | limit: limit -%}
+      
+      {%- if related_ideas.size > 0 -%}
+      <div class="related-items__section">
+        <h4 class="related-items__subheading">RELATED IDEAS</h4>
+        <ul class="related-items__list">
+          {%- for idea in related_ideas -%}
+          <li>
+            <a href="{{ idea.url | relative_url }}">
+              {% include notation-badge.html idea=idea.idea_number size="sm" %}
+              {{ idea.title | truncate: 30 }}
+            </a>
+          </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+      {%- endif -%}
+    {%- endif -%}
+    
+    <!-- If viewing a Sprint, show adjacent sprints -->
+    {%- if include.sprint -%}
+      {%- assign all_sprints = site.sprints | sort: "sprint_id" -%}
+      {%- assign prev_sprint = nil -%}
+      {%- assign next_sprint = nil -%}
+      {%- for s in all_sprints -%}
+        {%- if s.sprint_id == include.sprint.sprint_id -%}
+          {%- assign current_index = forloop.index0 -%}
+          {%- if forloop.index > 1 -%}
+            {%- assign prev_index = current_index | minus: 1 -%}
+            {%- assign prev_sprint = all_sprints[prev_index] -%}
+          {%- endif -%}
+          {%- unless forloop.last -%}
+            {%- assign next_index = current_index | plus: 1 -%}
+            {%- assign next_sprint = all_sprints[next_index] -%}
+          {%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+      
+      <div class="related-items__section related-items__section--nav">
+        {%- if prev_sprint -%}
+        <a href="{{ prev_sprint.url | relative_url }}" class="related-items__nav-link related-items__nav-link--prev">
+          ← <span class="notation-badge notation-badge--sm">{{ prev_sprint.sprint_id }}</span>
+        </a>
+        {%- endif -%}
+        {%- if next_sprint -%}
+        <a href="{{ next_sprint.url | relative_url }}" class="related-items__nav-link related-items__nav-link--next">
+          <span class="notation-badge notation-badge--sm">{{ next_sprint.sprint_id }}</span> →
+        </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    
+  </div>
+</aside>
+

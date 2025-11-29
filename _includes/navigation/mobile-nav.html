@@ -1,0 +1,52 @@
+<!--
+  Mobile Navigation
+  Full-screen overlay menu for mobile devices
+-->
+
+<div id="mobile-nav" class="mobile-nav" hidden>
+  <div class="mobile-nav__header">
+    {% include notation-badge.html idea=0 %}
+    <button class="mobile-nav__close" aria-label="Close menu">×</button>
+  </div>
+  
+  <nav class="mobile-nav__primary" role="navigation">
+    <ul class="mobile-nav__list">
+      <li>
+        <a href="{{ '/ideas/' | relative_url }}" class="mobile-nav__link">
+          IDEAS
+          <span class="mobile-nav__count">{{ site.ideas | size }}</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ '/sprints/' | relative_url }}" class="mobile-nav__link">
+          SPRINTS
+        </a>
+      </li>
+      <li>
+        <a href="{{ '/backlog/' | relative_url }}" class="mobile-nav__link">
+          BACKLOG
+          {%- assign backlog_count = site.stories | where: "assigned_sprint", nil | size -%}
+          <span class="mobile-nav__count">{{ backlog_count }}</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ '/timeline/' | relative_url }}" class="mobile-nav__link">
+          TIMELINE
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="mobile-nav__search">
+    {% include navigation/notation-search.html %}
+  </div>
+  
+  <nav class="mobile-nav__secondary">
+    <ul class="mobile-nav__list mobile-nav__list--secondary">
+      <li><a href="{{ '/glossary/' | relative_url }}">Glossary</a></li>
+      <li><a href="{{ '/blog/' | relative_url }}">Articles</a></li>
+      <li><a href="{{ '/i/0/' | relative_url }}">About (i0)</a></li>
+    </ul>
+  </nav>
+</div>
+

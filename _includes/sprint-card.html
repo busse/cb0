@@ -7,7 +7,9 @@
 {%- include helpers/stories-for-sprint.html sprint_id=sprint.sprint_id -%}
 {%- assign story_count = sprint_stories.size -%}
 
-<article class="sprint-card sprint-card--{{ sprint.status }}" data-sprint="{{ sprint.sprint_id }}">
+<article class="sprint-card sprint-card--{{ sprint.status }}" 
+         data-sprint="{{ sprint.sprint_id }}"
+         data-status="{{ sprint.status }}">
   <header class="sprint-card__header">
     {% include notation-badge.html sprint=sprint.sprint_id size="lg" %}
     <span class="status-indicator status-indicator--{{ sprint.status }}">{{ sprint.status | upcase }}</span>

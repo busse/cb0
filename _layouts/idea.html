@@ -2,6 +2,8 @@
 layout: default
 ---
 <main class="page-idea container">
+  {% include navigation/breadcrumbs.html %}
+  
   <section class="header-region">
     <div class="header-primary">
       <header class="idea-header">
@@ -30,6 +32,8 @@ layout: default
     </div>
     
     <aside class="header-sidebar">
+      {% include navigation/related-items.html idea=page %}
+      
       <h2 class="sidebar-heading">ARTICLES</h2>
       {%- if site.posts.size > 0 -%}
         <div class="article-list">

@@ -1,16 +1,2 @@
-<nav class="nav-bar" role="navigation" aria-label="Primary navigation">
-  <div class="nav-container">
-    <a href="{{ '/' | relative_url }}" class="nav-brand">
-      {% include notation-badge.html idea=0 %}
-      <span class="nav-site-name">{{ site.title | upcase }}</span>
-    </a>
-    
-    <ul class="nav-links">
-      <li><a href="{{ '/ideas/' | relative_url }}" class="nav-link">IDEAS</a></li>
-      <li><a href="{{ '/sprints/' | relative_url }}" class="nav-link">SPRINTS</a></li>
-      <li><a href="{{ '/backlog/' | relative_url }}" class="nav-link">BACKLOG</a></li>
-      <li><a href="{{ '/glossary/' | relative_url }}" class="nav-link">GLOSSARY</a></li>
-    </ul>
-  </div>
-</nav>
+{%- include navigation/primary-nav.html -%}
 

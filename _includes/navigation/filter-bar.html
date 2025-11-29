@@ -1,0 +1,95 @@
+<!--
+  Filter Bar
+  Client-side filtering for collections
+  
+  Parameters:
+    - include.collection: "ideas" | "stories" | "sprints"
+    - include.show_status: boolean (default: true)
+    - include.show_priority: boolean (default: false)
+    - include.show_sprint: boolean (default: false)
+    - include.total: total count of items (optional)
+-->
+
+<div class="filter-bar" data-filter-collection="{{ include.collection }}">
+  
+  <div class="filter-bar__group">
+    <span class="filter-bar__label">FILTER:</span>
+    
+    <!-- Status Filter (always for ideas/stories) -->
+    {%- if include.show_status != false -%}
+    <div class="filter-bar__dropdown">
+      <button class="filter-bar__trigger" 
+              aria-expanded="false"
+              aria-haspopup="listbox"
+              data-filter-type="status">
+        STATUS <span class="filter-bar__caret">▼</span>
+      </button>
+      <ul class="filter-bar__options" role="listbox" hidden>
+        <li role="option" data-value="all" class="is-selected">All</li>
+        <li role="option" data-value="active">Active</li>
+        <li role="option" data-value="planned">Planned</li>
+        <li role="option" data-value="in-progress">In Progress</li>
+        <li role="option" data-value="completed">Completed</li>
+        <li role="option" data-value="archived">Archived</li>
+      </ul>
+    </div>
+    {%- endif -%}
+    
+    <!-- Priority Filter (stories only) -->
+    {%- if include.show_priority -%}
+    <div class="filter-bar__dropdown">
+      <button class="filter-bar__trigger"
+              aria-expanded="false"
+              aria-haspopup="listbox"
+              data-filter-type="priority">
+        PRIORITY <span class="filter-bar__caret">▼</span>
+      </button>
+      <ul class="filter-bar__options" role="listbox" hidden>
+        <li role="option" data-value="all" class="is-selected">All</li>
+        <li role="option" data-value="critical">Critical</li>
+        <li role="option" data-value="high">High</li>
+        <li role="option" data-value="medium">Medium</li>
+        <li role="option" data-value="low">Low</li>
+      </ul>
+    </div>
+    {%- endif -%}
+    
+    <!-- Sprint Filter -->
+    {%- if include.show_sprint -%}
+    <div class="filter-bar__dropdown">
+      <button class="filter-bar__trigger"
+              aria-expanded="false"
+              aria-haspopup="listbox"
+              data-filter-type="sprint">
+        SPRINT <span class="filter-bar__caret">▼</span>
+      </button>
+      <ul class="filter-bar__options" role="listbox" hidden>
+        <li role="option" data-value="all" class="is-selected">All</li>
+        <li role="option" data-value="unassigned">Unassigned</li>
+        <li role="option" data-value="current">Current Sprint</li>
+        {%- assign sprints = site.sprints | sort: "sprint_id" | reverse -%}
+        {%- for sprint in sprints limit: 6 -%}
+        <li role="option" data-value="{{ sprint.sprint_id }}">{{ sprint.sprint_id }}</li>
+        {%- endfor -%}
+      </ul>
+    </div>
+    {%- endif -%}
+    
+  </div>
+  
+  <!-- Active Filters Display -->
+  <div class="filter-bar__active" hidden>
+    <span class="filter-bar__active-label">Active:</span>
+    <ul class="filter-bar__tags"></ul>
+    <button class="filter-bar__clear" type="button">CLEAR ALL</button>
+  </div>
+  
+  <!-- Results Count -->
+  <div class="filter-bar__results">
+    <span class="filter-bar__count" data-total="{{ include.total | default: 0 }}">
+      Showing <strong data-visible-count>all</strong> items
+    </span>
+  </div>
+  
+</div>
+

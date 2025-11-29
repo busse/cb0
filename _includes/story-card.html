@@ -5,7 +5,12 @@
 {%- endcomment -%}
 {%- assign story = include.story -%}
 
-<article class="story-card story-card--{{ story.status }}" data-priority="{{ story.priority }}" data-story="{{ story.idea_number }}.{{ story.story_number }}">
+<article class="story-card story-card--{{ story.status }}" 
+         data-story="{{ story.idea_number }}.{{ story.story_number }}"
+         data-status="{{ story.status }}"
+         data-priority="{{ story.priority }}"
+         data-sprint="{{ story.assigned_sprint }}"
+         data-idea="{{ story.idea_number }}">
   <header class="story-card__header">
     {% include notation-badge.html idea=story.idea_number story=story.story_number size="sm" %}
     <span class="priority-indicator priority-indicator--{{ story.priority }}">{{ story.priority | upcase }}</span>

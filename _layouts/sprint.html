@@ -3,6 +3,8 @@ layout: default
 ---
 <main class="page-sprint-board">
   <div class="container">
+    {% include navigation/breadcrumbs.html %}
+    
     <header class="sprint-board__header">
       <div class="sprint-board__title">
         {% include notation-badge.html sprint=page.sprint_id size="lg" %}
@@ -99,6 +101,8 @@ layout: default
         </ul>
       </section>
     {%- endif -%}
+    
+    {% include navigation/related-items.html sprint=page %}
   </div>
 </main>
 

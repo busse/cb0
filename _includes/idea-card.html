@@ -7,7 +7,9 @@
 {%- include helpers/stories-for-idea.html idea_number=idea.idea_number -%}
 {%- assign story_count = stories_list.size -%}
 
-<article class="idea-card idea-card--{{ idea.status }}" data-idea="{{ idea.idea_number }}">
+<article class="idea-card idea-card--{{ idea.status }}" 
+         data-idea="{{ idea.idea_number }}"
+         data-status="{{ idea.status }}">
   <header class="idea-card__header">
     {% include notation-badge.html idea=idea.idea_number %}
     <span class="status-indicator status-indicator--{{ idea.status }}">{{ idea.status | upcase }}</span>

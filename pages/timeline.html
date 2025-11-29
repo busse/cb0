@@ -1,0 +1,78 @@
+---
+layout: default
+title: Timeline
+permalink: /timeline/
+---
+
+<main class="page-timeline">
+  <section class="header-region">
+    <div class="header-primary">
+      <h1 class="page-title">TIMELINE</h1>
+      <p class="page-description">
+        Chronological view of all activity across ideas, stories, and sprints.
+      </p>
+      
+      {% include navigation/filter-bar.html 
+         collection="updates" 
+         show_status=false
+         show_sprint=true %}
+    </div>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">SPRINTS</h2>
+      {%- assign recent_sprints = site.sprints | sort: "sprint_id" | reverse | limit: 10 -%}
+      <ul class="sprint-list">
+        {%- for sprint in recent_sprints -%}
+        <li>
+          <a href="{{ sprint.url | relative_url }}" class="sprint-list__link">
+            <span class="notation-badge notation-badge--sm">{{ sprint.sprint_id }}</span>
+            <span class="sprint-list__dates">{{ sprint.start_date | date: "%b %d" }} – {{ sprint.end_date | date: "%b %d" }}</span>
+          </a>
+        </li>
+        {%- endfor -%}
+      </ul>
+    </aside>
+  </section>
+  
+  <section class="timeline">
+    {%- assign updates = site.updates | sort: "date" | reverse -%}
+    {%- assign current_month = "" -%}
+    
+    {%- for update in updates -%}
+      {%- assign update_month = update.date | date: "%Y-%m" -%}
+      
+      {%- if update_month != current_month -%}
+        {%- if current_month != "" -%}</div>{%- endif -%}
+        <div class="timeline__month" data-month="{{ update_month }}">
+          <h2 class="timeline__month-heading">{{ update.date | date: "%B %Y" }}</h2>
+        {%- assign current_month = update_month -%}
+      {%- endif -%}
+      
+      <article class="timeline__item" 
+               data-type="{{ update.type }}"
+               data-sprint="{{ update.sprint_id }}"
+               data-idea="{{ update.idea_number }}">
+        <div class="timeline__marker"></div>
+        <div class="timeline__content">
+          <header class="timeline__header">
+            <span class="notation-badge">{{ update.notation }}</span>
+            <time datetime="{{ update.date | date_to_xmlschema }}">
+              {{ update.date | date: "%b %d" }}
+            </time>
+            <span class="status-indicator status-indicator--{{ update.type }}">
+              {{ update.type | upcase }}
+            </span>
+          </header>
+          <div class="timeline__body">
+            {{ update.content | markdownify | truncatewords: 30 }}
+          </div>
+          <a href="{{ update.url | relative_url }}" class="timeline__link">View details →</a>
+        </div>
+      </article>
+      
+    {%- endfor -%}
+    
+    {%- if current_month != "" -%}</div>{%- endif -%}
+  </section>
+</main>
+
