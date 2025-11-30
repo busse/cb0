@@ -4,41 +4,121 @@
 .notation-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 6px;
+  padding: 4px 12px;
   background: var(--color-notation-bg);
   color: var(--color-notation-text);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   border-radius: var(--radius-sm);
   white-space: nowrap;
   vertical-align: middle;
+  text-transform: uppercase;
+  box-shadow: 0 10px 25px rgba(32, 29, 63, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.notation-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(32, 29, 63, 0.3);
 }
 
 .notation-badge--lg {
-  padding: 4px 10px;
+  padding: 6px 14px;
   font-size: var(--text-base);
 }
 
 .notation-badge--sm {
-  padding: 1px 4px;
+  padding: 2px 6px;
   font-size: var(--text-xs);
+}
+
+/* Contextual badge colors */
+.idea-card .notation-badge,
+.idea-detail__notation .notation-badge,
+.idea-header .notation-badge {
+  background: var(--color-badge-idea-bg);
+  color: var(--color-badge-idea-text);
+  box-shadow: none;
+}
+
+.story-card .notation-badge,
+.story-detail__notation .notation-badge,
+.story-header .notation-badge {
+  background: var(--color-badge-story-bg);
+  color: var(--color-badge-story-text);
+  box-shadow: none;
+}
+
+.sprint-card .notation-badge,
+.sprint-detail__notation .notation-badge,
+.sprint-header .notation-badge {
+  background: var(--color-badge-sprint-bg);
+  color: var(--color-badge-sprint-text);
+  box-shadow: none;
+}
+
+.update-timeline__notation .notation-badge,
+.update-detail__notation .notation-badge {
+  background: var(--color-badge-update-bg);
+  color: var(--color-badge-update-text);
+  box-shadow: none;
+}
+
+/* Status-aware badge hues */
+[data-status="active"] .notation-badge,
+[data-status="in-progress"] .notation-badge {
+  background: var(--color-badge-in-progress-bg);
+  color: var(--color-badge-in-progress-text);
+}
+
+[data-status="planned"] .notation-badge {
+  background: var(--color-badge-planned-bg);
+  color: var(--color-badge-planned-text);
+}
+
+[data-status="complete"] .notation-badge,
+[data-status="completed"] .notation-badge,
+[data-status="done"] .notation-badge {
+  background: var(--color-badge-complete-bg);
+  color: var(--color-badge-complete-text);
+}
+
+[data-status="blocked"] .notation-badge {
+  background: var(--color-badge-blocked-bg);
+  color: var(--color-badge-blocked-text);
+}
+
+[data-status="backlog"] .notation-badge {
+  background: var(--color-badge-backlog-bg);
+  color: var(--color-badge-backlog-text);
+}
+
+[data-status="archived"] .notation-badge {
+  background: var(--color-badge-archived-bg);
+  color: var(--color-badge-archived-text);
 }
 
 // Status Indicator
 .status-indicator {
+  --status-chip-bg: rgba(227, 226, 244, 0.4);
+  --status-chip-text: var(--color-chip-neutral-text);
+  --status-chip-dot: var(--color-chip-neutral-text);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 6px;
+  gap: 6px;
+  padding: 4px 14px;
   font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
+  border-radius: 999px;
+  background: var(--status-chip-bg);
+  color: var(--status-chip-text);
   white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .status-indicator::before {
@@ -47,36 +127,46 @@
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: var(--status-chip-dot);
 }
 
-.status-indicator--active::before {
-  background: var(--color-status-active);
+.status-indicator--active,
+.status-indicator--in-progress {
+  --status-chip-bg: var(--color-badge-in-progress-bg);
+  --status-chip-text: var(--color-badge-in-progress-text);
+  --status-chip-dot: var(--color-status-active);
 }
 
-.status-indicator--planned::before {
-  background: var(--color-status-planned);
+.status-indicator--planned {
+  --status-chip-bg: var(--color-badge-planned-bg);
+  --status-chip-text: var(--color-badge-planned-text);
+  --status-chip-dot: var(--color-status-planned);
 }
 
-.status-indicator--complete::before,
-.status-indicator--completed::before,
-.status-indicator--done::before {
-  background: var(--color-status-complete);
+.status-indicator--backlog {
+  --status-chip-bg: var(--color-badge-backlog-bg);
+  --status-chip-text: var(--color-badge-backlog-text);
+  --status-chip-dot: var(--color-status-planned);
 }
 
-.status-indicator--blocked::before {
-  background: var(--color-status-blocked);
+.status-indicator--complete,
+.status-indicator--completed,
+.status-indicator--done {
+  --status-chip-bg: var(--color-badge-complete-bg);
+  --status-chip-text: var(--color-badge-complete-text);
+  --status-chip-dot: var(--color-status-complete);
 }
 
-.status-indicator--archived::before {
-  background: var(--color-status-archived);
+.status-indicator--blocked {
+  --status-chip-bg: var(--color-badge-blocked-bg);
+  --status-chip-text: var(--color-badge-blocked-text);
+  --status-chip-dot: var(--color-status-blocked);
 }
 
-.status-indicator--backlog::before {
-  background: var(--color-text-secondary);
-}
-
-.status-indicator--in-progress::before {
-  background: var(--color-status-active);
+.status-indicator--archived {
+  --status-chip-bg: var(--color-badge-archived-bg);
+  --status-chip-text: var(--color-badge-archived-text);
+  --status-chip-dot: var(--color-status-archived);
 }
 
 // Priority Indicator
@@ -92,11 +182,11 @@
 }
 
 .priority-indicator--high {
-  color: #E65100;
+  color: var(--color-status-planned);
 }
 
 .priority-indicator--medium {
-  color: var(--color-text-secondary);
+  color: var(--color-chip-neutral-text);
 }
 
 .priority-indicator--low {

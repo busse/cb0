@@ -23,7 +23,9 @@ body {
   font-size: var(--text-base);
   color: var(--color-text-primary);
   background-color: var(--color-background);
-  padding-top: var(--nav-height);
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + var(--spacing-xl));
+  transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 img,
