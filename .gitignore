@@ -8,6 +8,9 @@ _site/
 vendor/
 .bundle/
 
+# Node
+node_modules/
+
 # macOS
 .DS_Store
 
@@ -19,4 +22,15 @@ vendor/
 
 # Environment
 .env
+
+# Electron
+electron/dist/
+electron/out/
+electron/node_modules/
+electron/.vite/
+*.log
+
+# Playwright test artifacts
+electron/test-results/
+electron/playwright-report/
 

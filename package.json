@@ -1,10 +1,19 @@
 {
-  "name": "jekyll-ideas-taxonomy",
+  "name": "ideas-taxonomy",
   "version": "1.0.0",
-  "description": "Jekyll Ideas Taxonomy System with Playwright MCP support",
+  "description": "Jekyll Ideas Taxonomy System with Electron CMS",
   "private": true,
+  "workspaces": [
+    "electron"
+  ],
   "scripts": {
-    "mcp:playwright": "npx @playwright/mcp@latest"
+    "mcp:playwright": "npx @playwright/mcp@latest",
+    "electron:dev": "npm run dev --workspace=electron",
+    "electron:build": "npm run build --workspace=electron",
+    "electron:dist": "npm run dist --workspace=electron",
+    "test:electron": "cd electron && npx playwright test tests/playwright-mcp",
+    "test:electron:ui": "cd electron && npx playwright test tests/playwright-mcp --ui",
+    "test:electron:debug": "cd electron && npx playwright test tests/playwright-mcp --debug"
   },
   "devDependencies": {
     "@playwright/mcp": "latest"

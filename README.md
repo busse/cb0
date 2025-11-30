@@ -104,9 +104,32 @@ Only static-compatible plugins are used:
 
 No server-side Ruby execution required.
 
+## Electron CMS App
+
+This repository includes an Electron desktop application for managing Ideas, Stories, and Sprints with a graphical interface.
+
+### Setup
+
+```bash
+# Install dependencies (includes Electron workspace)
+npm install
+```
+
+### Running the CMS
+
+```bash
+# Development mode
+npm run electron:dev
+
+# Build distributable
+npm run electron:dist
+```
+
+See [`electron/README.md`](electron/README.md) for detailed documentation.
+
 ## Content Management
 
-### Creating Ideas
+### Creating Ideas (Manual)
 
 ```bash
 make new-idea
