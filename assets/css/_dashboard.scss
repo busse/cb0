@@ -1,0 +1,530 @@
+// Dashboard Styles
+
+// Dashboard Summary Stats
+.dashboard-summary {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-lg);
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  min-width: 120px;
+}
+
+.summary-stat--highlight {
+  background: var(--color-badge-complete-bg);
+  border-color: var(--color-status-complete);
+}
+
+.summary-stat__value {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.summary-stat__label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+// Quick Stats (sidebar)
+.quick-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.quick-stats li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.quick-stats li:last-child {
+  border-bottom: none;
+}
+
+.quick-stats__label {
+  color: var(--color-text-secondary);
+}
+
+.quick-stats__value {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+// Progress Overview
+.progress-overview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+// Stacked Progress Bar
+.progress-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.progress-bar-stacked {
+  display: flex;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+}
+
+.progress-bar-stacked__segment {
+  height: 100%;
+  transition: width var(--transition-base);
+  min-width: 2px;
+}
+
+.progress-bar-stacked__segment--complete {
+  background: var(--color-status-complete);
+}
+
+.progress-bar-stacked__segment--active {
+  background: var(--color-status-active);
+}
+
+.progress-bar-stacked__segment--planned {
+  background: var(--color-status-planned);
+}
+
+.progress-bar-stacked__segment--blocked {
+  background: var(--color-status-blocked);
+}
+
+.progress-bar-stacked__segment--archived {
+  background: var(--color-status-archived);
+}
+
+.progress-bar-stacked__segment--backlog {
+  background: var(--color-text-secondary);
+}
+
+// Progress Legend
+.progress-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-item--complete .legend-dot {
+  background: var(--color-status-complete);
+}
+
+.legend-item--active .legend-dot {
+  background: var(--color-status-active);
+}
+
+.legend-item--planned .legend-dot {
+  background: var(--color-status-planned);
+}
+
+.legend-item--blocked .legend-dot {
+  background: var(--color-status-blocked);
+}
+
+.legend-item--archived .legend-dot {
+  background: var(--color-status-archived);
+}
+
+.legend-item--backlog .legend-dot {
+  background: var(--color-text-secondary);
+}
+
+// Progress Grid (Idea cards)
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+// Progress Card
+.progress-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--color-text-secondary);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.progress-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--color-shadow-soft);
+}
+
+.progress-card--active {
+  border-left-color: var(--color-status-active);
+}
+
+.progress-card--completed,
+.progress-card--complete {
+  border-left-color: var(--color-status-complete);
+}
+
+.progress-card--planned {
+  border-left-color: var(--color-status-planned);
+}
+
+.progress-card--archived {
+  border-left-color: var(--color-status-archived);
+}
+
+.progress-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-card__title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-card__bar {
+  height: 8px;
+  background: var(--color-surface-muted);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: var(--spacing-sm) 0;
+}
+
+.progress-card__fill {
+  height: 100%;
+  background: var(--color-status-complete);
+  border-radius: 4px;
+  transition: width var(--transition-base);
+}
+
+.progress-card__footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.progress-card__pct {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+// Progress Subheading
+.progress-subheading {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+// Priority Grid
+.progress-by-priority {
+  margin-top: var(--spacing-md);
+}
+
+.priority-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.priority-card {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  text-align: center;
+  border-top: 4px solid var(--color-text-secondary);
+}
+
+.priority-card--critical {
+  border-top-color: var(--color-status-blocked);
+  background: var(--color-badge-blocked-bg);
+}
+
+.priority-card--high {
+  border-top-color: var(--color-status-planned);
+  background: var(--color-badge-planned-bg);
+}
+
+.priority-card--medium {
+  border-top-color: var(--color-status-active);
+  background: var(--color-badge-active-bg);
+}
+
+.priority-card--low {
+  border-top-color: var(--color-status-archived);
+  background: var(--color-surface-alt);
+}
+
+.priority-card__label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.priority-card__count {
+  display: block;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.priority-card__done {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+// Sprint Progress Grid
+.sprint-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+// Sprint Progress Card
+.sprint-progress-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  border-top: 5px solid var(--color-status-planned);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sprint-progress-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--color-shadow-soft);
+}
+
+.sprint-progress-card--active {
+  border-top-color: var(--color-status-active);
+}
+
+.sprint-progress-card--completed,
+.sprint-progress-card--complete {
+  border-top-color: var(--color-status-complete);
+}
+
+.sprint-progress-card--planned {
+  border-top-color: var(--color-status-planned);
+}
+
+.sprint-progress-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.sprint-progress-card__dates {
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.sprint-progress-card__bar {
+  height: 10px;
+  background: var(--color-surface-muted);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.sprint-progress-card__fill {
+  height: 100%;
+  background: var(--color-status-complete);
+  border-radius: 5px;
+  transition: width var(--transition-base);
+}
+
+.sprint-progress-card__footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.sprint-progress-card__pct {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+// Projection Cards
+.projection-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.projection-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+}
+
+.projection-card--highlight {
+  background: var(--color-badge-complete-bg);
+  border-color: var(--color-status-complete);
+}
+
+.projection-card__icon {
+  font-size: var(--text-xl);
+}
+
+.projection-card__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.projection-card__value {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.projection-card__label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+// Upcoming Sprints
+.upcoming-sprints {
+  margin-top: var(--spacing-md);
+}
+
+.upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.upcoming-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--color-status-planned);
+}
+
+.upcoming-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.upcoming-card__dates {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+}
+
+.upcoming-card__stories {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.upcoming-card__goals {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  padding-left: var(--spacing-md);
+  margin: 0;
+}
+
+.upcoming-card__goals li {
+  margin-bottom: 4px;
+}
+
+.upcoming-empty {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .priority-grid,
+  .projection-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-summary {
+    flex-direction: column;
+  }
+  
+  .summary-stat {
+    min-width: 100%;
+  }
+  
+  .priority-grid,
+  .projection-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-grid,
+  .sprint-progress-grid,
+  .upcoming-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,363 @@
+---
+layout: default
+title: Dashboard
+permalink: /dashboard/
+---
+
+<main class="page-dashboard container">
+  <section class="header-region">
+    <div class="header-primary">
+      <h1 class="page-title">DASHBOARD</h1>
+      <p class="page-description">
+        Visual progress overview of Ideas, Stories, and Sprints.
+      </p>
+      
+      {%- comment -%} Calculate totals for summary stats {%- endcomment -%}
+      {%- assign total_ideas = site.ideas | size -%}
+      {%- assign active_ideas = site.ideas | where: "status", "active" | size -%}
+      {%- assign completed_ideas = site.ideas | where: "status", "completed" | size -%}
+      
+      {%- assign total_stories = site.stories | size -%}
+      {%- assign done_stories = site.stories | where: "status", "done" | size -%}
+      {%- assign in_progress_stories = site.stories | where: "status", "in_progress" | size -%}
+      {%- assign in_progress_stories_alt = site.stories | where: "status", "in-progress" | size -%}
+      {%- assign in_progress_stories = in_progress_stories | plus: in_progress_stories_alt -%}
+      {%- assign backlog_stories = site.stories | where: "status", "backlog" | size -%}
+      
+      {%- assign total_sprints = site.sprints | size -%}
+      {%- assign active_sprints = site.sprints | where: "status", "active" | size -%}
+      {%- assign completed_sprints = site.sprints | where: "status", "completed" | size -%}
+      
+      <div class="dashboard-summary">
+        <div class="summary-stat">
+          <span class="summary-stat__value">{{ total_ideas }}</span>
+          <span class="summary-stat__label">IDEAS</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat__value">{{ total_stories }}</span>
+          <span class="summary-stat__label">STORIES</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat__value">{{ total_sprints }}</span>
+          <span class="summary-stat__label">SPRINTS</span>
+        </div>
+        <div class="summary-stat summary-stat--highlight">
+          <span class="summary-stat__value">{{ done_stories }}</span>
+          <span class="summary-stat__label">COMPLETED</span>
+        </div>
+      </div>
+    </div>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">QUICK STATS</h2>
+      <ul class="quick-stats">
+        <li><span class="quick-stats__label">Active Ideas:</span> <span class="quick-stats__value">{{ active_ideas }}</span></li>
+        <li><span class="quick-stats__label">In Progress:</span> <span class="quick-stats__value">{{ in_progress_stories }}</span></li>
+        <li><span class="quick-stats__label">Active Sprints:</span> <span class="quick-stats__value">{{ active_sprints }}</span></li>
+        <li><span class="quick-stats__label">Backlog:</span> <span class="quick-stats__value">{{ backlog_stories }}</span></li>
+      </ul>
+    </aside>
+  </section>
+  
+  {%- comment -%} IDEAS PROGRESS SECTION {%- endcomment -%}
+  <section class="content-section">
+    <header class="section-header">
+      <h2 class="section-title">IDEAS PROGRESS</h2>
+      <a href="{{ '/ideas/' | relative_url }}" class="section-link">VIEW ALL →</a>
+    </header>
+    
+    <div class="progress-overview">
+      {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
+      
+      {%- comment -%} Progress bar showing idea status distribution {%- endcomment -%}
+      <div class="progress-distribution">
+        <div class="progress-bar-stacked">
+          {%- if total_ideas > 0 -%}
+            {%- assign completed_pct = completed_ideas | times: 100.0 | divided_by: total_ideas -%}
+            {%- assign active_pct = active_ideas | times: 100.0 | divided_by: total_ideas -%}
+            {%- assign planned_ideas = site.ideas | where: "status", "planned" | size -%}
+            {%- assign planned_pct = planned_ideas | times: 100.0 | divided_by: total_ideas -%}
+            {%- assign archived_ideas = site.ideas | where: "status", "archived" | size -%}
+            {%- assign archived_pct = archived_ideas | times: 100.0 | divided_by: total_ideas -%}
+          {%- else -%}
+            {%- assign completed_pct = 0 -%}
+            {%- assign active_pct = 0 -%}
+            {%- assign planned_ideas = 0 -%}
+            {%- assign planned_pct = 0 -%}
+            {%- assign archived_ideas = 0 -%}
+            {%- assign archived_pct = 0 -%}
+          {%- endif -%}
+          
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ completed_pct }}%;" title="Completed: {{ completed_ideas }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ active_pct }}%;" title="Active: {{ active_ideas }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--planned" style="width: {{ planned_pct }}%;" title="Planned: {{ planned_ideas }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--archived" style="width: {{ archived_pct }}%;" title="Archived: {{ archived_ideas }}"></div>
+        </div>
+        <div class="progress-legend">
+          <span class="legend-item legend-item--complete"><span class="legend-dot"></span>Complete ({{ completed_ideas }})</span>
+          <span class="legend-item legend-item--active"><span class="legend-dot"></span>Active ({{ active_ideas }})</span>
+          <span class="legend-item legend-item--planned"><span class="legend-dot"></span>Planned ({{ planned_ideas }})</span>
+          <span class="legend-item legend-item--archived"><span class="legend-dot"></span>Archived ({{ archived_ideas }})</span>
+        </div>
+      </div>
+      
+      {%- comment -%} Individual idea progress cards {%- endcomment -%}
+      <div class="progress-grid">
+        {%- for idea in sorted_ideas -%}
+          {%- include helpers/stories-for-idea.html idea_number=idea.idea_number -%}
+          {%- assign idea_stories = stories_list -%}
+          {%- assign idea_story_count = idea_stories | size -%}
+          {%- assign idea_done = idea_stories | where: "status", "done" | size -%}
+          {%- if idea_story_count > 0 -%}
+            {%- assign idea_progress = idea_done | times: 100.0 | divided_by: idea_story_count -%}
+          {%- else -%}
+            {%- assign idea_progress = 0 -%}
+          {%- endif -%}
+          
+          <div class="progress-card progress-card--{{ idea.status }}">
+            <header class="progress-card__header">
+              {% include notation-badge.html idea=idea.idea_number size="sm" %}
+              <span class="progress-card__title">{{ idea.title | truncate: 25 }}</span>
+            </header>
+            <div class="progress-card__bar">
+              <div class="progress-card__fill" style="width: {{ idea_progress }}%;"></div>
+            </div>
+            <footer class="progress-card__footer">
+              <span class="progress-card__count">{{ idea_done }}/{{ idea_story_count }} stories</span>
+              <span class="progress-card__pct">{{ idea_progress | round }}%</span>
+            </footer>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+  
+  {%- comment -%} STORIES PROGRESS SECTION {%- endcomment -%}
+  <section class="content-section">
+    <header class="section-header">
+      <h2 class="section-title">STORIES PROGRESS</h2>
+      <a href="{{ '/backlog/' | relative_url }}" class="section-link">VIEW BACKLOG →</a>
+    </header>
+    
+    <div class="progress-overview">
+      {%- comment -%} Stories status distribution {%- endcomment -%}
+      {%- assign stories_planned = site.stories | where: "status", "planned" | size -%}
+      {%- assign stories_in_progress = site.stories | where: "status", "in_progress" | size -%}
+      {%- assign stories_in_progress_alt = site.stories | where: "status", "in-progress" | size -%}
+      {%- assign stories_in_progress = stories_in_progress | plus: stories_in_progress_alt -%}
+      {%- assign stories_done = site.stories | where: "status", "done" | size -%}
+      {%- assign stories_blocked = site.stories | where: "status", "blocked" | size -%}
+      {%- assign stories_backlog = site.stories | where: "status", "backlog" | size -%}
+      
+      <div class="progress-distribution">
+        <div class="progress-bar-stacked">
+          {%- if total_stories > 0 -%}
+            {%- assign done_pct = stories_done | times: 100.0 | divided_by: total_stories -%}
+            {%- assign in_progress_pct = stories_in_progress | times: 100.0 | divided_by: total_stories -%}
+            {%- assign planned_pct = stories_planned | times: 100.0 | divided_by: total_stories -%}
+            {%- assign blocked_pct = stories_blocked | times: 100.0 | divided_by: total_stories -%}
+            {%- assign backlog_pct = stories_backlog | times: 100.0 | divided_by: total_stories -%}
+          {%- else -%}
+            {%- assign done_pct = 0 -%}
+            {%- assign in_progress_pct = 0 -%}
+            {%- assign planned_pct = 0 -%}
+            {%- assign blocked_pct = 0 -%}
+            {%- assign backlog_pct = 0 -%}
+          {%- endif -%}
+          
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ done_pct }}%;" title="Done: {{ stories_done }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ in_progress_pct }}%;" title="In Progress: {{ stories_in_progress }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--planned" style="width: {{ planned_pct }}%;" title="Planned: {{ stories_planned }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--blocked" style="width: {{ blocked_pct }}%;" title="Blocked: {{ stories_blocked }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--backlog" style="width: {{ backlog_pct }}%;" title="Backlog: {{ stories_backlog }}"></div>
+        </div>
+        <div class="progress-legend">
+          <span class="legend-item legend-item--complete"><span class="legend-dot"></span>Done ({{ stories_done }})</span>
+          <span class="legend-item legend-item--active"><span class="legend-dot"></span>In Progress ({{ stories_in_progress }})</span>
+          <span class="legend-item legend-item--planned"><span class="legend-dot"></span>Planned ({{ stories_planned }})</span>
+          <span class="legend-item legend-item--blocked"><span class="legend-dot"></span>Blocked ({{ stories_blocked }})</span>
+          <span class="legend-item legend-item--backlog"><span class="legend-dot"></span>Backlog ({{ stories_backlog }})</span>
+        </div>
+      </div>
+      
+      {%- comment -%} Stories by priority {%- endcomment -%}
+      <div class="progress-by-priority">
+        <h3 class="progress-subheading">BY PRIORITY</h3>
+        <div class="priority-grid">
+          {%- assign critical_stories = site.stories | where: "priority", "critical" -%}
+          {%- assign high_stories = site.stories | where: "priority", "high" -%}
+          {%- assign medium_stories = site.stories | where: "priority", "medium" -%}
+          {%- assign low_stories = site.stories | where: "priority", "low" -%}
+          
+          <div class="priority-card priority-card--critical">
+            <span class="priority-card__label">CRITICAL</span>
+            <span class="priority-card__count">{{ critical_stories | size }}</span>
+            <span class="priority-card__done">{{ critical_stories | where: "status", "done" | size }} done</span>
+          </div>
+          <div class="priority-card priority-card--high">
+            <span class="priority-card__label">HIGH</span>
+            <span class="priority-card__count">{{ high_stories | size }}</span>
+            <span class="priority-card__done">{{ high_stories | where: "status", "done" | size }} done</span>
+          </div>
+          <div class="priority-card priority-card--medium">
+            <span class="priority-card__label">MEDIUM</span>
+            <span class="priority-card__count">{{ medium_stories | size }}</span>
+            <span class="priority-card__done">{{ medium_stories | where: "status", "done" | size }} done</span>
+          </div>
+          <div class="priority-card priority-card--low">
+            <span class="priority-card__label">LOW</span>
+            <span class="priority-card__count">{{ low_stories | size }}</span>
+            <span class="priority-card__done">{{ low_stories | where: "status", "done" | size }} done</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  {%- comment -%} SPRINTS PROGRESS SECTION {%- endcomment -%}
+  <section class="content-section">
+    <header class="section-header">
+      <h2 class="section-title">SPRINT PROGRESS</h2>
+      <a href="{{ '/sprints/' | relative_url }}" class="section-link">VIEW ALL →</a>
+    </header>
+    
+    <div class="progress-overview">
+      {%- assign sorted_sprints = site.sprints | sort: "sprint_id" | reverse -%}
+      
+      {%- comment -%} Sprint status distribution {%- endcomment -%}
+      {%- assign sprints_planned = site.sprints | where: "status", "planned" | size -%}
+      
+      <div class="progress-distribution">
+        <div class="progress-bar-stacked">
+          {%- if total_sprints > 0 -%}
+            {%- assign completed_sprint_pct = completed_sprints | times: 100.0 | divided_by: total_sprints -%}
+            {%- assign active_sprint_pct = active_sprints | times: 100.0 | divided_by: total_sprints -%}
+            {%- assign planned_sprint_pct = sprints_planned | times: 100.0 | divided_by: total_sprints -%}
+          {%- else -%}
+            {%- assign completed_sprint_pct = 0 -%}
+            {%- assign active_sprint_pct = 0 -%}
+            {%- assign planned_sprint_pct = 0 -%}
+          {%- endif -%}
+          
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ completed_sprint_pct }}%;" title="Completed: {{ completed_sprints }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ active_sprint_pct }}%;" title="Active: {{ active_sprints }}"></div>
+          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--planned" style="width: {{ planned_sprint_pct }}%;" title="Planned: {{ sprints_planned }}"></div>
+        </div>
+        <div class="progress-legend">
+          <span class="legend-item legend-item--complete"><span class="legend-dot"></span>Completed ({{ completed_sprints }})</span>
+          <span class="legend-item legend-item--active"><span class="legend-dot"></span>Active ({{ active_sprints }})</span>
+          <span class="legend-item legend-item--planned"><span class="legend-dot"></span>Planned ({{ sprints_planned }})</span>
+        </div>
+      </div>
+      
+      {%- comment -%} Individual sprint progress cards {%- endcomment -%}
+      <div class="sprint-progress-grid">
+        {%- for sprint in sorted_sprints limit: 6 -%}
+          {%- include helpers/stories-for-sprint.html sprint_id=sprint.sprint_id -%}
+          {%- assign sprint_story_count = sprint_stories | size -%}
+          {%- assign sprint_done = sprint_stories | where: "status", "done" | size -%}
+          {%- if sprint_story_count > 0 -%}
+            {%- assign sprint_progress = sprint_done | times: 100.0 | divided_by: sprint_story_count -%}
+          {%- else -%}
+            {%- assign sprint_progress = 0 -%}
+          {%- endif -%}
+          
+          <div class="sprint-progress-card sprint-progress-card--{{ sprint.status }}">
+            <header class="sprint-progress-card__header">
+              {% include notation-badge.html sprint=sprint.sprint_id size="lg" %}
+              <span class="status-indicator status-indicator--{{ sprint.status }}">{{ sprint.status | upcase }}</span>
+            </header>
+            <div class="sprint-progress-card__dates">
+              {{ sprint.start_date | date: "%b %d" }} → {{ sprint.end_date | date: "%b %d" }}
+            </div>
+            <div class="sprint-progress-card__bar">
+              <div class="sprint-progress-card__fill" style="width: {{ sprint_progress }}%;"></div>
+            </div>
+            <footer class="sprint-progress-card__footer">
+              <span>{{ sprint_done }}/{{ sprint_story_count }} stories complete</span>
+              <span class="sprint-progress-card__pct">{{ sprint_progress | round }}%</span>
+            </footer>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+  
+  {%- comment -%} PROJECTED WORK SECTION {%- endcomment -%}
+  <section class="content-section">
+    <header class="section-header">
+      <h2 class="section-title">PROJECTED WORK</h2>
+    </header>
+    
+    <div class="projection-overview">
+      {%- comment -%} Calculate projections based on current velocity {%- endcomment -%}
+      {%- assign remaining_stories = total_stories | minus: stories_done -%}
+      {%- assign unassigned_stories = site.stories | where_exp: "story", "story.assigned_sprint == nil or story.assigned_sprint == ''" | size -%}
+      {%- assign assigned_stories = remaining_stories | minus: unassigned_stories -%}
+      
+      <div class="projection-cards">
+        <div class="projection-card">
+          <div class="projection-card__icon">📋</div>
+          <div class="projection-card__content">
+            <span class="projection-card__value">{{ remaining_stories }}</span>
+            <span class="projection-card__label">Remaining Stories</span>
+          </div>
+        </div>
+        <div class="projection-card">
+          <div class="projection-card__icon">📅</div>
+          <div class="projection-card__content">
+            <span class="projection-card__value">{{ assigned_stories }}</span>
+            <span class="projection-card__label">Assigned to Sprints</span>
+          </div>
+        </div>
+        <div class="projection-card">
+          <div class="projection-card__icon">📥</div>
+          <div class="projection-card__content">
+            <span class="projection-card__value">{{ unassigned_stories }}</span>
+            <span class="projection-card__label">Unassigned (Backlog)</span>
+          </div>
+        </div>
+        <div class="projection-card projection-card--highlight">
+          <div class="projection-card__icon">✅</div>
+          <div class="projection-card__content">
+            {%- if total_stories > 0 -%}
+              {%- assign completion_rate = stories_done | times: 100.0 | divided_by: total_stories -%}
+            {%- else -%}
+              {%- assign completion_rate = 0 -%}
+            {%- endif -%}
+            <span class="projection-card__value">{{ completion_rate | round }}%</span>
+            <span class="projection-card__label">Overall Completion</span>
+          </div>
+        </div>
+      </div>
+      
+      {%- comment -%} Upcoming sprint preview {%- endcomment -%}
+      <div class="upcoming-sprints">
+        <h3 class="progress-subheading">UPCOMING SPRINTS</h3>
+        <div class="upcoming-grid">
+          {%- assign planned_sprints = site.sprints | where: "status", "planned" | sort: "sprint_id" -%}
+          {%- for sprint in planned_sprints limit: 3 -%}
+            {%- include helpers/stories-for-sprint.html sprint_id=sprint.sprint_id -%}
+            <div class="upcoming-card">
+              <div class="upcoming-card__header">
+                {% include notation-badge.html sprint=sprint.sprint_id %}
+                <span class="upcoming-card__dates">{{ sprint.start_date | date: "%b %d" }} - {{ sprint.end_date | date: "%b %d" }}</span>
+              </div>
+              <div class="upcoming-card__stories">{{ sprint_stories | size }} stories planned</div>
+              {%- if sprint.goals.size > 0 -%}
+                <ul class="upcoming-card__goals">
+                  {%- for goal in sprint.goals limit: 2 -%}
+                    <li>{{ goal | truncate: 40 }}</li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+          {%- if planned_sprints.size == 0 -%}
+            <p class="upcoming-empty">No planned sprints yet.</p>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
