@@ -1,0 +1,90 @@
+---
+layout: default
+title: Sprint Table View
+permalink: /sprint-table/
+---
+
+<main class="page-sprint-table container">
+  <section class="header-region">
+    <div class="header-primary">
+      <h1 class="page-title">SPRINT TABLE VIEW</h1>
+      <p class="page-description">Sprints 2601-2626 as columns, Ideas as rows. Cells show Stories assigned to that Sprint & Idea.</p>
+    </div>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">ARTICLES</h2>
+      {%- if site.posts.size > 0 -%}
+        <div class="article-list">
+          {%- for post in site.posts limit:5 -%}
+            {% include article-item.html post=post %}
+          {%- endfor -%}
+        </div>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+      {%- else -%}
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
+      {%- endif -%}
+    </aside>
+  </section>
+  
+  <section class="content-section">
+    {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
+    {%- if sorted_ideas.size > 0 -%}
+      <div class="sprint-table-wrapper">
+        <table class="sprint-table">
+          <thead>
+            <tr>
+              <th class="sprint-table__idea-header">IDEA</th>
+              {%- for sprint_num in (1..26) -%}
+                {%- assign sprint_id = 2600 | plus: sprint_num -%}
+                {%- assign sprint = site.sprints | where: "sprint_id", sprint_id | first -%}
+                <th class="sprint-table__sprint-header">
+                  {%- if sprint -%}
+                    <a href="{{ sprint.url | relative_url }}" class="sprint-table__sprint-link">
+                      {{ sprint_id }}
+                    </a>
+                  {%- else -%}
+                    <span class="sprint-table__sprint-link">
+                      {{ sprint_id }}
+                    </span>
+                  {%- endif -%}
+                </th>
+              {%- endfor -%}
+            </tr>
+          </thead>
+          <tbody>
+            {%- for idea in sorted_ideas -%}
+              <tr class="sprint-table__row">
+                <td class="sprint-table__idea-cell">
+                  <a href="{{ idea.url | relative_url }}" class="sprint-table__idea-link" title="{{ idea.title }}">
+                    {% include notation-badge.html idea=idea.idea_number size="sm" %}
+                    <span class="sprint-table__idea-title">{{ idea.title | truncate: 20 }}</span>
+                  </a>
+                </td>
+                {%- for sprint_num in (1..26) -%}
+                  {%- assign sprint_id = 2600 | plus: sprint_num -%}
+                  {%- assign cell_stories = site.stories | where: "idea_number", idea.idea_number | where: "assigned_sprint", sprint_id | sort: "story_number" -%}
+                  <td class="sprint-table__cell">
+                    {%- if cell_stories.size > 0 -%}
+                      <div class="sprint-table__stories">
+                        {%- for story in cell_stories -%}
+                          <a href="{{ story.url | relative_url }}" class="sprint-table__story-link" title="{{ story.title }}">
+                            {% include notation-badge.html idea=story.idea_number story=story.story_number size="sm" %}
+                          </a>
+                        {%- endfor -%}
+                      </div>
+                    {%- else -%}
+                      <span class="sprint-table__empty">—</span>
+                    {%- endif -%}
+                  </td>
+                {%- endfor -%}
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+      </div>
+    {%- else -%}
+      <p class="sprint-table__empty-message">No ideas yet. Create your first idea to get started.</p>
+    {%- endif -%}
+  </section>
+</main>
+

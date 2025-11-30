@@ -406,6 +406,194 @@
   border-bottom: none;
 }
 
+// Sprint table view (Sprints as columns, Ideas as rows)
+.sprint-table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 300px);
+  margin: var(--spacing-lg) 0;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border);
+}
+
+.sprint-table {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-xs);
+  table-layout: fixed;
+}
+
+.sprint-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.sprint-table th,
+.sprint-table td {
+  padding: 4px 6px;
+  text-align: left;
+  border: 1px solid var(--color-border);
+  vertical-align: top;
+  overflow: hidden;
+}
+
+.sprint-table__idea-header {
+  position: sticky;
+  left: 0;
+  z-index: 30;
+  background: var(--color-background);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: var(--text-xs);
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+  padding: 6px 8px;
+}
+
+.sprint-table__sprint-header {
+  background: var(--color-surface);
+  font-weight: 700;
+  text-align: center;
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+  padding: 8px 4px;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+.sprint-table__sprint-link {
+  display: block;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: opacity var(--transition-fast);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  
+  &:hover {
+    opacity: 0.7;
+    text-decoration: none;
+  }
+  
+  // When used as span (sprint doesn't exist)
+  &:not(a) {
+    cursor: default;
+  }
+}
+
+.sprint-table__idea-cell {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: var(--color-background);
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+  padding: 4px 8px;
+}
+
+.sprint-table__idea-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: opacity var(--transition-fast);
+  font-size: var(--text-xs);
+  line-height: 1.3;
+  
+  &:hover {
+    opacity: 0.7;
+    text-decoration: none;
+  }
+}
+
+.sprint-table__idea-title {
+  font-weight: 500;
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sprint-table__cell {
+  background: var(--color-background);
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+  padding: 4px 2px;
+  text-align: center;
+}
+
+.sprint-table__stories {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 20px;
+}
+
+.sprint-table__story-link {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: opacity var(--transition-fast);
+  line-height: 1;
+  
+  &:hover {
+    opacity: 0.7;
+    text-decoration: none;
+  }
+  
+  // Make badges smaller in table cells
+  .notation-badge {
+    font-size: 9px;
+    padding: 1px 3px;
+    line-height: 1.1;
+    display: inline-block;
+  }
+}
+
+.sprint-table__empty {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  display: block;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.sprint-table__empty-message {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-secondary);
+}
+
+// Responsive adjustments for sprint table
+@media (max-width: 1024px) {
+  .sprint-table__idea-header,
+  .sprint-table__idea-cell {
+    min-width: 150px;
+    max-width: 150px;
+  }
+  
+  .sprint-table__sprint-header,
+  .sprint-table__cell {
+    min-width: 70px;
+    max-width: 100px;
+  }
+}
+
 // Glossary
 .glossary-content {
   max-width: 900px;
