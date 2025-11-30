@@ -67,7 +67,7 @@ function resolveAssetPath(assetPath: string): { absolutePath: string; fileUrl: s
     absolutePath.startsWith(dir + path.sep) || absolutePath === dir
   );
 
-  if (!isAllowed && !absolutePath.startsWith(path.resolve(repoRoot, 'assets'))) {
+  if (!isAllowed) {
     throw new Error('Access denied: path not in allowed directory');
   }
 
