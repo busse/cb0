@@ -2,7 +2,7 @@
  * Validation utilities for taxonomy system
  */
 
-import type { Idea, Story, Sprint, Update } from './types';
+import type { Idea, Story, Sprint, Update, Figure } from './types';
 
 /**
  * Validate sprint ID format (YYSS)
@@ -23,6 +23,13 @@ export function isValidIdeaNumber(ideaNumber: number): boolean {
  */
 export function isValidStoryNumber(storyNumber: number): boolean {
   return Number.isInteger(storyNumber) && storyNumber >= 0;
+}
+
+/**
+ * Validate figure number (must be non-negative integer)
+ */
+export function isValidFigureNumber(figureNumber: number): boolean {
+  return Number.isInteger(figureNumber) && figureNumber >= 0;
 }
 
 /**
@@ -56,6 +63,21 @@ export function isUniqueStoryNumber(
 }
 
 /**
+ * Check if figure number is unique
+ */
+export function isUniqueFigureNumber(
+  figureNumber: number,
+  existingFigures: Figure[],
+  excludeFigureNumber?: number
+): boolean {
+  return !existingFigures.some(
+    (figure) =>
+      figure.figure_number === figureNumber &&
+      (excludeFigureNumber === undefined || figure.figure_number !== excludeFigureNumber)
+  );
+}
+
+/**
  * Validate notation format
  */
 export function isValidNotation(notation: string): boolean {
@@ -65,6 +87,7 @@ export function isValidNotation(notation: string): boolean {
     /^\d+\.\d+$/, // 5.56
     /^i\d+$/, // i5
     /^s\d+$/, // s56
+    /^fig_\d+$/, // fig_32
   ];
   return patterns.some((pattern) => pattern.test(notation));
 }
@@ -93,12 +116,20 @@ export function formatNotation(
 }
 
 /**
+ * Format figure notation
+ */
+export function formatFigureNotation(figureNumber: number): string {
+  return `fig_${figureNumber}`;
+}
+
+/**
  * Parse notation
  */
 export function parseNotation(notation: string): {
   sprintId?: string;
   ideaNumber?: number;
   storyNumber?: number;
+  figureNumber?: number;
 } {
   const fullMatch = notation.match(/^(\d{4})\.(\d+)\.(\d+)$/);
   if (fullMatch) {
@@ -127,6 +158,11 @@ export function parseNotation(notation: string): {
     return { storyNumber: parseInt(storyMatch[1], 10) };
   }
 
+  const figureMatch = notation.match(/^fig_(\d+)$/);
+  if (figureMatch) {
+    return { figureNumber: parseInt(figureMatch[1], 10) };
+  }
+
   return {};
 }
 
@@ -146,6 +182,15 @@ export function getNextStoryNumber(ideaNumber: number, existingStories: Story[])
   const ideaStories = existingStories.filter((story) => story.idea_number === ideaNumber);
   if (ideaStories.length === 0) return 0;
   const maxNumber = Math.max(...ideaStories.map((story) => story.story_number));
+  return maxNumber + 1;
+}
+
+/**
+ * Get next available figure number
+ */
+export function getNextFigureNumber(existingFigures: Figure[]): number {
+  if (existingFigures.length === 0) return 0;
+  const maxNumber = Math.max(...existingFigures.map((figure) => figure.figure_number));
   return maxNumber + 1;
 }
 
@@ -240,6 +285,85 @@ export function validateStory(
   }
 
   return errors;
+}
+
+/**
+ * Validate figure front matter
+ */
+export function validateFigure(
+  figure: Partial<Figure>,
+  existingFigures: Figure[],
+  existingIdeas: Idea[],
+  existingStories: Story[],
+  excludeFigureNumber?: number
+): string[] {
+  const errors: string[] = [];
+
+  if (figure.figure_number === undefined) {
+    errors.push('figure_number is required');
+  } else if (!isValidFigureNumber(figure.figure_number)) {
+    errors.push('figure_number must be a non-negative integer');
+  } else if (!isUniqueFigureNumber(figure.figure_number, existingFigures, excludeFigureNumber)) {
+    errors.push(`Figure number ${figure.figure_number} already exists`);
+  }
+
+  if (!figure.title || figure.title.trim() === '') {
+    errors.push('title is required');
+  }
+
+  if (!figure.image_path || figure.image_path.trim() === '') {
+    errors.push('image_path is required');
+  }
+
+  if (!figure.status) {
+    errors.push('status is required');
+  } else if (!['active', 'archived'].includes(figure.status)) {
+    errors.push('status must be one of: active, archived');
+  }
+
+  if (!figure.created) {
+    errors.push('created date is required');
+  } else if (!/^\d{4}-\d{2}-\d{2}$/.test(figure.created)) {
+    errors.push('created must be in YYYY-MM-DD format');
+  }
+
+  if (figure.uploaded_date && !/^\d{4}-\d{2}-\d{2}$/.test(figure.uploaded_date)) {
+    errors.push('uploaded_date must be in YYYY-MM-DD format');
+  }
+
+  if (figure.related_ideas) {
+    const missingIdeas = figure.related_ideas.filter(
+      (ideaNumber) => !existingIdeas.some((idea) => idea.idea_number === ideaNumber)
+    );
+    if (missingIdeas.length) {
+      errors.push(`Related ideas not found: ${missingIdeas.join(', ')}`);
+    }
+  }
+
+  if (figure.related_stories) {
+    const missingStories: string[] = [];
+    for (const ref of figure.related_stories) {
+      if (!isValidStoryReference(ref, existingStories)) {
+        missingStories.push(ref);
+      }
+    }
+    if (missingStories.length) {
+      errors.push(`Related stories not found: ${missingStories.join(', ')}`);
+    }
+  }
+
+  return errors;
+}
+
+function isValidStoryReference(reference: string, existingStories: Story[]): boolean {
+  const [ideaPart, storyPart] = reference.split('.');
+  if (!ideaPart || !storyPart) return false;
+  const ideaNumber = Number(ideaPart);
+  const storyNumber = Number(storyPart);
+  if (Number.isNaN(ideaNumber) || Number.isNaN(storyNumber)) return false;
+  return existingStories.some(
+    (story) => story.idea_number === ideaNumber && story.story_number === storyNumber
+  );
 }
 
 /**
