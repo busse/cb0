@@ -20,6 +20,8 @@ permalink: /dashboard/
       {%- assign total_stories = site.stories | size -%}
       {%- assign done_stories = site.stories | where: "status", "done" | size -%}
       {%- assign in_progress_stories = site.stories | where: "status", "in_progress" | size -%}
+      {%- assign in_progress_stories_alt = site.stories | where: "status", "in-progress" | size -%}
+      {%- assign in_progress_stories = in_progress_stories | plus: in_progress_stories_alt -%}
       {%- assign backlog_stories = site.stories | where: "status", "backlog" | size -%}
       
       {%- assign total_sprints = site.sprints | size -%}
@@ -70,12 +72,21 @@ permalink: /dashboard/
       {%- comment -%} Progress bar showing idea status distribution {%- endcomment -%}
       <div class="progress-distribution">
         <div class="progress-bar-stacked">
-          {%- assign completed_pct = completed_ideas | times: 100.0 | divided_by: total_ideas -%}
-          {%- assign active_pct = active_ideas | times: 100.0 | divided_by: total_ideas -%}
-          {%- assign planned_ideas = site.ideas | where: "status", "planned" | size -%}
-          {%- assign planned_pct = planned_ideas | times: 100.0 | divided_by: total_ideas -%}
-          {%- assign archived_ideas = site.ideas | where: "status", "archived" | size -%}
-          {%- assign archived_pct = archived_ideas | times: 100.0 | divided_by: total_ideas -%}
+          {%- if total_ideas > 0 -%}
+            {%- assign completed_pct = completed_ideas | times: 100.0 | divided_by: total_ideas -%}
+            {%- assign active_pct = active_ideas | times: 100.0 | divided_by: total_ideas -%}
+            {%- assign planned_ideas = site.ideas | where: "status", "planned" | size -%}
+            {%- assign planned_pct = planned_ideas | times: 100.0 | divided_by: total_ideas -%}
+            {%- assign archived_ideas = site.ideas | where: "status", "archived" | size -%}
+            {%- assign archived_pct = archived_ideas | times: 100.0 | divided_by: total_ideas -%}
+          {%- else -%}
+            {%- assign completed_pct = 0 -%}
+            {%- assign active_pct = 0 -%}
+            {%- assign planned_ideas = 0 -%}
+            {%- assign planned_pct = 0 -%}
+            {%- assign archived_ideas = 0 -%}
+            {%- assign archived_pct = 0 -%}
+          {%- endif -%}
           
           <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ completed_pct }}%;" title="Completed: {{ completed_ideas }}"></div>
           <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ active_pct }}%;" title="Active: {{ active_ideas }}"></div>
@@ -140,11 +151,19 @@ permalink: /dashboard/
       
       <div class="progress-distribution">
         <div class="progress-bar-stacked">
-          {%- assign done_pct = stories_done | times: 100.0 | divided_by: total_stories -%}
-          {%- assign in_progress_pct = stories_in_progress | times: 100.0 | divided_by: total_stories -%}
-          {%- assign planned_pct = stories_planned | times: 100.0 | divided_by: total_stories -%}
-          {%- assign blocked_pct = stories_blocked | times: 100.0 | divided_by: total_stories -%}
-          {%- assign backlog_pct = stories_backlog | times: 100.0 | divided_by: total_stories -%}
+          {%- if total_stories > 0 -%}
+            {%- assign done_pct = stories_done | times: 100.0 | divided_by: total_stories -%}
+            {%- assign in_progress_pct = stories_in_progress | times: 100.0 | divided_by: total_stories -%}
+            {%- assign planned_pct = stories_planned | times: 100.0 | divided_by: total_stories -%}
+            {%- assign blocked_pct = stories_blocked | times: 100.0 | divided_by: total_stories -%}
+            {%- assign backlog_pct = stories_backlog | times: 100.0 | divided_by: total_stories -%}
+          {%- else -%}
+            {%- assign done_pct = 0 -%}
+            {%- assign in_progress_pct = 0 -%}
+            {%- assign planned_pct = 0 -%}
+            {%- assign blocked_pct = 0 -%}
+            {%- assign backlog_pct = 0 -%}
+          {%- endif -%}
           
           <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ done_pct }}%;" title="Done: {{ stories_done }}"></div>
           <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ in_progress_pct }}%;" title="In Progress: {{ stories_in_progress }}"></div>
@@ -210,9 +229,15 @@ permalink: /dashboard/
       
       <div class="progress-distribution">
         <div class="progress-bar-stacked">
-          {%- assign completed_sprint_pct = completed_sprints | times: 100.0 | divided_by: total_sprints -%}
-          {%- assign active_sprint_pct = active_sprints | times: 100.0 | divided_by: total_sprints -%}
-          {%- assign planned_sprint_pct = sprints_planned | times: 100.0 | divided_by: total_sprints -%}
+          {%- if total_sprints > 0 -%}
+            {%- assign completed_sprint_pct = completed_sprints | times: 100.0 | divided_by: total_sprints -%}
+            {%- assign active_sprint_pct = active_sprints | times: 100.0 | divided_by: total_sprints -%}
+            {%- assign planned_sprint_pct = sprints_planned | times: 100.0 | divided_by: total_sprints -%}
+          {%- else -%}
+            {%- assign completed_sprint_pct = 0 -%}
+            {%- assign active_sprint_pct = 0 -%}
+            {%- assign planned_sprint_pct = 0 -%}
+          {%- endif -%}
           
           <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ completed_sprint_pct }}%;" title="Completed: {{ completed_sprints }}"></div>
           <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ active_sprint_pct }}%;" title="Active: {{ active_sprints }}"></div>
