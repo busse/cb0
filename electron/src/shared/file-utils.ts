@@ -149,11 +149,25 @@ export async function readUpdates(): Promise<UpdateRecord[]> {
 }
 
 /**
+ * Remove undefined values from an object (YAML can't serialize undefined)
+ */
+function removeUndefined<T extends Record<string, any>>(obj: T): T {
+  const cleaned = { ...obj };
+  for (const key in cleaned) {
+    if (cleaned[key] === undefined) {
+      delete cleaned[key];
+    }
+  }
+  return cleaned;
+}
+
+/**
  * Write idea file
  */
 export async function writeIdea(idea: Idea, content: string): Promise<void> {
   const filePath = path.join(PATHS.ideas, `${idea.idea_number}.md`);
-  const frontMatter = matter.stringify(content, idea);
+  const cleaned = removeUndefined(idea);
+  const frontMatter = matter.stringify(content, cleaned);
   await fs.writeFile(filePath, frontMatter, 'utf-8');
 }
 
@@ -164,7 +178,8 @@ export async function writeStory(story: Story, content: string): Promise<void> {
   const ideaDir = path.join(PATHS.stories, story.idea_number.toString());
   await fs.mkdir(ideaDir, { recursive: true });
   const filePath = path.join(ideaDir, `${story.story_number}.md`);
-  const frontMatter = matter.stringify(content, story);
+  const cleaned = removeUndefined(story);
+  const frontMatter = matter.stringify(content, cleaned);
   await fs.writeFile(filePath, frontMatter, 'utf-8');
 }
 
@@ -173,7 +188,8 @@ export async function writeStory(story: Story, content: string): Promise<void> {
  */
 export async function writeSprint(sprint: Sprint, content: string): Promise<void> {
   const filePath = path.join(PATHS.sprints, `${sprint.sprint_id}.md`);
-  const frontMatter = matter.stringify(content, sprint);
+  const cleaned = removeUndefined(sprint);
+  const frontMatter = matter.stringify(content, cleaned);
   await fs.writeFile(filePath, frontMatter, 'utf-8');
 }
 
@@ -183,7 +199,8 @@ export async function writeSprint(sprint: Sprint, content: string): Promise<void
 export async function writeUpdate(update: Update, content: string): Promise<void> {
   const filename = `${update.sprint_id}-${update.idea_number}-${update.story_number}.md`;
   const filePath = path.join(PATHS.updates, filename);
-  const frontMatter = matter.stringify(content, update);
+  const cleaned = removeUndefined(update);
+  const frontMatter = matter.stringify(content, cleaned);
   await fs.writeFile(filePath, frontMatter, 'utf-8');
 }
 
