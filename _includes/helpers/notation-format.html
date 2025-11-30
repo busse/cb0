@@ -10,6 +10,8 @@
   {{- include.sprint -}}.{{- include.idea -}}.{{- include.story -}}
 {%- elsif include.idea and include.story -%}
   {{- include.idea -}}.{{- include.story -}}
+{%- elsif include.sprint -%}
+  {{- include.sprint -}}
 {%- elsif include.idea -%}
   i{{- include.idea -}}
 {%- elsif include.story -%}

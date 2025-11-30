@@ -55,7 +55,7 @@
       <li class="breadcrumbs__item">
         <span class="breadcrumbs__separator" aria-hidden="true">→</span>
         <a href="{{ include.sprint.url | relative_url }}" class="breadcrumbs__link">
-          <span class="notation-badge notation-badge--sm">{{ include.sprint.sprint_id }}</span>
+          {% include notation-badge.html sprint=include.sprint.sprint_id size="sm" %}
         </a>
       </li>
     {%- endif -%}

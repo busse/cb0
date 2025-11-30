@@ -43,7 +43,7 @@
         <div class="related-items__section">
           <h4 class="related-items__subheading">SPRINT</h4>
           <a href="{{ sprint.url | relative_url }}" class="related-items__sprint-link">
-            <span class="notation-badge">{{ sprint.sprint_id }}</span>
+            {% include notation-badge.html sprint=sprint.sprint_id %}
             <span class="related-items__sprint-dates">
               {{ sprint.start_date | date: "%b %d" }} – {{ sprint.end_date | date: "%b %d" }}
             </span>
@@ -101,12 +101,12 @@
       <div class="related-items__section related-items__section--nav">
         {%- if prev_sprint -%}
         <a href="{{ prev_sprint.url | relative_url }}" class="related-items__nav-link related-items__nav-link--prev">
-          ← <span class="notation-badge notation-badge--sm">{{ prev_sprint.sprint_id }}</span>
+          ← {% include notation-badge.html sprint=prev_sprint.sprint_id size="sm" %}
         </a>
         {%- endif -%}
         {%- if next_sprint -%}
         <a href="{{ next_sprint.url | relative_url }}" class="related-items__nav-link related-items__nav-link--next">
-          <span class="notation-badge notation-badge--sm">{{ next_sprint.sprint_id }}</span> →
+          {% include notation-badge.html sprint=next_sprint.sprint_id size="sm" %} →
         </a>
         {%- endif -%}
       </div>
