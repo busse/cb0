@@ -12,6 +12,11 @@
   <nav class="mobile-nav__primary" role="navigation">
     <ul class="mobile-nav__list">
       <li>
+        <a href="{{ '/dashboard/' | relative_url }}" class="mobile-nav__link">
+          DASHBOARD
+        </a>
+      </li>
+      <li>
         <a href="{{ '/ideas/' | relative_url }}" class="mobile-nav__link">
           IDEAS
           <span class="mobile-nav__count">{{ site.ideas | size }}</span>

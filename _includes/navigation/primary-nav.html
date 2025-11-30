@@ -20,6 +20,14 @@
     <!-- Main Links -->
     <ul class="primary-nav__links" role="menubar">
       <li role="none">
+        <a href="{{ '/dashboard/' | relative_url }}"
+           role="menuitem"
+           class="primary-nav__link {% if page.url contains '/dashboard' %}is-active{% endif %}"
+           {% if page.url contains '/dashboard' %}aria-current="page"{% endif %}>
+          DASHBOARD
+        </a>
+      </li>
+      <li role="none">
         <a href="{{ '/ideas/' | relative_url }}" 
            role="menuitem"
            class="primary-nav__link {% if page.url contains '/ideas' or page.url contains '/i/' or page.layout == 'idea' %}is-active{% endif %}"
