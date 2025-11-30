@@ -12,7 +12,8 @@
     "dev:renderer": "vite",
     "build": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json && vite build",
     "dist": "electron-builder",
-    "start": "electron ."
+    "start": "electron .",
+    "test:server": "npm run build:once && concurrently \"npm run dev:main\" \"npm run dev:preload\" \"npm run dev:renderer\""
   },
   "dependencies": {
     "electron-updater": "^6.1.7",
@@ -20,6 +21,7 @@
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.10.6",
     "concurrently": "^8.2.2",

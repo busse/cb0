@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as fsPromises from 'fs/promises';
 import {
   readIdeas,
   readStories,
@@ -14,6 +15,7 @@ import {
   deleteStory,
   deleteSprint,
   deleteUpdate,
+  PATHS,
 } from '../shared/file-utils';
 import {
   validateIdea,
@@ -61,7 +63,10 @@ function createWindow() {
   
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
+    // Only open DevTools if not in test mode
+    if (process.env.NODE_ENV !== 'test') {
+      mainWindow.webContents.openDevTools();
+    }
   } else {
     mainWindow.loadFile(rendererDistPath);
   }
@@ -128,8 +133,10 @@ ipcMain.handle('write-idea', async (_event, idea: Idea, content: string) => {
   try {
     const existingIdeas = await readIdeas();
     // Check if this idea already exists (editing vs creating)
-    const existingIdea = existingIdeas.find((i) => i.idea_number === idea.idea_number);
-    const errors = validateIdea(idea, existingIdeas, existingIdea ? idea.idea_number : undefined);
+    // We need to check if the file exists to determine if we're editing
+    const ideaFilePath = path.join(PATHS.ideas, `${idea.idea_number}.md`);
+    const isEditing = await fsPromises.access(ideaFilePath).then(() => true).catch(() => false);
+    const errors = validateIdea(idea, existingIdeas, isEditing ? idea.idea_number : undefined);
     if (errors.length > 0) {
       return { success: false, error: errors.join(', ') };
     }

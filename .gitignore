@@ -30,3 +30,7 @@ electron/node_modules/
 electron/.vite/
 *.log
 
+# Playwright test artifacts
+electron/test-results/
+electron/playwright-report/
+
