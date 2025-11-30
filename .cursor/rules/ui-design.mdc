@@ -1,5 +1,5 @@
 ---
-description: Swiss wayfinding design system - typography, color, components
+description: Bauhaus/Experimental Jetset/Swiss-German design system - typography, color, components, grid
 globs:
   - "assets/css/**"
   - "assets/scss/**"
@@ -11,86 +11,115 @@ globs:
 alwaysApply: false
 ---
 
-# Swiss Wayfinding Design System
+# Bauhaus/Experimental Jetset/Swiss-German Design System
 
 ## Design Influences
-1. **German Road Signage** (Bundesautobahn) - Clear hierarchy, functional color
-2. **Rudy Bauer Design Studio** - Cologne Bonn Airport (CGN) wayfinding
-3. **Swiss International Typographic Style** - Grid, Helvetica, density
+1. **Bauhaus** - Geometric, functional, minimal decoration, strong structure
+2. **Experimental Jetset** - Modernist typography, grid-based layouts, precise spacing
+3. **Swiss/German Package Design** - Helvetica/Akzidenz Grotesk, strong grids, functional color, information density
 
 ## Core Principles
 
 | Principle | Implementation |
 |-----------|----------------|
-| Clarity | Hierarchy through scale/weight, not decoration |
-| Density | Maximum useful information per viewport |
-| Systematic | Consistent patterns, universally applied |
-| Functional Color | Color = meaning, never decorative |
-| Wayfinding | User always knows location and navigation |
+| Strong Grid | Visible, structural grid system with tight alignment |
+| Sans-Serif Typography | All text uses sans-serif fonts (Helvetica Neue) |
+| Density | Maximum information per viewport without losing readability |
+| Geometric Precision | Square corners, aligned elements, no decoration |
+| Functional Color | Monochromatic palette with minimal, functional accents |
+| Minimum Text Size | All text must be at least 10px |
 
 ## Typography
 
 ```scss
 // Font stacks
---font-primary: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;
+--font-primary: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 --font-mono: 'SF Mono', Consolas, 'Liberation Mono', monospace;
 
-// Scale (base 14px, ratio 1.25)
---text-xs: 0.64rem;    // 9px - timestamps, meta
---text-sm: 0.8rem;     // 11px - captions, secondary
---text-base: 1rem;     // 14px - body text
---text-md: 1.25rem;    // 17.5px - card titles
---text-lg: 1.563rem;   // 22px - section headers
---text-xl: 1.953rem;   // 27px - page titles
---text-2xl: 2.441rem;  // 34px - hero text
+// Base
+--font-size-base: 14px;
+--line-height-base: 1.4;
+
+// Type Scale (minimum 10px, ratio 1.25)
+--text-xs: 0.625rem;    /* 10px - meta, timestamps */
+--text-sm: 0.75rem;     /* 12px - captions, secondary */
+--text-base: 0.875rem;  /* 14px - body text */
+--text-md: 1.094rem;    /* ~15px - card titles */
+--text-lg: 1.367rem;    /* ~19px - section headers */
+--text-xl: 1.709rem;    /* ~24px - page titles */
+--text-2xl: 2.136rem;   /* ~30px - hero text */
+--text-3xl: 2.67rem;    /* ~37px - display */
 ```
 
 ### Typography Rules
 - **ALL CAPS**: Navigation, status labels, section headers
 - **Sentence case**: Body text, descriptions
 - **Tabular numerals**: All notation (i5, s23, 2609.5.56)
-- **Letter-spacing**: +0.02em for all-caps, 0 for body
+- **Letter-spacing**: -0.02em for headings, +0.02em for all-caps
 - **No italics** except `<cite>` elements
 - **Weights**: 400 body, 500 headings, 700 emphasis
+- **All headings use sans-serif** (no serif fonts)
 
-## Color System (Semantic Only)
+## Color System (Monochromatic with Functional Accent)
 
 ```scss
-// Base
+// Base (High Contrast)
 --color-background: #FFFFFF;
---color-surface: #F5F5F5;
+--color-surface: #FFFFFF;
+--color-surface-alt: #FAFAFA;
+--color-surface-muted: #F5F5F5;
 --color-text-primary: #1A1A1A;
 --color-text-secondary: #666666;
 --color-border: #E0E0E0;
+--color-border-strong: #CCCCCC;
 
-// Status (functional, not decorative)
---color-status-active: #0066CC;     // Blue - current, in progress
---color-status-planned: #666666;    // Gray - future, pending
---color-status-complete: #2E7D32;   // Green - done, shipped
---color-status-blocked: #C62828;    // Red - blocker, critical
---color-status-archived: #9E9E9E;   // Muted - inactive
+// Status (Less Saturated, Monochromatic)
+--color-status-active: #4A5568;      /* Gray - in progress */
+--color-status-planned: #718096;     /* Gray - future, pending */
+--color-status-complete: #2D3748;    /* Dark gray - done */
+--color-status-blocked: #1A202C;     /* Very dark - blocker */
+--color-status-archived: #A0AEC0;     /* Light gray - inactive */
 
-// Wayfinding accent
---color-accent-primary: #FFCC00;    // CGN yellow highlight
---color-accent-secondary: #0066CC;  // Interactive elements
+// Accent (Functional, Monochromatic)
+--color-accent-primary: #1A1A1A;     /* Black - primary accent */
+--color-accent-secondary: #1A1A1A;   /* Black - interactive elements */
 
-// Notation badge
+// Notation Badge
 --color-notation-bg: #1A1A1A;
 --color-notation-text: #FFFFFF;
+```
+
+## Grid System (Strong, Visible)
+
+```scss
+// Grid (Tight, Dense)
+--grid-columns: 12;
+--grid-gutter: 16px;        /* Tight spacing */
+--grid-margin: 24px;
+--container-max-width: 1440px;
+
+// Spacing (Dense, Grid-Based)
+--spacing-xs: 4px;
+--spacing-sm: 8px;
+--spacing-md: 16px;
+--spacing-lg: 24px;
+--spacing-xl: 32px;
+--spacing-2xl: 48px;
+--spacing-3xl: 64px;
 ```
 
 ## Layout Structure
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ NAVIGATION (fixed, 48px height)                         │
+│ NAVIGATION (fixed, 48px height, compact)                 │
 ├─────────────────────────────────────────────────────────┤
 │  ┌─────────────────────────────────┬───────────────┐   │
 │  │ PRIMARY (4/5)                   │ SIDEBAR (1/5) │   │
-│  │ Static content / hero           │ Articles list │   │
+│  │ Dense padding (16px)            │ Articles list │   │
 │  └─────────────────────────────────┴───────────────┘   │
 ├─────────────────────────────────────────────────────────┤
-│  CARD GRID (5 columns)                                  │
+│  CARD GRID (tight 16px gaps, aligned to grid)           │
 │  ┌─────┬─────┬─────┬─────┬─────┐                       │
 │  │     │     │     │     │     │                       │
 │  └─────┴─────┴─────┴─────┴─────┘                       │
@@ -103,25 +132,33 @@ alwaysApply: false
 
 ### Notation Badge
 - Dark background (#1A1A1A), white text
-- Monospace font, small padding (2px 6px)
-- Minimal border-radius (2px)
+- Monospace font, compact padding (2px 8px)
+- Square corners (border-radius: 0)
+- Font size: var(--text-xs) (10px minimum)
 - Variants: --sm, default, --lg
 
 ### Status Indicator
-- Colored dot (8px) + uppercase label
-- Dot color matches status
+- Square dot (6px) + uppercase label
+- Dot color matches status (monochromatic)
 - Background: surface color
+- Compact padding (2px 8px)
+- Square corners
 
 ### Cards (Idea/Story/Sprint)
-- Dense padding (12px)
-- Left border (3px) indicates status color
-- Title, description (clamped to 3 lines), meta footer
-- Subtle hover state (border darkens, slight shadow)
+- Dense padding (16px, reduced from previous)
+- Top border (3-4px) indicates status color
+- Title, description (clamped to 3 lines)
+- Meta footer with tight spacing
+- Square corners (border-radius: 0)
+- No shadows (or minimal 1px)
+- Hover: border color change only
 
 ### Navigation
-- Fixed position, 48px height
+- Fixed position, 48px height (compact)
 - Logo + notation badge left, links center, search right
-- Links: uppercase, small, letter-spaced
+- Links: uppercase, var(--text-xs), letter-spaced
+- Tight spacing throughout
+- Square corners on all elements
 
 ## Responsive Breakpoints
 
@@ -129,17 +166,29 @@ alwaysApply: false
 |------------|-----------|--------|--------|
 | >1280px | 5 columns | 4/5 + 1/5 | 3 columns |
 | 1024-1280px | 4 columns | 4/5 + 1/5 | 3 columns |
-| 768-1024px | 3 columns | Stacked | Scrollable |
-| 480-768px | 2 columns | Stacked | Tabs |
-| <480px | 1 column | Stacked | Tabs |
+| 768-1024px | 3 columns | Stacked | 3 columns |
+| 480-768px | 2 columns | Stacked | Stacked |
+| <480px | 1 column | Stacked | Stacked |
 
 ## Anti-Patterns (Do NOT Do)
 
+- ❌ Serif fonts (use sans-serif only)
+- ❌ Text smaller than 10px
+- ❌ Rounded corners (use square corners)
+- ❌ Decorative shadows (minimal or none)
 - ❌ Decorative colors or gradients
-- ❌ Rounded corners > 4px
-- ❌ Drop shadows for decoration
+- ❌ Excessive whitespace
 - ❌ Italic text (except citations)
 - ❌ Centered body text
-- ❌ Excessive whitespace between elements
 - ❌ Icons without labels in navigation
 - ❌ Low-contrast text
+- ❌ Saturated colors (use monochromatic palette)
+
+## Density Guidelines
+
+- Reduce padding/margins by 20-30% from typical web standards
+- Tighten line-heights (1.2-1.4)
+- Smaller font sizes where appropriate (maintain 10px minimum)
+- Align all elements to grid
+- Minimize gaps between elements
+- Create density through typography and grid, not decoration

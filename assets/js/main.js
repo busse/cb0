@@ -1,4 +1,4 @@
-// Swiss Wayfinding Design - Client-side Interactivity
+// Bauhaus/Experimental Jetset/Swiss-German Design - Client-side Interactivity
 // Ideas/Stories/Sprints Taxonomy System
 
 (function() {
@@ -54,7 +54,7 @@
   function init() {
     initFilters();
     setCurrentNav();
-    console.log('Swiss Wayfinding System - Initialized');
+    console.log('Bauhaus/Swiss-German Design System - Initialized');
   }
   
   if (document.readyState === 'loading') {
