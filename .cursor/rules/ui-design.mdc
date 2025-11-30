@@ -41,7 +41,7 @@ alwaysApply: false
 --line-height-base: 1.4;
 
 // Type Scale (minimum 10px, ratio 1.25)
---text-xs: 0.625rem;    /* 10px - meta, timestamps */
+--text-xs: 0.714rem;    /* 10px - meta, timestamps */
 --text-sm: 0.75rem;     /* 12px - captions, secondary */
 --text-base: 0.875rem;  /* 14px - body text */
 --text-md: 1.094rem;    /* ~15px - card titles */
