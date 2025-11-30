@@ -1,0 +1,108 @@
+{%- comment -%}
+  Ideas cards flat grid component for home page
+  Displays all ideas with detailed progress information in a flat, grid-based card layout
+  Uses plain text notation, rectangular boxes, and grid lines instead of badges and curves
+{%- endcomment -%}
+{%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
+{%- if sorted_ideas.size > 0 -%}
+  <div class="ideas-cards-flat-grid">
+    {%- for idea in sorted_ideas -%}
+      {%- include helpers/stories-for-idea.html idea_number=idea.idea_number -%}
+      {%- assign idea_stories = stories_list -%}
+      {%- assign total_stories = idea_stories | size -%}
+      
+      {%- comment -%} Count stories by status {%- endcomment -%}
+      {%- assign done_stories = idea_stories | where: "status", "done" | size -%}
+      {%- assign in_progress_stories = idea_stories | where: "status", "in_progress" | size -%}
+      {%- assign in_progress_stories_alt = idea_stories | where: "status", "in-progress" | size -%}
+      {%- assign in_progress_stories = in_progress_stories | plus: in_progress_stories_alt -%}
+      {%- assign backlog_stories = idea_stories | where: "status", "backlog" | size -%}
+      {%- assign planned_stories = idea_stories | where: "status", "planned" | size -%}
+      
+      {%- comment -%} Calculate progress percentage {%- endcomment -%}
+      {%- if total_stories > 0 -%}
+        {%- assign progress_pct = done_stories | times: 100.0 | divided_by: total_stories | round -%}
+      {%- else -%}
+        {%- assign progress_pct = 0 -%}
+      {%- endif -%}
+      
+      {%- comment -%} Build story status string {%- endcomment -%}
+      {%- assign status_parts = "" -%}
+      {%- if done_stories > 0 -%}
+        {%- if status_parts != "" -%}
+          {%- assign status_parts = status_parts | append: ", " -%}
+        {%- endif -%}
+        {%- assign status_parts = status_parts | append: done_stories | append: " done" -%}
+      {%- endif -%}
+      {%- if in_progress_stories > 0 -%}
+        {%- if status_parts != "" -%}
+          {%- assign status_parts = status_parts | append: ", " -%}
+        {%- endif -%}
+        {%- assign status_parts = status_parts | append: in_progress_stories | append: " active" -%}
+      {%- endif -%}
+      {%- if backlog_stories > 0 -%}
+        {%- if status_parts != "" -%}
+          {%- assign status_parts = status_parts | append: ", " -%}
+        {%- endif -%}
+        {%- assign status_parts = status_parts | append: backlog_stories | append: " backlog" -%}
+      {%- endif -%}
+      {%- if planned_stories > 0 -%}
+        {%- if status_parts != "" -%}
+          {%- assign status_parts = status_parts | append: ", " -%}
+        {%- endif -%}
+        {%- assign status_parts = status_parts | append: planned_stories | append: " planned" -%}
+      {%- endif -%}
+      {%- if status_parts == "" -%}
+        {%- assign status_parts = "—" -%}
+      {%- endif -%}
+      
+      <article class="idea-card-flat idea-card-flat--{{ idea.status }}" 
+               data-idea="{{ idea.idea_number }}"
+               data-status="{{ idea.status }}">
+        <header class="idea-card-flat__header">
+          <span class="idea-card-flat__notation">{% include helpers/notation-format.html idea=idea.idea_number %}</span>
+          <h3 class="idea-card-flat__title">
+            <a href="{{ idea.url | relative_url }}">{{ idea.title }}</a>
+          </h3>
+          <div class="idea-card-flat__status-box">
+            <span class="idea-card-flat__status-text">{{ idea.status | upcase }}</span>
+          </div>
+        </header>
+        
+        <div class="idea-card-flat__grid">
+          <div class="idea-card-flat__row">
+            <div class="idea-card-flat__cell idea-card-flat__cell--label">STORIES</div>
+            <div class="idea-card-flat__cell idea-card-flat__cell--value">{{ total_stories }}</div>
+          </div>
+          
+          <div class="idea-card-flat__row">
+            <div class="idea-card-flat__cell idea-card-flat__cell--label">PROGRESS</div>
+            <div class="idea-card-flat__cell idea-card-flat__cell--value">
+              <div class="idea-card-flat__progress">
+                <span class="idea-card-flat__progress-text">{{ progress_pct }}%</span>
+                <div class="idea-card-flat__progress-bar">
+                  <div class="idea-card-flat__progress-fill" style="width: {{ progress_pct }}%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="idea-card-flat__row">
+            <div class="idea-card-flat__cell idea-card-flat__cell--label">STORY STATUS</div>
+            <div class="idea-card-flat__cell idea-card-flat__cell--value idea-card-flat__cell--secondary">{{ status_parts }}</div>
+          </div>
+          
+          <div class="idea-card-flat__row">
+            <div class="idea-card-flat__cell idea-card-flat__cell--label">CREATED</div>
+            <div class="idea-card-flat__cell idea-card-flat__cell--value">
+              <time datetime="{{ idea.created }}">{{ idea.created | date: "%Y-%m-%d" }}</time>
+            </div>
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+{%- else -%}
+  <p class="ideas-cards-flat__empty-message">No ideas yet. Create your first idea to get started.</p>
+{%- endif -%}
+

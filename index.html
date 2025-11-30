@@ -56,6 +56,22 @@ title: Home
       </header>
       {% include ideas-table.html %}
     </section>
+    
+    <section class="content-section">
+      <header class="section-header">
+        <h2 class="section-title">IDEA CARDS</h2>
+        <a href="{{ '/ideas/' | relative_url }}" class="section-link">VIEW ALL →</a>
+      </header>
+      {% include ideas-cards.html %}
+    </section>
+    
+    <section class="content-section">
+      <header class="section-header">
+        <h2 class="section-title">IDEA CARDS (FLAT)</h2>
+        <a href="{{ '/ideas/' | relative_url }}" class="section-link">VIEW ALL →</a>
+      </header>
+      {% include ideas-cards-flat.html %}
+    </section>
   {%- endif -%}
   
   {%- assign active_sprints = site.sprints | where: "status", "active" | sort: "sprint_id" | reverse -%}
