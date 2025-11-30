@@ -1,97 +1,98 @@
-// Swiss Wayfinding Design System - Variables
-// Based on German road signage and Rudy Bauer CGN wayfinding
+// Bauhaus/Experimental Jetset/Swiss-German Design System
+// Primary influences: Bauhaus, Experimental Jetset, Swiss/German Package Design
 
 :root {
   /* Typography */
-  --font-primary: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;
+  --font-primary: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Georgia', 'Times New Roman', serif; /* Reserved, not used */
   --font-mono: 'SF Mono', Consolas, 'Liberation Mono', monospace;
   
-  --font-size-base: 15px;
-  --line-height-base: 1.5;
+  --font-size-base: 14px;
+  --line-height-base: 1.4;
   
-  /* Type Scale (ratio 1.25) */
-  --text-xs: 0.64rem;    /* 9px */
-  --text-sm: 0.8rem;     /* 11px */
-  --text-base: 1rem;     /* 14px */
-  --text-md: 1.25rem;    /* 17.5px */
-  --text-lg: 1.563rem;   /* 22px */
-  --text-xl: 1.953rem;   /* 27px */
-  --text-2xl: 2.441rem;  /* 34px */
-  --text-3xl: 3.052rem;  /* 43px */
+  /* Type Scale (minimum 10px, ratio 1.25) */
+  --text-xs: 0.714rem;    /* 10px */
+  --text-sm: 0.75rem;     /* 12px */
+  --text-base: 0.875rem;  /* 14px */
+  --text-md: 1.094rem;    /* ~15px */
+  --text-lg: 1.367rem;    /* ~19px */
+  --text-xl: 1.709rem;    /* ~24px */
+  --text-2xl: 2.136rem;   /* ~30px */
+  --text-3xl: 2.67rem;    /* ~37px */
   
   /* Colors - Base */
-  --color-background: #F5F4FA;
-  --color-background-muted: #EFEDF6;
+  --color-background: #FFFFFF;
+  --color-background-muted: #FAFAFA;
   --color-surface: #FFFFFF;
-  --color-surface-alt: #F9F8FD;
-  --color-surface-muted: #F1EFF8;
-  --color-surface-bright: #FCFBFF;
-  --color-surface-highlight: #F7F5FE;
-  --color-text-primary: #1E1B3C;
-  --color-text-secondary: #5B5873;
-  --color-border: #DFDCEF;
-  --color-border-strong: #C7C3DD;
-  --color-shadow-soft: 0 20px 50px rgba(25, 20, 64, 0.08);
-  --color-shadow-hover: 0 28px 70px rgba(25, 20, 64, 0.12);
+  --color-surface-alt: #FAFAFA;
+  --color-surface-muted: #F5F5F5;
+  --color-surface-bright: #FFFFFF;
+  --color-surface-highlight: #FAFAFA;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #666666;
+  --color-border: #E0E0E0;
+  --color-border-strong: #CCCCCC;
+  --color-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --color-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.08);
   
-  /* Colors - Status (Functional) */
-  --color-status-active: #5E6DE2;
-  --color-status-planned: #F28F4B;
-  --color-status-complete: #32BDA4;
-  --color-status-blocked: #ED5F76;
-  --color-status-archived: #AFAAC3;
+  /* Colors - Status (Functional, Less Saturated) */
+  --color-status-active: #4A5568;
+  --color-status-planned: #718096;
+  --color-status-complete: #2D3748;
+  --color-status-blocked: #1A202C;
+  --color-status-archived: #A0AEC0;
   
-  /* Colors - Accent */
-  --color-accent-primary: #F2C86B;
-  --color-accent-secondary: #6455CC;
-  --color-accent-tertiary: #5BC7BA;
+  /* Colors - Accent (Monochromatic, Functional) */
+  --color-accent-primary: #1A1A1A;
+  --color-accent-secondary: #1A1A1A;
+  --color-accent-tertiary: #000000;
   
   /* Colors - Notation Badge */
-  --color-notation-bg: #201D3F;
+  --color-notation-bg: #1A1A1A;
   --color-notation-text: #FFFFFF;
   
-  /* Colors - Badge Context */
-  --color-badge-idea-bg: #F1EDFF;
-  --color-badge-idea-text: #4C2F8D;
-  --color-badge-story-bg: #E8EDFF;
-  --color-badge-story-text: #203B80;
-  --color-badge-sprint-bg: #E5FBF5;
-  --color-badge-sprint-text: #0F6147;
-  --color-badge-update-bg: #FFE6F1;
-  --color-badge-update-text: #7A2048;
-  --color-badge-active-bg: #EAECFF;
-  --color-badge-active-text: #2E318A;
-  --color-badge-in-progress-bg: #E3E6FB;
-  --color-badge-in-progress-text: #2A3180;
-  --color-badge-planned-bg: #FFEEDC;
-  --color-badge-planned-text: #7F4315;
-  --color-badge-complete-bg: #E5FFF6;
-  --color-badge-complete-text: #0B5E48;
-  --color-badge-blocked-bg: #FFE6ED;
-  --color-badge-blocked-text: #7D1F33;
-  --color-badge-backlog-bg: #EEF0FF;
-  --color-badge-backlog-text: #4A4E82;
-  --color-badge-archived-bg: #F1F0F6;
-  --color-badge-archived-text: #4C4B63;
+  /* Colors - Badge Context (Monochromatic) */
+  --color-badge-idea-bg: #F5F5F5;
+  --color-badge-idea-text: #1A1A1A;
+  --color-badge-story-bg: #E5E5E5;
+  --color-badge-story-text: #1A1A1A;
+  --color-badge-sprint-bg: #EBEBEB;
+  --color-badge-sprint-text: #1A1A1A;
+  --color-badge-update-bg: #F0F0F0;
+  --color-badge-update-text: #1A1A1A;
+  --color-badge-active-bg: #E0E0E0;
+  --color-badge-active-text: #1A1A1A;
+  --color-badge-in-progress-bg: #D5D5D5;
+  --color-badge-in-progress-text: #1A1A1A;
+  --color-badge-planned-bg: #EAEAEA;
+  --color-badge-planned-text: #1A1A1A;
+  --color-badge-complete-bg: #E8E8E8;
+  --color-badge-complete-text: #1A1A1A;
+  --color-badge-blocked-bg: #D0D0D0;
+  --color-badge-blocked-text: #1A1A1A;
+  --color-badge-backlog-bg: #E5E5E5;
+  --color-badge-backlog-text: #1A1A1A;
+  --color-badge-archived-bg: #F0F0F0;
+  --color-badge-archived-text: #666666;
   
   /* Utility */
-  --color-chip-neutral-bg: #EDF0FF;
-  --color-chip-neutral-text: #363458;
+  --color-chip-neutral-bg: #E5E5E5;
+  --color-chip-neutral-text: #1A1A1A;
   /* Utility colors intentionally flat – gradients avoided */
   
-  /* Spacing */
+  /* Spacing (Dense, Grid-Based) */
   --spacing-xs: 4px;
-  --spacing-sm: 12px;
-  --spacing-md: 24px;
-  --spacing-lg: 40px;
-  --spacing-xl: 56px;
-  --spacing-2xl: 88px;
-  --spacing-3xl: 120px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
   
-  /* Grid System */
+  /* Grid System (Strong, Visible) */
   --grid-columns: 12;
-  --grid-gutter: 24px;
-  --grid-margin: 40px;
+  --grid-gutter: 16px;
+  --grid-margin: 24px;
   --container-max-width: 1440px;
   
   /* Breakpoints */
@@ -101,14 +102,14 @@
   --bp-xl: 1280px;
   --bp-2xl: 1536px;
   
-  /* Navigation */
-  --nav-height: 64px;
-  --nav-blur: 18px;
+  /* Navigation (Compact) */
+  --nav-height: 48px;
+  --nav-blur: 12px;
   
-  /* Border Radius */
-  --radius-sm: 10px;
-  --radius-md: 22px;
-  --radius-lg: 32px;
+  /* Border Radius (Square corners - Bauhaus style) */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
   
   /* Transitions */
   --transition-fast: 0.15s ease;
@@ -118,21 +119,21 @@
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: #141321;
-    --color-background-muted: #1D1C2F;
-    --color-surface: #1F1E2F;
-    --color-surface-alt: #24213A;
-    --color-surface-muted: #1B1A2B;
-    --color-surface-bright: #25233C;
-    --color-surface-highlight: #2D2A43;
-    --color-text-primary: #F2F1FF;
-    --color-text-secondary: #B2AFD0;
-    --color-border: #33324A;
-    --color-border-strong: #444265;
-    --color-chip-neutral-bg: #2A2941;
-    --color-chip-neutral-text: #E2E0FF;
-    --color-notation-bg: #FFC857;
-    --color-notation-text: #1A1A1A;
+    --color-background: #1A1A1A;
+    --color-background-muted: #242424;
+    --color-surface: #1F1F1F;
+    --color-surface-alt: #242424;
+    --color-surface-muted: #1A1A1A;
+    --color-surface-bright: #1F1F1F;
+    --color-surface-highlight: #242424;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #CCCCCC;
+    --color-border: #333333;
+    --color-border-strong: #444444;
+    --color-chip-neutral-bg: #2A2A2A;
+    --color-chip-neutral-text: #E0E0E0;
+    --color-notation-bg: #E3120B;
+    --color-notation-text: #FFFFFF;
     --color-badge-active-bg: rgba(86, 101, 255, 0.22);
     --color-badge-active-text: #E6E3FF;
     --color-badge-in-progress-bg: rgba(124, 146, 255, 0.22);

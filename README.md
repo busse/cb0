@@ -288,14 +288,15 @@ Update content...
 
 ## Design System
 
-UI placeholders are marked with `<!-- UI_SPEC_PLACEHOLDER -->` for future design implementation. The design will follow Swiss wayfinding principles:
+The design system follows Bauhaus/Experimental Jetset/Swiss-German principles:
 
-- Clear hierarchy through scale/weight
-- Dense information display
-- Functional color (semantic, not decorative)
-- Systematic patterns
-- Minimal border radius (≤4px)
-- Helvetica Neue typography
+- Strong visible grid structure
+- Sans-serif typography throughout (Helvetica Neue)
+- High information density without losing readability
+- Monochromatic color palette with functional accents
+- Square corners (no border radius)
+- Minimum 10px text size
+- Geometric precision and alignment
 
 See `.cursor/rules/ui-design.mdc` for full specifications.
 
