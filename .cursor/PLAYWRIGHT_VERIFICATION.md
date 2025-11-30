@@ -78,3 +78,5 @@ node test-playwright-local.js
 - Local Jekyll server integration works correctly
 - Screenshots and page interactions are working as expected
 
+
+

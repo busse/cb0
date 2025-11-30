@@ -66,6 +66,7 @@ exclude:
   - .ruby-version
   - vendor/
   - .cursor/
+  - electron/
 
 # Include files
 include:

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ideas Taxonomy CMS</title>
+  <style>
+    :root {
+      --color-bg: #f5f5f5;
+      --color-surface: #ffffff;
+      --color-border: #e0e0e0;
+      --color-border-strong: #d0d0d0;
+      --color-text: #1f1f1f;
+      --color-muted: #6c6c6c;
+      --color-primary: #0066cc;
+      --color-primary-dark: #0052a3;
+      --color-danger: #c62828;
+      --radius-md: 10px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 12px 24px rgba(15, 23, 42, 0.12);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--color-bg);
+      color: var(--color-text);
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    header h1 {
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--color-muted);
+      font-size: 15px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .tab {
+      background: none;
+      border: none;
+      padding: 14px 4px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-muted);
+      letter-spacing: 0.08em;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .tab::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: transparent;
+      transition: background 0.2s ease;
+    }
+
+    .tab.active {
+      color: var(--color-primary);
+    }
+
+    .tab.active::after {
+      background: var(--color-primary);
+    }
+
+    .content {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      min-height: 600px;
+    }
+
+    .panel {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel.active {
+      display: flex;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .item-card {
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 18px;
+      background: white;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .item-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .item-header {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .item-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .item-badge {
+      background: var(--color-primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+
+    .item-description {
+      margin-top: 10px;
+      color: var(--color-muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-muted);
+    }
+
+    .item-actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-text);
+      border-color: var(--color-border-strong);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .btn-danger {
+      background: var(--color-danger);
+      color: white;
+      border-color: var(--color-danger);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--color-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .error {
+      background: #ffe6e6;
+      border: 1px solid #ffb3b3;
+      color: #a00c0c;
+      padding: 14px 16px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 20;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal__dialog {
+      background: white;
+      border-radius: 16px;
+      width: min(900px, 100%);
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .modal__dialog[data-size='md'] {
+      width: min(640px, 100%);
+    }
+
+    .modal__dialog[data-size='lg'] {
+      width: min(900px, 100%);
+    }
+
+    .modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .modal__header h2 {
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .modal__close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--color-muted);
+    }
+
+    #modal-form {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-field textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+
+    .modal__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 8px 0 0;
+    }
+
+    .helper-text {
+      font-size: 12px;
+      color: var(--color-muted);
+    }
+
+    /* Toasts */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 50;
+    }
+
+    .toast {
+      padding: 14px 18px;
+      border-radius: 999px;
+      color: white;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      min-width: 220px;
+      box-shadow: var(--shadow-md);
+      animation: slide-in 0.3s ease-out;
+    }
+
+    .toast--success {
+      background: #0f9d58;
+    }
+
+    .toast--error {
+      background: #d93025;
+    }
+
+    @keyframes slide-in {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .item-card {
+        border-radius: 10px;
+      }
+    }
+  </style>
+  <script type="module" crossorigin src="/assets/index-lCL8clqb.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Ideas Taxonomy CMS</h1>
+      <p>Manage your Ideas, Stories, and Sprints</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="ideas">Ideas</button>
+        <button class="tab" data-tab="stories">Stories</button>
+        <button class="tab" data-tab="sprints">Sprints</button>
+        <button class="tab" data-tab="updates">Updates</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div id="error-message" class="error" role="alert"></div>
+      
+      <div id="ideas-panel" class="panel active">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-idea">New Idea</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-ideas">Refresh</button>
+        </div>
+        <div id="ideas-list" class="list"></div>
+      </div>
+
+      <div id="stories-panel" class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-story">New Story</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-stories">Refresh</button>
+        </div>
+        <div id="stories-list" class="list"></div>
+      </div>
+
+      <div id="sprints-panel" class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-sprint">New Sprint</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-sprints">Refresh</button>
+        </div>
+        <div id="sprints-list" class="list"></div>
+      </div>
+
+      <div id="updates-panel" class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-update">New Update</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-updates">Refresh</button>
+        </div>
+        <div id="updates-list" class="list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__dialog" data-size="md">
+      <div class="modal__header">
+        <h2 id="modal-title"></h2>
+        <button class="modal__close" id="modal-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <form id="modal-form"></form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+</body>
+</html>
+
