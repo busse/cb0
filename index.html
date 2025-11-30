@@ -47,6 +47,17 @@ title: Home
     </aside>
   </section>
   
+  {%- assign all_ideas = site.ideas | sort: "idea_number" -%}
+  {%- if all_ideas.size > 0 -%}
+    <section class="content-section">
+      <header class="section-header">
+        <h2 class="section-title">IDEAS</h2>
+        <a href="{{ '/ideas/' | relative_url }}" class="section-link">VIEW ALL →</a>
+      </header>
+      {% include ideas-table.html %}
+    </section>
+  {%- endif -%}
+  
   {%- assign active_sprints = site.sprints | where: "status", "active" | sort: "sprint_id" | reverse -%}
   {%- if active_sprints.size > 0 -%}
     <section class="content-section">
