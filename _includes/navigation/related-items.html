@@ -6,6 +6,7 @@
     - include.idea: current idea object
     - include.story: current story object
     - include.sprint: current sprint object
+    - include.figure: current figure object
     - include.limit: max items to show (default: 5)
 -->
 
@@ -76,6 +77,83 @@
           {%- endfor -%}
         </ul>
       </div>
+      {%- endif -%}
+    {%- endif -%}
+    
+    <!-- If viewing an Idea, show related figures -->
+    {%- if include.idea -%}
+      {%- include helpers/figures-for-idea.html idea_number=include.idea.idea_number -%}
+      {%- if figures_list.size > 0 -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">FIGURES</h4>
+          <ul class="related-items__list">
+            {%- for figure in figures_list limit: limit -%}
+            <li>
+              <a href="{{ figure.url | relative_url }}">
+                {% include notation-badge.html figure=figure.figure_number size="sm" %}
+                {{ figure.title | truncate: 30 }}
+              </a>
+            </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+    
+    <!-- If viewing a Story, show related figures -->
+    {%- if include.story -%}
+      {%- include helpers/figures-for-story.html idea_number=include.story.idea_number story_number=include.story.story_number -%}
+      {%- if figures_list.size > 0 -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">FIGURES</h4>
+          <ul class="related-items__list">
+            {%- for figure in figures_list limit: limit -%}
+            <li>
+              <a href="{{ figure.url | relative_url }}">
+                {% include notation-badge.html figure=figure.figure_number size="sm" %}
+                {{ figure.title | truncate: 30 }}
+              </a>
+            </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+    
+    <!-- If viewing a Figure, show related ideas and stories -->
+    {%- if include.figure -%}
+      {%- include helpers/ideas-for-figure.html figure_number=include.figure.figure_number -%}
+      {%- if ideas_list.size > 0 -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">IDEAS</h4>
+          <ul class="related-items__list">
+            {%- for idea in ideas_list limit: limit -%}
+            <li>
+              <a href="{{ idea.url | relative_url }}">
+                {% include notation-badge.html idea=idea.idea_number size="sm" %}
+                {{ idea.title | truncate: 30 }}
+              </a>
+            </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+      
+      {%- include helpers/stories-for-figure.html figure_number=include.figure.figure_number -%}
+      {%- if stories_list.size > 0 -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">STORIES</h4>
+          <ul class="related-items__list">
+            {%- for story in stories_list limit: limit -%}
+            <li>
+              <a href="{{ story.url | relative_url }}">
+                {% include notation-badge.html idea=story.idea_number story=story.story_number size="sm" %}
+                {{ story.title | truncate: 30 }}
+              </a>
+            </li>
+            {%- endfor -%}
+          </ul>
+        </div>
       {%- endif -%}
     {%- endif -%}
     

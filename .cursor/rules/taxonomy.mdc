@@ -1,16 +1,18 @@
 ---
-description: Ideas/Stories/Sprints taxonomy system and notation conventions
+description: Ideas/Stories/Sprints/Figures taxonomy system and notation conventions
 globs:
   - "_ideas/**"
   - "_stories/**"
   - "_sprints/**"
   - "_updates/**"
+  - "_figures/**"
   - "_data/notation.yml"
   - "_data/sprint_calendar.yml"
   - "_includes/**/notation*"
   - "_includes/**/idea*"
   - "_includes/**/story*"
   - "_includes/**/sprint*"
+  - "_includes/**/figure*"
 alwaysApply: false
 ---
 
@@ -22,6 +24,7 @@ alwaysApply: false
 |--------|---------|---------|
 | `i{n}` | Idea n | i5 = Idea 5 |
 | `s{n}` | Story n | s56 = Story 56 |
+| `fig_{n}` | Figure n (always italicized) | fig_32 = Figure 32 |
 | `{idea}.{story}` | Combined (no prefixes) | 5.56 = Idea 5, Story 56 |
 | `{sprint}.{idea}.{story}` | Full reference | 2609.5.56 |
 
@@ -33,6 +36,7 @@ alwaysApply: false
 ## Reserved Values
 - `i0` = The site itself (meta-idea documenting this system)
 - `s0` = Intent/purpose story for any idea (why the idea exists)
+- Figures have no reserved values (start from fig_0)
 
 ## Collection Relationships
 
@@ -41,7 +45,22 @@ Ideas (i{n})
   └── Stories (i{n}.s{m})
         └── Updates ({sprint}.{idea}.{story})
               └── Sprints ({YYSS})
+
+Figures (fig_{n})
+  └── Many-to-many with Ideas
+  └── Many-to-many with Stories
 ```
+
+### Many-to-Many Relationships
+
+Figures can be related to multiple Ideas and Stories:
+- Figures have `related_ideas: [5, 7]` array in front matter
+- Figures have `related_stories: ["5.0", "7.1"]` array (format: "idea.story")
+- Use helper includes to query relationships:
+  - `helpers/figures-for-idea.html` - Get figures for an idea
+  - `helpers/figures-for-story.html` - Get figures for a story
+  - `helpers/ideas-for-figure.html` - Get ideas for a figure
+  - `helpers/stories-for-figure.html` - Get stories for a figure
 
 ## Front Matter Requirements
 
@@ -100,6 +119,27 @@ type: progress          # Required: progress | completion | blocker | note
 ---
 ```
 
+### Figures (`_figures/{n}.md`)
+```yaml
+---
+layout: figure
+figure_number: 32       # Required: integer, unique
+title: ""               # Required: string
+description: ""         # Optional: string
+image_path: "/assets/figures/fig_32.png"  # Required: path to image
+alt_text: ""            # Optional: accessibility description
+related_ideas: [5, 7]   # Optional: array of idea numbers
+related_stories: ["5.0", "7.1"]  # Optional: array of "idea.story" strings
+created: 2025-01-15     # Required: ISO date
+uploaded_date: 2025-01-15  # Optional: ISO date
+file_type: "png"        # Optional: png, jpg, svg, etc.
+status: active          # Required: active | archived
+tags: []                # Optional: array of strings
+dimensions: "1920x1080"  # Optional: width x height
+file_size: "245KB"      # Optional: file size string
+---
+```
+
 ## Implicit Backlog Logic
 
 The backlog is DERIVED, not stored:
@@ -129,4 +169,14 @@ Always use `_includes/helpers/notation-format.html` for consistent formatting:
 
 {% include helpers/notation-format.html idea=5 %}
 <!-- Outputs: i5 -->
+
+{% include helpers/notation-format.html figure=32 %}
+<!-- Outputs: fig_32 (displayed italicized) -->
 ```
+
+## Figure Notation Display
+
+Figures are always displayed with italic styling:
+- Use `notation-badge.html` with `figure` parameter
+- Badge automatically gets `notation-badge--figure` class for italic styling
+- Example: `{% include notation-badge.html figure=32 %}` renders as *fig_32*

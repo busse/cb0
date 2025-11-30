@@ -26,6 +26,14 @@
       </li>
     {%- endif -%}
     
+    <!-- Figures level -->
+    {%- if include.figure or page.layout == 'figure' -%}
+      <li class="breadcrumbs__item">
+        <span class="breadcrumbs__separator" aria-hidden="true">→</span>
+        <a href="{{ '/figures/' | relative_url }}" class="breadcrumbs__link">FIGURES</a>
+      </li>
+    {%- endif -%}
+    
     <!-- Specific Idea -->
     {%- if include.idea -%}
       <li class="breadcrumbs__item">
@@ -47,6 +55,21 @@
       <li class="breadcrumbs__item" aria-current="page">
         <span class="breadcrumbs__separator" aria-hidden="true">→</span>
         <span class="notation-badge notation-badge--sm">{{ story.idea_number }}.{{ story.story_number }}</span>
+      </li>
+    {%- endif -%}
+    
+    <!-- Specific Figure -->
+    {%- if include.figure -%}
+      <li class="breadcrumbs__item">
+        <span class="breadcrumbs__separator" aria-hidden="true">→</span>
+        <a href="{{ include.figure.url | relative_url }}" class="breadcrumbs__link">
+          {% include notation-badge.html figure=include.figure.figure_number size="sm" %}
+        </a>
+      </li>
+    {%- elsif page.layout == 'figure' -%}
+      <li class="breadcrumbs__item" aria-current="page">
+        <span class="breadcrumbs__separator" aria-hidden="true">→</span>
+        {% include notation-badge.html figure=page.figure_number size="sm" %}
       </li>
     {%- endif -%}
     

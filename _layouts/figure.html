@@ -1,0 +1,109 @@
+---
+layout: default
+---
+<main class="page-figure container">
+  {% include navigation/breadcrumbs.html %}
+  
+  <section class="header-region">
+    <div class="header-primary">
+      <header class="figure-header">
+        {% include notation-badge.html figure=page.figure_number size="lg" %}
+        <span class="status-indicator status-indicator--{{ page.status }}">
+          {{ page.status | upcase }}
+        </span>
+      </header>
+      
+      <h1 class="page-title">{{ page.title }}</h1>
+      
+      <div class="figure-detail__meta">
+        <time class="figure-detail__date" datetime="{{ page.created }}">Created: {{ page.created | date: "%B %d, %Y" }}</time>
+        {%- if page.uploaded_date -%}
+          <time class="figure-detail__uploaded" datetime="{{ page.uploaded_date }}">Uploaded: {{ page.uploaded_date | date: "%B %d, %Y" }}</time>
+        {%- endif -%}
+        {%- if page.dimensions -%}
+          <span class="figure-detail__dimensions">Dimensions: {{ page.dimensions }}</span>
+        {%- endif -%}
+        {%- if page.file_size -%}
+          <span class="figure-detail__file-size">Size: {{ page.file_size }}</span>
+        {%- endif -%}
+        {%- if page.file_type -%}
+          <span class="figure-detail__file-type">Type: {{ page.file_type | upcase }}</span>
+        {%- endif -%}
+        {%- if page.tags.size > 0 -%}
+          <ul class="figure-detail__tags">
+            {%- for tag in page.tags -%}
+              <li class="tag">{{ tag }}</li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+      
+      {%- if page.description -%}
+        <div class="figure-detail__description">
+          <p>{{ page.description }}</p>
+        </div>
+      {%- endif -%}
+      
+      <div class="figure-content">
+        <div class="figure-image-wrapper">
+          <a href="{{ page.image_path | relative_url }}" class="figure-image-link" data-lightbox="figure-detail">
+            <img src="{{ page.image_path | relative_url }}" 
+                 alt="{{ page.alt_text | default: page.title }}"
+                 class="figure-image"
+                 loading="lazy">
+          </a>
+        </div>
+        {{ content }}
+      </div>
+    </div>
+    
+    <aside class="header-sidebar">
+      {% include navigation/related-items.html figure=page %}
+      
+      <h2 class="sidebar-heading">ARTICLES</h2>
+      {%- if site.posts.size > 0 -%}
+        <div class="article-list">
+          {%- for post in site.posts limit:5 -%}
+            {% include article-item.html post=post %}
+          {%- endfor -%}
+        </div>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+      {%- else -%}
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
+      {%- endif -%}
+    </aside>
+  </section>
+  
+  {%- include helpers/ideas-for-figure.html figure_number=page.figure_number -%}
+  {%- if ideas_list.size > 0 -%}
+    <section class="content-section">
+      <header class="section-header">
+        <h2 class="section-title">RELATED IDEAS</h2>
+        <span class="section-count">{{ ideas_list.size }} total</span>
+      </header>
+      
+      <div class="card-grid">
+        {%- for idea in ideas_list -%}
+          {% include idea-card.html idea=idea %}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+  
+  {%- include helpers/stories-for-figure.html figure_number=page.figure_number -%}
+  {%- if stories_list.size > 0 -%}
+    <section class="content-section">
+      <header class="section-header">
+        <h2 class="section-title">RELATED STORIES</h2>
+        <span class="section-count">{{ stories_list.size }} total</span>
+      </header>
+      
+      <div class="card-grid">
+        {%- for story in stories_list -%}
+          {% include story-card.html story=story %}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+</main>
+

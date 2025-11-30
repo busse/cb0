@@ -21,7 +21,7 @@
         this.classList.add('filter-btn--active');
         
         // Filter cards
-        const cards = document.querySelectorAll('.idea-card, .story-card, .sprint-card');
+        const cards = document.querySelectorAll('.idea-card, .story-card, .sprint-card, .figure-card');
         cards.forEach(card => {
           if (filter === 'all') {
             card.style.display = '';
@@ -29,7 +29,8 @@
             // Check if card has the matching status class
             const hasStatus = card.classList.contains(`idea-card--${filter}`) ||
                             card.classList.contains(`story-card--${filter}`) ||
-                            card.classList.contains(`sprint-card--${filter}`);
+                            card.classList.contains(`sprint-card--${filter}`) ||
+                            card.classList.contains(`figure-card--${filter}`);
             card.style.display = hasStatus ? '' : 'none';
           }
         });

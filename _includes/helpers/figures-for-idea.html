@@ -1,0 +1,16 @@
+{%- comment -%}
+  Get all figures related to an idea
+  Parameters:
+    - idea_number: The idea number to find figures for
+  Output:
+    - figures_list: Array of figure objects
+{%- endcomment -%}
+{%- assign idea_num = include.idea_number | default: page.idea_number -%}
+{%- assign figures_list = "" | split: "" -%}
+{%- for figure in site.figures -%}
+  {%- if figure.related_ideas and figure.related_ideas contains idea_num -%}
+    {%- assign figures_list = figures_list | push: figure -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign figures_list = figures_list | sort: "figure_number" -%}
+

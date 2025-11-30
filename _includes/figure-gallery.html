@@ -1,0 +1,22 @@
+{%- comment -%}
+  Gallery component for displaying multiple figures in a grid
+  Parameters:
+    - figures: Array of figure objects (optional, defaults to all figures)
+    - limit: Maximum number of figures to display (optional)
+{%- endcomment -%}
+{%- assign figures_to_show = include.figures | default: site.figures -%}
+{%- if include.limit -%}
+  {%- assign figures_to_show = figures_to_show | limit: include.limit -%}
+{%- endif -%}
+{%- assign sorted_figures = figures_to_show | sort: "figure_number" -%}
+
+{%- if sorted_figures.size > 0 -%}
+  <div class="figure-gallery">
+    {%- for figure in sorted_figures -%}
+      {% include figure-card.html figure=figure %}
+    {%- endfor -%}
+  </div>
+{%- else -%}
+  <p class="figure-gallery__empty">No figures to display.</p>
+{%- endif -%}
+

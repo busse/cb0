@@ -45,6 +45,15 @@
         </a>
       </li>
       <li role="none">
+        <a href="{{ '/figures/' | relative_url }}"
+           role="menuitem"
+           class="primary-nav__link {% if page.url contains '/figures' or page.url contains '/fig/' or page.layout == 'figure' %}is-active{% endif %}"
+           {% if page.url contains '/figures' or page.url contains '/fig/' %}aria-current="page"{% endif %}>
+          FIGURES
+          <span class="primary-nav__count">{{ site.figures | size }}</span>
+        </a>
+      </li>
+      <li role="none">
         <a href="{{ '/backlog/' | relative_url }}"
            role="menuitem"
            class="primary-nav__link {% if page.url contains '/backlog' %}is-active{% endif %}"

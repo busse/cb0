@@ -21,6 +21,9 @@ collections:
   updates:
     output: true
     permalink: /updates/:path/
+  figures:
+    output: true
+    permalink: /fig/:slug/
 
 # Collection defaults
 defaults:
@@ -44,6 +47,11 @@ defaults:
       type: "updates"
     values:
       layout: "update"
+  - scope:
+      path: ""
+      type: "figures"
+    values:
+      layout: "figure"
   - scope:
       path: ""
       type: "posts"

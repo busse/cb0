@@ -1,0 +1,20 @@
+{%- comment -%}
+  Get all figures related to a story
+  Parameters:
+    - idea_number: The idea number of the story
+    - story_number: The story number
+  Output:
+    - figures_list: Array of figure objects
+  Note: Stories are referenced as "idea.story" in related_stories array
+{%- endcomment -%}
+{%- assign idea_num = include.idea_number | default: page.idea_number -%}
+{%- assign story_num = include.story_number | default: page.story_number -%}
+{%- assign story_ref = idea_num | append: "." | append: story_num -%}
+{%- assign figures_list = "" | split: "" -%}
+{%- for figure in site.figures -%}
+  {%- if figure.related_stories and figure.related_stories contains story_ref -%}
+    {%- assign figures_list = figures_list | push: figure -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign figures_list = figures_list | sort: "figure_number" -%}
+
