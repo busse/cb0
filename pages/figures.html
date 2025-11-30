@@ -1,0 +1,50 @@
+---
+layout: default
+title: Figures
+permalink: /figures/
+---
+
+<main class="page-figures container">
+  <section class="header-region">
+    <div class="header-primary">
+      <h1 class="page-title">FIGURES</h1>
+      <p class="page-description">
+        All figures (images, screenshots, sketches, designs) tracked in this system.
+      </p>
+      
+      {%- assign sorted_figures = site.figures | sort: "figure_number" -%}
+      {%- if sorted_figures.size > 0 -%}
+        <div class="filter-bar">
+          <button class="filter-btn filter-btn--active" data-filter="all">ALL ({{ sorted_figures.size }})</button>
+          {%- assign active = sorted_figures | where: "status", "active" -%}
+          <button class="filter-btn" data-filter="active">ACTIVE ({{ active.size }})</button>
+          {%- assign archived = sorted_figures | where: "status", "archived" -%}
+          <button class="filter-btn" data-filter="archived">ARCHIVED ({{ archived.size }})</button>
+        </div>
+      {%- endif -%}
+    </div>
+    
+    <aside class="header-sidebar">
+      <h2 class="sidebar-heading">ARTICLES</h2>
+      {%- if site.posts.size > 0 -%}
+        <div class="article-list">
+          {%- for post in site.posts limit:5 -%}
+            {% include article-item.html post=post %}
+          {%- endfor -%}
+        </div>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+      {%- else -%}
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
+      {%- endif -%}
+    </aside>
+  </section>
+  
+  <section class="content-section">
+    {%- if sorted_figures.size > 0 -%}
+      {% include figure-gallery.html figures=sorted_figures %}
+    {%- else -%}
+      <p class="figures-index__empty">No figures yet. Upload your first figure to get started.</p>
+    {%- endif -%}
+  </section>
+</main>
+

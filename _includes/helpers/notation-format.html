@@ -1,10 +1,11 @@
 {%- comment -%}
-  Usage: {% include helpers/notation-format.html sprint=2609 idea=5 story=56 %}
+  Usage: {% include helpers/notation-format.html sprint=2609 idea=5 story=56 figure=32 %}
   Output: 2609.5.56 (or appropriate shorter form)
   Parameters:
     - sprint: Sprint ID (YYSS format)
     - idea: Idea number
     - story: Story number
+    - figure: Figure number
 {%- endcomment -%}
 {%- if include.sprint and include.idea and include.story -%}
   {{- include.sprint -}}.{{- include.idea -}}.{{- include.story -}}
@@ -16,5 +17,7 @@
   i{{- include.idea -}}
 {%- elsif include.story -%}
   s{{- include.story -}}
+{%- elsif include.figure -%}
+  fig_{{- include.figure -}}
 {%- endif -%}
 

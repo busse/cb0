@@ -1,6 +1,7 @@
 formats:
   idea: "i{n}"
   story: "s{n}"
+  figure: "fig_{n}"
   idea_story: "{idea}.{story}"
   full: "{sprint}.{idea}.{story}"
 
@@ -9,6 +10,8 @@ examples:
     meaning: "Idea 5"
   - notation: "s56"
     meaning: "Story 56"
+  - notation: "fig_32"
+    meaning: "Figure 32"
   - notation: "5.56"
     meaning: "Idea 5, Story 56"
   - notation: "2609.5.56"

@@ -1,0 +1,54 @@
+{%- comment -%}
+  Card component for displaying a figure in list/grid views
+  Parameters:
+    - figure: The figure object from site.figures
+{%- endcomment -%}
+{%- assign figure = include.figure -%}
+{%- include helpers/ideas-for-figure.html figure_number=figure.figure_number -%}
+{%- include helpers/stories-for-figure.html figure_number=figure.figure_number -%}
+{%- assign idea_count = ideas_list.size -%}
+{%- assign story_count = stories_list.size -%}
+
+<article class="figure-card figure-card--{{ figure.status }}" 
+         data-figure="{{ figure.figure_number }}"
+         data-status="{{ figure.status }}">
+  <div class="figure-card__image-wrapper">
+    <a href="{{ figure.image_path | relative_url }}" class="figure-card__image-link" data-lightbox="figures">
+      <img src="{{ figure.image_path | relative_url }}" 
+           alt="{{ figure.alt_text | default: figure.title }}"
+           class="figure-card__image"
+           loading="lazy">
+    </a>
+  </div>
+  
+  <header class="figure-card__header">
+    {% include notation-badge.html figure=figure.figure_number size="sm" %}
+    <span class="status-indicator status-indicator--{{ figure.status }}">
+      {{ figure.status | upcase }}
+    </span>
+  </header>
+  
+  <h3 class="figure-card__title">
+    <a href="{{ figure.url | relative_url }}">{{ figure.title }}</a>
+  </h3>
+  
+  {%- if figure.description -%}
+    <p class="figure-card__description">{{ figure.description | truncate: 80 }}</p>
+  {%- endif -%}
+  
+  <footer class="figure-card__meta">
+    {%- if idea_count > 0 or story_count > 0 -%}
+      <span class="figure-card__related">
+        {%- if idea_count > 0 -%}
+          {{ idea_count }} {% if idea_count == 1 %}idea{% else %}ideas{% endif %}
+        {%- endif -%}
+        {%- if idea_count > 0 and story_count > 0 -%}, {%- endif -%}
+        {%- if story_count > 0 -%}
+          {{ story_count }} {% if story_count == 1 %}story{% else %}stories{% endif %}
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+    <time class="figure-card__date" datetime="{{ figure.created }}">{{ figure.created | date: "%Y-%m-%d" }}</time>
+  </footer>
+</article>
+

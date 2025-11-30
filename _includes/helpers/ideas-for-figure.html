@@ -1,0 +1,21 @@
+{%- comment -%}
+  Get all ideas related to a figure
+  Parameters:
+    - figure_number: The figure number to find ideas for
+  Output:
+    - ideas_list: Array of idea objects
+{%- endcomment -%}
+{%- assign fig_num = include.figure_number | default: page.figure_number -%}
+{%- assign current_figure = site.figures | where: "figure_number", fig_num | first -%}
+{%- if current_figure and current_figure.related_ideas.size > 0 -%}
+  {%- assign ideas_list = "" | split: "" -%}
+  {%- for idea_num in current_figure.related_ideas -%}
+    {%- assign related_idea = site.ideas | where: "idea_number", idea_num | first -%}
+    {%- if related_idea -%}
+      {%- assign ideas_list = ideas_list | push: related_idea -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {%- assign ideas_list = "" | split: "" -%}
+{%- endif -%}
+
