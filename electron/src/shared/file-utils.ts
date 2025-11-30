@@ -4,16 +4,19 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { pathToFileURL } from 'url';
 import matter from 'gray-matter';
 import type {
   Idea,
   Story,
   Sprint,
   Update,
+  Figure,
   IdeaRecord,
   StoryRecord,
   SprintRecord,
   UpdateRecord,
+  FigureRecord,
 } from './types';
 
 // Get content directory relative to the Jekyll site root
@@ -36,6 +39,8 @@ export const PATHS = {
   stories: path.join(CONTENT_DIR, '_stories'),
   sprints: path.join(CONTENT_DIR, '_sprints'),
   updates: path.join(CONTENT_DIR, '_updates'),
+  figures: path.join(CONTENT_DIR, '_figures'),
+  figureImages: path.join(CONTENT_DIR, 'assets', 'figures'),
 };
 
 /**
@@ -149,6 +154,40 @@ export async function readUpdates(): Promise<UpdateRecord[]> {
 }
 
 /**
+ * Read all figures
+ */
+export async function readFigures(): Promise<FigureRecord[]> {
+  const files = await safeReaddir(PATHS.figures);
+  const figures: FigureRecord[] = [];
+
+  for (const file of files) {
+    if (!file.endsWith('.md')) continue;
+    const filePath = path.join(PATHS.figures, file);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const parsed = matter(content);
+    const data = parsed.data as Figure;
+    figures.push({
+      ...data,
+      body: parsed.content?.trim() ?? '',
+    });
+  }
+
+  return figures.sort((a, b) => a.figure_number - b.figure_number);
+}
+
+async function safeReaddir(dir: string): Promise<string[]> {
+  try {
+    return await fs.readdir(dir);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      await fs.mkdir(dir, { recursive: true });
+      return [];
+    }
+    throw error;
+  }
+}
+
+/**
  * Remove undefined values from an object (YAML can't serialize undefined)
  */
 function removeUndefined<T extends Record<string, any>>(obj: T): T {
@@ -205,6 +244,17 @@ export async function writeUpdate(update: Update, content: string): Promise<void
 }
 
 /**
+ * Write figure file
+ */
+export async function writeFigure(figure: Figure, content: string): Promise<void> {
+  await fs.mkdir(PATHS.figures, { recursive: true });
+  const filePath = path.join(PATHS.figures, `${figure.figure_number}.md`);
+  const cleaned = removeUndefined(figure);
+  const frontMatter = matter.stringify(content, cleaned);
+  await fs.writeFile(filePath, frontMatter, 'utf-8');
+}
+
+/**
  * Delete idea file
  */
 export async function deleteIdea(ideaNumber: number): Promise<void> {
@@ -235,5 +285,51 @@ export async function deleteUpdate(sprintId: string, ideaNumber: number, storyNu
   const filename = `${sprintId}-${ideaNumber}-${storyNumber}.md`;
   const filePath = path.join(PATHS.updates, filename);
   await fs.unlink(filePath);
+}
+
+/**
+ * Delete figure file
+ */
+export async function deleteFigure(figureNumber: number): Promise<void> {
+  const filePath = path.join(PATHS.figures, `${figureNumber}.md`);
+  await fs.unlink(filePath);
+}
+
+/**
+ * Copy an image file into the figures assets directory
+ */
+export async function copyImageFile(
+  sourcePath: string,
+  figureNumber: number
+): Promise<{
+  relativePath: string;
+  absolutePath: string;
+  fileType: string;
+  fileSize: string;
+  fileUrl: string;
+}> {
+  const ext = path.extname(sourcePath) || '.png';
+  const fileType = ext.replace('.', '').toLowerCase();
+  const fileName = `fig_${figureNumber}${ext}`;
+  await fs.mkdir(PATHS.figureImages, { recursive: true });
+  const destinationPath = path.join(PATHS.figureImages, fileName);
+  await fs.copyFile(sourcePath, destinationPath);
+  const stats = await fs.stat(destinationPath);
+
+  return {
+    relativePath: `/assets/figures/${fileName}`,
+    absolutePath: destinationPath,
+    fileType,
+    fileSize: formatFileSize(stats.size),
+    fileUrl: pathToFileURL(destinationPath).href,
+  };
+}
+
+function formatFileSize(bytes: number): string {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / Math.pow(1024, index);
+  return `${value.toFixed(value >= 10 || index === 0 ? 0 : 1)}${units[index]}`;
 }
 

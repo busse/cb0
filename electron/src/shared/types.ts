@@ -7,6 +7,7 @@ export type StoryStatus = 'backlog' | 'planned' | 'in-progress' | 'done';
 export type StoryPriority = 'low' | 'medium' | 'high' | 'critical';
 export type SprintStatus = 'planned' | 'active' | 'completed';
 export type UpdateType = 'progress' | 'completion' | 'blocker' | 'note';
+export type FigureStatus = 'active' | 'archived';
 
 export interface Idea {
   layout: 'idea';
@@ -51,6 +52,24 @@ export interface Update {
   type: UpdateType;
 }
 
+export interface Figure {
+  layout: 'figure';
+  figure_number: number;
+  title: string;
+  description?: string;
+  image_path: string;
+  alt_text?: string;
+  related_ideas?: number[];
+  related_stories?: string[];
+  created: string;
+  uploaded_date?: string;
+  file_type?: string;
+  status: FigureStatus;
+  tags?: string[];
+  dimensions?: string;
+  file_size?: string;
+}
+
 export type MarkdownDocument = {
   body?: string;
 };
@@ -59,11 +78,13 @@ export type IdeaRecord = Idea & MarkdownDocument;
 export type StoryRecord = Story & MarkdownDocument;
 export type SprintRecord = Sprint & MarkdownDocument;
 export type UpdateRecord = Update & MarkdownDocument;
+export type FigureRecord = Figure & MarkdownDocument;
 
 export interface TaxonomyData {
   ideas: IdeaRecord[];
   stories: StoryRecord[];
   sprints: SprintRecord[];
   updates: UpdateRecord[];
+  figures: FigureRecord[];
 }
 

@@ -12,10 +12,13 @@ import type {
   Update,
   UpdateRecord,
   UpdateType,
+  Figure,
+  FigureRecord,
+  FigureStatus,
 } from '@shared/types';
-import { formatNotation } from '@shared/validation';
+import { formatNotation, formatFigureNotation } from '@shared/validation';
 
-type Tab = 'ideas' | 'stories' | 'sprints' | 'updates';
+type Tab = 'ideas' | 'stories' | 'sprints' | 'updates' | 'figures';
 
 type ModalOptions = {
   title: string;
@@ -42,24 +45,31 @@ type Action =
   | 'new-update'
   | 'edit-update'
   | 'delete-update'
-  | 'refresh-updates';
+  | 'refresh-updates'
+  | 'new-figure'
+  | 'edit-figure'
+  | 'delete-figure'
+  | 'refresh-figures';
 
 const IDEA_STATUSES: IdeaStatus[] = ['planned', 'active', 'completed', 'archived'];
 const STORY_STATUSES: StoryStatus[] = ['backlog', 'planned', 'in-progress', 'done'];
 const STORY_PRIORITIES: StoryPriority[] = ['low', 'medium', 'high', 'critical'];
 const SPRINT_STATUSES: SprintStatus[] = ['planned', 'active', 'completed'];
 const UPDATE_TYPES: UpdateType[] = ['progress', 'completion', 'blocker', 'note'];
+const FIGURE_STATUSES: FigureStatus[] = ['active', 'archived'];
 
 const state: {
   ideas: IdeaRecord[];
   stories: StoryRecord[];
   sprints: SprintRecord[];
   updates: UpdateRecord[];
+  figures: FigureRecord[];
 } = {
   ideas: [],
   stories: [],
   sprints: [],
   updates: [],
+  figures: [],
 };
 
 let currentTab: Tab = 'ideas';
@@ -157,6 +167,10 @@ async function loadTabData(tab: Tab) {
         await fetchUpdates();
         renderUpdates();
         break;
+      case 'figures':
+        await fetchFigures();
+        await renderFigures();
+        break;
     }
   } catch (error) {
     showError((error as Error).message);
@@ -200,6 +214,14 @@ async function fetchUpdates() {
     throw new Error(result.error || 'Failed to load updates');
   }
   state.updates = result.data;
+}
+
+async function fetchFigures() {
+  const result = await window.electronAPI.readFigures();
+  if (!result.success || !result.data) {
+    throw new Error(result.error || 'Failed to load figures');
+  }
+  state.figures = result.data;
 }
 
 function renderIdeas() {
@@ -334,6 +356,64 @@ function renderUpdates() {
     .join('');
 }
 
+async function renderFigures() {
+  const listElement = document.getElementById('figures-list');
+  if (!listElement) return;
+
+  if (state.figures.length === 0) {
+    listElement.innerHTML = '<div class="loading">No figures yet. Add one to document your work.</div>';
+    return;
+  }
+
+  const figuresWithSrc = await Promise.all(
+    state.figures.map(async (figure) => ({
+      figure,
+      imageSrc: figure.image_path ? await resolveAssetUrl(figure.image_path) : undefined,
+    }))
+  );
+
+  listElement.innerHTML = figuresWithSrc
+    .map(({ figure, imageSrc }) => {
+      const ideaCount = figure.related_ideas?.length ?? 0;
+      const storyCount = figure.related_stories?.length ?? 0;
+      const relationshipText = [
+        ideaCount ? `${ideaCount} ${ideaCount === 1 ? 'idea' : 'ideas'}` : '',
+        storyCount ? `${storyCount} ${storyCount === 1 ? 'story' : 'stories'}` : '',
+      ]
+        .filter(Boolean)
+        .join(' • ');
+
+      return `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">${escapeHtml(figure.title || 'Untitled figure')}</span>
+            <span class="item-badge">${formatFigureNotation(figure.figure_number)}</span>
+          </div>
+          <div class="figure-card__preview">
+            ${
+              imageSrc
+                ? `<img src="${escapeAttr(imageSrc)}" alt="${escapeAttr(
+                    figure.alt_text || figure.title || 'Figure preview'
+                  )}" />`
+                : '<div class="helper-text">No image selected</div>'
+            }
+          </div>
+          <div class="item-description">${escapeHtml(figure.description || '')}</div>
+          <div class="item-meta">
+            <span>Status: ${figure.status}</span>
+            <span>Created: ${figure.created}</span>
+            ${relationshipText ? `<span>${relationshipText}</span>` : ''}
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-figure" data-figure="${figure.figure_number}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-figure" data-figure="${figure.figure_number}">Delete</button>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
 function handleActionClick(event: Event) {
   const target = event.target as HTMLElement;
   const action = target.dataset.action as Action | undefined;
@@ -390,6 +470,18 @@ function handleActionClick(event: Event) {
     case 'refresh-updates':
       void loadTabData('updates');
       break;
+    case 'new-figure':
+      void openFigureForm('create');
+      break;
+    case 'edit-figure':
+      void openFigureForm('edit', getFigureFromDataset(target));
+      break;
+    case 'delete-figure':
+      void deleteFigure(target.dataset.figure);
+      break;
+    case 'refresh-figures':
+      void loadTabData('figures');
+      break;
   }
 }
 
@@ -425,6 +517,12 @@ function getUpdateFromDataset(el: HTMLElement): UpdateRecord | undefined {
       update.idea_number === ideaNumber &&
       update.story_number === storyNumber
   );
+}
+
+function getFigureFromDataset(el: HTMLElement): FigureRecord | undefined {
+  const figureNumber = Number(el.dataset.figure);
+  if (Number.isNaN(figureNumber)) return undefined;
+  return state.figures.find((figure) => figure.figure_number === figureNumber);
 }
 
 async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord) {
@@ -942,6 +1040,264 @@ async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRecord) {
   });
 }
 
+async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRecord) {
+  if (mode === 'edit' && !figure) {
+    showError('Unable to find that figure.');
+    return;
+  }
+
+  await Promise.all([ensureIdeas(), ensureStories(), ensureFigures()]);
+
+  const figureNumber =
+    figure?.figure_number ??
+    (await getNextFigureNumber().catch((error) => {
+      showError(error.message);
+      return undefined;
+    }));
+  if (figureNumber === undefined) return;
+
+  const defaults = {
+    title: figure?.title ?? '',
+    description: figure?.description ?? '',
+    image_path: figure?.image_path ?? '',
+    alt_text: figure?.alt_text ?? '',
+    status: figure?.status ?? 'active',
+    created: figure?.created ?? today(),
+    uploaded_date: figure?.uploaded_date ?? '',
+    file_type: figure?.file_type ?? '',
+    dimensions: figure?.dimensions ?? '',
+    file_size: figure?.file_size ?? '',
+    tags: figure?.tags?.join(', ') ?? '',
+    body: figure?.body ?? '',
+  };
+
+  const selectedIdeaSet = new Set(figure?.related_ideas ?? []);
+  const selectedStorySet = new Set(figure?.related_stories ?? []);
+
+  openModal({
+    title:
+      mode === 'create'
+        ? 'Create Figure'
+        : `Edit ${formatFigureNotation(figure!.figure_number)}`,
+    width: 'lg',
+    submitLabel: mode === 'create' ? 'Create Figure' : 'Save Changes',
+    body: `
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Figure Number</label>
+          <input type="number" name="figure_number" value="${figureNumber}" ${
+      mode === 'edit' ? 'readonly' : 'min="0"'
+    } required />
+        </div>
+        <div class="form-field">
+          <label>Status</label>
+          <select name="status" required>
+            ${FIGURE_STATUSES.map(
+              (status) => `<option value="${status}" ${status === defaults.status ? 'selected' : ''}>${status}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Created</label>
+          <input type="date" name="created" value="${defaults.created}" required />
+        </div>
+        <div class="form-field">
+          <label>Uploaded Date</label>
+          <input type="date" name="uploaded_date" value="${defaults.uploaded_date}" />
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Title</label>
+        <input type="text" name="title" value="${escapeAttr(defaults.title)}" required />
+      </div>
+      <div class="form-field">
+        <label>Description</label>
+        <textarea name="description" placeholder="Describe the figure">${escapeHtml(
+          defaults.description
+        )}</textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Image Path</label>
+          <div class="figure-input-group">
+            <input type="text" name="image_path" value="${escapeAttr(defaults.image_path)}" required data-image-path />
+            <button type="button" class="btn btn-secondary" data-image-browse>Select</button>
+          </div>
+          <div class="helper-text">Images are copied to /assets/figures/</div>
+        </div>
+        <div class="form-field">
+          <label>Alt Text</label>
+          <input type="text" name="alt_text" value="${escapeAttr(defaults.alt_text)}" />
+        </div>
+      </div>
+      <div class="figure-preview" data-figure-preview>
+        ${
+          defaults.image_path
+            ? `<img src="${escapeAttr(defaults.image_path)}" alt="${escapeAttr(
+                defaults.alt_text || defaults.title || 'Figure preview'
+              )}" />`
+            : '<div class="helper-text">No image selected</div>'
+        }
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>File Type</label>
+          <input type="text" name="file_type" value="${escapeAttr(defaults.file_type)}" placeholder="png" />
+        </div>
+        <div class="form-field">
+          <label>File Size</label>
+          <input type="text" name="file_size" value="${escapeAttr(defaults.file_size)}" placeholder="245KB" />
+        </div>
+        <div class="form-field">
+          <label>Dimensions</label>
+          <input type="text" name="dimensions" value="${escapeAttr(defaults.dimensions)}" placeholder="1920x1080" />
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Tags (comma separated)</label>
+        <input type="text" name="tags" value="${escapeAttr(defaults.tags)}" />
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Related Ideas</label>
+          <select name="related_ideas" multiple size="5">
+            ${state.ideas
+              .map(
+                (idea) =>
+                  `<option value="${idea.idea_number}" ${
+                    selectedIdeaSet.has(idea.idea_number) ? 'selected' : ''
+                  }>i${idea.idea_number} — ${escapeHtml(idea.title)}</option>`
+              )
+              .join('')}
+          </select>
+          <div class="helper-text">Hold Cmd/Ctrl to select multiple ideas.</div>
+        </div>
+        <div class="form-field">
+          <label>Related Stories</label>
+          <select name="related_stories" multiple size="6">
+            ${state.stories
+              .map((story) => {
+                const ref = `${story.idea_number}.${story.story_number}`;
+                return `<option value="${ref}" ${selectedStorySet.has(ref) ? 'selected' : ''}>${ref} — ${escapeHtml(
+                  story.title
+                )}</option>`;
+              })
+              .join('')}
+          </select>
+          <div class="helper-text">Format: idea.story (e.g., 5.2). Hold Cmd/Ctrl to select.</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Body (Markdown)</label>
+        <textarea name="body">${escapeHtml(defaults.body)}</textarea>
+      </div>
+    `,
+    onOpen: (form) => {
+      const browseButton = form.querySelector<HTMLButtonElement>('[data-image-browse]');
+      const imagePathInput = form.querySelector<HTMLInputElement>('input[name="image_path"]');
+      const figureNumberInput = form.querySelector<HTMLInputElement>('input[name="figure_number"]');
+      const altInput = form.querySelector<HTMLInputElement>('input[name="alt_text"]');
+
+      browseButton?.addEventListener('click', async () => {
+        if (!imagePathInput || !figureNumberInput) return;
+        const figureValue = Number(figureNumberInput.value);
+        if (Number.isNaN(figureValue)) {
+          showError('Enter a figure number before selecting an image.');
+          return;
+        }
+
+        const selection = await window.electronAPI.selectFigureImage();
+        if (!selection.success) {
+          if (selection.error) {
+            showError(selection.error);
+          }
+          return;
+        }
+
+        const copyResult = await window.electronAPI.copyFigureImage(selection.path!, figureValue);
+        if (!copyResult.success || !copyResult.data) {
+          showError(copyResult.error || 'Unable to copy image');
+          return;
+        }
+
+        imagePathInput.value = copyResult.data.relativePath;
+        const fileTypeInput = form.querySelector<HTMLInputElement>('input[name="file_type"]');
+        if (fileTypeInput && !fileTypeInput.value) {
+          fileTypeInput.value = copyResult.data.fileType;
+        }
+        const fileSizeInput = form.querySelector<HTMLInputElement>('input[name="file_size"]');
+        if (fileSizeInput) {
+          fileSizeInput.value = copyResult.data.fileSize;
+        }
+        const previewSrc = await resolveAssetUrl(copyResult.data.relativePath);
+        void updateFigurePreview(
+          form,
+          copyResult.data.relativePath,
+          altInput?.value || defaults.alt_text,
+          previewSrc
+        );
+      });
+
+      imagePathInput?.addEventListener('change', () => {
+        void updateFigurePreview(form, imagePathInput.value, altInput?.value || defaults.alt_text);
+      });
+
+      altInput?.addEventListener('input', () => {
+        if (!imagePathInput) return;
+        void updateFigurePreview(form, imagePathInput.value, altInput.value || defaults.alt_text);
+      });
+
+      void updateFigurePreview(form, defaults.image_path, defaults.alt_text);
+    },
+    onSubmit: async (formData) => {
+      const figureValue = Number(formData.get('figure_number'));
+      if (Number.isNaN(figureValue)) {
+        throw new Error('Figure number is invalid.');
+      }
+      const imagePath = (formData.get('image_path') as string)?.trim();
+      if (!imagePath) {
+        throw new Error('Select an image for this figure.');
+      }
+
+      const relatedIdeaValues = formData.getAll('related_ideas') as string[];
+      const relatedIdeas = relatedIdeaValues
+        .map((value) => Number(value))
+        .filter((value) => !Number.isNaN(value));
+
+      const relatedStories = (formData.getAll('related_stories') as string[]).filter(Boolean);
+
+      const payload: Figure = {
+        layout: 'figure',
+        figure_number: figureValue,
+        title: (formData.get('title') as string).trim(),
+        description: (formData.get('description') as string)?.trim() || undefined,
+        image_path: imagePath,
+        alt_text: ((formData.get('alt_text') as string) || '').trim() || undefined,
+        status: formData.get('status') as FigureStatus,
+        created: formData.get('created') as string,
+        uploaded_date: ((formData.get('uploaded_date') as string) || '').trim() || undefined,
+        file_type: ((formData.get('file_type') as string) || '').trim() || undefined,
+        file_size: ((formData.get('file_size') as string) || '').trim() || undefined,
+        dimensions: ((formData.get('dimensions') as string) || '').trim() || undefined,
+        tags: parseTags(formData.get('tags') as string),
+        related_ideas: relatedIdeas.length ? relatedIdeas : undefined,
+        related_stories: relatedStories.length ? relatedStories : undefined,
+      };
+
+      const content = (formData.get('body') as string) ?? '';
+      const result = await window.electronAPI.writeFigure(payload, content);
+      if (!result.success) {
+        throw new Error(result.error || 'Unable to save figure');
+      }
+
+      await fetchFigures();
+      await renderFigures();
+      showToast(mode === 'create' ? 'Figure created' : 'Figure updated');
+      return true;
+    },
+  });
+}
+
 async function deleteIdea(ideaNumber?: string) {
   if (!ideaNumber) return;
   const parsed = Number(ideaNumber);
@@ -1011,6 +1367,23 @@ async function deleteUpdate(sprintId?: string, ideaNumber?: string, storyNumber?
   showToast('Update deleted');
 }
 
+async function deleteFigure(figureNumber?: string) {
+  if (!figureNumber) return;
+  const parsed = Number(figureNumber);
+  if (Number.isNaN(parsed)) return;
+  if (!confirm(`Delete ${formatFigureNotation(parsed)}? This cannot be undone.`)) return;
+
+  const result = await window.electronAPI.deleteFigure(parsed);
+  if (!result.success) {
+    showError(result.error || 'Unable to delete figure');
+    return;
+  }
+
+  await fetchFigures();
+  await renderFigures();
+  showToast('Figure deleted');
+}
+
 function buildStoryOptions(ideaNumber: number, selectedStory?: number) {
   const stories = state.stories.filter((story) => story.idea_number === ideaNumber);
   if (!stories.length) {
@@ -1025,6 +1398,49 @@ function buildStoryOptions(ideaNumber: number, selectedStory?: number) {
         }>${story.story_number} — ${escapeHtml(story.title)}</option>`
     )
     .join('');
+}
+
+const figureImageCache = new Map<string, string>();
+
+async function updateFigurePreview(
+  form: HTMLFormElement,
+  imagePath?: string,
+  altText?: string,
+  directUrl?: string
+) {
+  const preview = form.querySelector<HTMLDivElement>('[data-figure-preview]');
+  if (!preview) return;
+  if (!imagePath && !directUrl) {
+    preview.innerHTML = '<div class="helper-text">No image selected</div>';
+    return;
+  }
+
+  const resolvedSrc = directUrl ?? (imagePath ? await resolveAssetUrl(imagePath) : undefined);
+  if (!resolvedSrc) {
+    preview.innerHTML = '<div class="helper-text">Image not found</div>';
+    return;
+  }
+
+  preview.innerHTML = `<img src="${escapeAttr(resolvedSrc)}" alt="${escapeAttr(
+    altText || 'Figure preview'
+  )}" />`;
+}
+
+async function resolveAssetUrl(assetPath: string): Promise<string | undefined> {
+  if (!assetPath) return undefined;
+  if (figureImageCache.has(assetPath)) {
+    return figureImageCache.get(assetPath);
+  }
+  if (/^(https?:|file:|data:)/i.test(assetPath)) {
+    figureImageCache.set(assetPath, assetPath);
+    return assetPath;
+  }
+  const result = await window.electronAPI.getFigureImage(assetPath);
+  if (result.success && result.data) {
+    figureImageCache.set(assetPath, result.data);
+    return result.data;
+  }
+  return undefined;
 }
 
 function openModal(options: ModalOptions) {
@@ -1125,6 +1541,12 @@ async function ensureSprints() {
   }
 }
 
+async function ensureFigures() {
+  if (!state.figures.length) {
+    await fetchFigures();
+  }
+}
+
 async function getNextIdeaNumber(): Promise<number> {
   const result = await window.electronAPI.getNextIdeaNumber();
   if (!result.success || result.data === undefined) {
@@ -1137,6 +1559,14 @@ async function getNextStoryNumber(ideaNumber: number): Promise<number> {
   const result = await window.electronAPI.getNextStoryNumber(ideaNumber);
   if (!result.success || result.data === undefined) {
     throw new Error(result.error || 'Unable to determine next story number');
+  }
+  return result.data;
+}
+
+async function getNextFigureNumber(): Promise<number> {
+  const result = await window.electronAPI.getNextFigureNumber();
+  if (!result.success || result.data === undefined) {
+    throw new Error(result.error || 'Unable to determine next figure number');
   }
   return result.data;
 }
