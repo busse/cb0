@@ -292,7 +292,7 @@ permalink: /dashboard/
     <div class="projection-overview">
       {%- comment -%} Calculate projections based on current velocity {%- endcomment -%}
       {%- assign remaining_stories = total_stories | minus: stories_done -%}
-      {%- assign unassigned_stories = site.stories | where_exp: "story", "story.assigned_sprint == nil or story.assigned_sprint == ''" | size -%}
+      {%- assign unassigned_stories = site.stories | where_exp: "story", "story.related_sprints == nil or story.related_sprints == empty" | size -%}
       {%- assign assigned_stories = remaining_stories | minus: unassigned_stories -%}
       
       <div class="projection-cards">

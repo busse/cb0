@@ -2,7 +2,7 @@
  * Validation utilities for taxonomy system
  */
 
-import type { Idea, Story, Sprint, Update, Figure } from './types';
+import type { Idea, Story, Sprint, Update, Figure, StoryStatus } from './types';
 
 /**
  * Validate sprint ID format (YYSS)
@@ -49,16 +49,14 @@ export function isUniqueIdeaNumber(
  * Check if story number is unique within an idea
  */
 export function isUniqueStoryNumber(
-  ideaNumber: number,
   storyNumber: number,
   existingStories: Story[],
   excludeStoryNumber?: number
 ): boolean {
   return !existingStories.some(
     (story) =>
-      story.idea_number === ideaNumber &&
       story.story_number === storyNumber &&
-      story.story_number !== excludeStoryNumber
+      (excludeStoryNumber === undefined || story.story_number !== excludeStoryNumber)
   );
 }
 
@@ -176,12 +174,11 @@ export function getNextIdeaNumber(existingIdeas: Idea[]): number {
 }
 
 /**
- * Get next available story number for an idea
+ * Get next available story number (global)
  */
-export function getNextStoryNumber(ideaNumber: number, existingStories: Story[]): number {
-  const ideaStories = existingStories.filter((story) => story.idea_number === ideaNumber);
-  if (ideaStories.length === 0) return 0;
-  const maxNumber = Math.max(...ideaStories.map((story) => story.story_number));
+export function getNextStoryNumber(existingStories: Story[]): number {
+  if (existingStories.length === 0) return 0;
+  const maxNumber = Math.max(...existingStories.map((story) => story.story_number));
   return maxNumber + 1;
 }
 
@@ -238,30 +235,33 @@ export function validateStory(
   story: Partial<Story>,
   existingStories: Story[],
   existingIdeas: Idea[],
-  excludeIdeaNumber?: number,
+  existingSprints: Sprint[],
   excludeStoryNumber?: number
 ): string[] {
   const errors: string[] = [];
-
-  if (story.idea_number === undefined) {
-    errors.push('idea_number is required');
-  } else if (!isValidIdeaNumber(story.idea_number)) {
-    errors.push('idea_number must be a non-negative integer');
-  } else if (!existingIdeas.some((idea) => idea.idea_number === story.idea_number)) {
-    errors.push(`Parent idea ${story.idea_number} does not exist`);
-  }
 
   if (story.story_number === undefined) {
     errors.push('story_number is required');
   } else if (!isValidStoryNumber(story.story_number)) {
     errors.push('story_number must be a non-negative integer');
-  } else if (
-    story.idea_number !== undefined &&
-    !isUniqueStoryNumber(story.idea_number, story.story_number, existingStories, excludeStoryNumber)
-  ) {
-    errors.push(
-      `Story number ${story.story_number} already exists for idea ${story.idea_number}`
+  } else if (!isUniqueStoryNumber(story.story_number, existingStories, excludeStoryNumber)) {
+    errors.push(`Story number ${story.story_number} already exists`);
+  }
+
+  const relatedIdeas = Array.isArray(story.related_ideas) ? story.related_ideas : [];
+
+  if (relatedIdeas.length > 0) {
+    const invalidIdeas = relatedIdeas.filter((ideaNumber) => !isValidIdeaNumber(ideaNumber));
+    if (invalidIdeas.length) {
+      errors.push(`Invalid idea numbers: ${invalidIdeas.join(', ')}`);
+    }
+
+    const missingIdeas = relatedIdeas.filter(
+      (ideaNumber) => !existingIdeas.some((idea) => idea.idea_number === ideaNumber)
     );
+    if (missingIdeas.length) {
+      errors.push(`Related ideas not found: ${missingIdeas.join(', ')}`);
+    }
   }
 
   if (!story.title || story.title.trim() === '') {
@@ -270,8 +270,13 @@ export function validateStory(
 
   if (!story.status) {
     errors.push('status is required');
-  } else if (!['backlog', 'planned', 'in-progress', 'done'].includes(story.status)) {
-    errors.push('status must be one of: backlog, planned, in-progress, done');
+  } else {
+    const normalizedStatus = story.status.replace(/_/g, '-');
+    if (!['backlog', 'planned', 'in-progress', 'done'].includes(normalizedStatus)) {
+      errors.push('status must be one of: backlog, planned, in-progress, done');
+    } else if (normalizedStatus !== story.status) {
+      story.status = normalizedStatus as StoryStatus;
+    }
   }
 
   if (!story.priority) {
@@ -280,8 +285,21 @@ export function validateStory(
     errors.push('priority must be one of: low, medium, high, critical');
   }
 
-  if (story.assigned_sprint && !isValidSprintId(story.assigned_sprint)) {
-    errors.push('assigned_sprint must be in YYSS format (e.g., 2609)');
+  if (story.related_sprints) {
+    const invalidSprints = story.related_sprints.filter((sprintId) => !isValidSprintId(sprintId));
+    if (invalidSprints.length) {
+      errors.push(
+        `related_sprints must be YYSS format (e.g., 2609). Invalid: ${invalidSprints.join(', ')}`
+      );
+    }
+
+    const missingSprints = story.related_sprints.filter(
+      (sprintId) => !existingSprints.some((sprint) => String(sprint.sprint_id) === sprintId)
+    );
+
+    if (missingSprints.length) {
+      errors.push(`Related sprints not found: ${missingSprints.join(', ')}`);
+    }
   }
 
   return errors;
@@ -362,7 +380,7 @@ function isValidStoryReference(reference: string, existingStories: Story[]): boo
   const storyNumber = Number(storyPart);
   if (Number.isNaN(ideaNumber) || Number.isNaN(storyNumber)) return false;
   return existingStories.some(
-    (story) => story.idea_number === ideaNumber && story.story_number === storyNumber
+    (story) => story.story_number === storyNumber && story.related_ideas?.includes(ideaNumber)
   );
 }
 

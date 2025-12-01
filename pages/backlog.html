@@ -12,8 +12,8 @@ permalink: /backlog/
         Stories not yet assigned to a sprint.
       </p>
       
-      {%- assign unassigned_stories = site.stories | where_exp: "story", "story.assigned_sprint == nil or story.assigned_sprint == empty" -%}
-      {%- assign planned_stories = site.stories | where_exp: "story", "story.assigned_sprint != nil and story.status != 'done'" -%}
+      {%- assign unassigned_stories = site.stories | where_exp: "story", "story.related_sprints == nil or story.related_sprints == empty" -%}
+      {%- assign planned_stories = site.stories | where_exp: "story", "story.related_sprints != nil and story.status != 'done'" -%}
       {%- assign in_progress_stories = site.stories | where: "status", "in-progress" -%}
       
       <div class="backlog-stats">
@@ -51,7 +51,7 @@ permalink: /backlog/
     {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
     {%- for idea in sorted_ideas -%}
       {%- include helpers/stories-for-idea.html idea_number=idea.idea_number -%}
-      {%- assign backlog_stories = stories_list | where_exp: "story", "story.assigned_sprint == nil or story.assigned_sprint == empty" -%}
+      {%- assign backlog_stories = stories_list | where_exp: "story", "story.related_sprints == nil or story.related_sprints == empty" -%}
       
       {%- if backlog_stories.size > 0 -%}
         <div class="backlog-group">

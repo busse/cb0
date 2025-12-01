@@ -21,8 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Delete operations
   deleteIdea: (ideaNumber: number) => ipcRenderer.invoke('delete-idea', ideaNumber),
-  deleteStory: (ideaNumber: number, storyNumber: number) =>
-    ipcRenderer.invoke('delete-story', ideaNumber, storyNumber),
+  deleteStory: (storyNumber: number) => ipcRenderer.invoke('delete-story', storyNumber),
   deleteSprint: (sprintId: string) => ipcRenderer.invoke('delete-sprint', sprintId),
   deleteUpdate: (sprintId: string, ideaNumber: number, storyNumber: number) =>
     ipcRenderer.invoke('delete-update', sprintId, ideaNumber, storyNumber),
@@ -30,7 +29,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Utility operations
   getNextIdeaNumber: () => ipcRenderer.invoke('get-next-idea-number'),
-  getNextStoryNumber: (ideaNumber: number) => ipcRenderer.invoke('get-next-story-number', ideaNumber),
+  getNextStoryNumber: () => ipcRenderer.invoke('get-next-story-number'),
   getNextFigureNumber: () => ipcRenderer.invoke('get-next-figure-number'),
   selectFigureImage: () => ipcRenderer.invoke('select-figure-image'),
   copyFigureImage: (sourcePath: string, figureNumber: number) =>
@@ -64,12 +63,12 @@ type ElectronAPI = {
   writeUpdate: (update: Update, content: string) => Promise<IpcResult<void>>;
   writeFigure: (figure: Figure, content: string) => Promise<IpcResult<void>>;
   deleteIdea: (ideaNumber: number) => Promise<IpcResult<void>>;
-  deleteStory: (ideaNumber: number, storyNumber: number) => Promise<IpcResult<void>>;
+  deleteStory: (storyNumber: number) => Promise<IpcResult<void>>;
   deleteSprint: (sprintId: string) => Promise<IpcResult<void>>;
   deleteUpdate: (sprintId: string, ideaNumber: number, storyNumber: number) => Promise<IpcResult<void>>;
   deleteFigure: (figureNumber: number) => Promise<IpcResult<void>>;
   getNextIdeaNumber: () => Promise<IpcResult<number>>;
-  getNextStoryNumber: (ideaNumber: number) => Promise<IpcResult<number>>;
+  getNextStoryNumber: () => Promise<IpcResult<number>>;
   getNextFigureNumber: () => Promise<IpcResult<number>>;
   selectFigureImage: () => Promise<IpcResult<FigureSelection>>;
   copyFigureImage: (sourcePath: string, figureNumber: number) => Promise<IpcResult<FigureImageMetadata>>;

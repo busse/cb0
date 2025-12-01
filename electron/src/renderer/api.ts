@@ -123,8 +123,8 @@ export async function deleteIdeaRemote(ideaNumber: number): Promise<void> {
   }
 }
 
-export async function deleteStoryRemote(ideaNumber: number, storyNumber: number): Promise<void> {
-  const result = await window.electronAPI.deleteStory(ideaNumber, storyNumber);
+export async function deleteStoryRemote(storyNumber: number): Promise<void> {
+  const result = await window.electronAPI.deleteStory(storyNumber);
   if (!result.success) {
     throw new Error(result.error || 'Unable to delete story');
   }
@@ -159,8 +159,8 @@ export async function getNextIdeaNumber(): Promise<number> {
   return result.data;
 }
 
-export async function getNextStoryNumber(ideaNumber: number): Promise<number> {
-  const result = await window.electronAPI.getNextStoryNumber(ideaNumber);
+export async function getNextStoryNumber(): Promise<number> {
+  const result = await window.electronAPI.getNextStoryNumber();
   if (!result.success || result.data === undefined) {
     throw new Error(result.error || 'Unable to determine next story number');
   }

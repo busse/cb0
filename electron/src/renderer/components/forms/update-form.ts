@@ -35,10 +35,18 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
     return;
   }
 
+  const fallbackIdeaFromStory = state.stories[0]?.related_ideas[0];
+  const defaultIdeaNumber =
+    update?.idea_number ?? fallbackIdeaFromStory ?? state.ideas[0].idea_number;
+  const defaultStoryNumber =
+    update?.story_number ??
+    state.stories.find((story) => story.related_ideas.includes(defaultIdeaNumber))?.story_number ??
+    state.stories[0].story_number;
+
   const defaults = {
     sprint_id: update?.sprint_id ?? state.sprints[0].sprint_id,
-    idea_number: update?.idea_number ?? state.stories[0].idea_number,
-    story_number: update?.story_number ?? state.stories[0].story_number,
+    idea_number: defaultIdeaNumber,
+    story_number: defaultStoryNumber,
     type: update?.type ?? 'progress',
     date: update?.date ?? today(),
     body: update?.body ?? '',

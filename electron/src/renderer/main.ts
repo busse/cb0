@@ -1,4 +1,4 @@
-import { setCurrentTab, type Tab } from './state';
+import { setCurrentTab, state, type Tab } from './state';
 import { Action } from './constants';
 import {
   fetchFigures,
@@ -73,6 +73,9 @@ async function loadTabData(tab: Tab): Promise<void> {
     switch (tab) {
       case 'ideas':
         await fetchIdeas();
+        if (!state.stories.length) {
+          await fetchStories();
+        }
         renderIdeas();
         break;
       case 'stories':
@@ -81,6 +84,9 @@ async function loadTabData(tab: Tab): Promise<void> {
         break;
       case 'sprints':
         await fetchSprints();
+        if (!state.stories.length) {
+          await fetchStories();
+        }
         renderSprints();
         break;
       case 'updates':
@@ -131,7 +137,7 @@ function handleActionClick(event: Event): void {
       void openStoryForm('edit', getStoryFromDataset(target));
       break;
     case 'delete-story':
-      void deleteStory(target.dataset.idea, target.dataset.story);
+      void deleteStory(target.dataset.story);
       break;
     case 'refresh-stories':
       void loadTabData('stories');

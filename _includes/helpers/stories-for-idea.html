@@ -4,5 +4,5 @@
   Parameters:
     - idea_number: The idea number to filter stories by
 {%- endcomment -%}
-{%- assign stories_list = site.stories | where: "idea_number", include.idea_number | sort: "story_number" -%}
+{%- assign stories_list = site.stories | where_exp: "story", "story.related_ideas contains include.idea_number" | sort: "story_number" -%}
 

@@ -4,15 +4,28 @@
     - story: The story object from site.stories
 {%- endcomment -%}
 {%- assign story = include.story -%}
+{%- assign story_ideas = story.related_ideas | default: "" -%}
+{%- if story_ideas == "" or story_ideas == nil -%}
+  {%- assign story_ideas = "" | split: "" -%}
+{%- endif -%}
+{%- assign primary_sprint = story.related_sprints | first -%}
 
 <article class="story-card story-card--{{ story.status }}" 
-         data-story="{{ story.idea_number }}.{{ story.story_number }}"
+         data-story="{{ story.story_number }}"
          data-status="{{ story.status }}"
          data-priority="{{ story.priority }}"
-         data-sprint="{{ story.assigned_sprint }}"
-         data-idea="{{ story.idea_number }}">
+         data-sprints="{{ story.related_sprints | join: ',' }}"
+         data-ideas="{{ story.related_ideas | join: ',' }}">
   <header class="story-card__header">
-    {% include notation-badge.html idea=story.idea_number story=story.story_number size="sm" %}
+    <div class="story-card__ideas">
+      {%- if story_ideas.size > 0 -%}
+        {%- for idea_number in story_ideas -%}
+          {% include notation-badge.html idea=idea_number story=story.story_number size="sm" %}
+        {%- endfor -%}
+      {%- else -%}
+        <span class="notation-badge notation-badge--sm">s{{ story.story_number }}</span>
+      {%- endif -%}
+    </div>
     <span class="priority-indicator priority-indicator--{{ story.priority }}">{{ story.priority | upcase }}</span>
   </header>
   
@@ -24,8 +37,8 @@
   
   <footer class="story-card__meta">
     <span class="status-indicator status-indicator--{{ story.status }}">{{ story.status | replace: "-", " " | upcase }}</span>
-    {%- if story.assigned_sprint -%}
-      <span class="story-card__sprint">{% include notation-badge.html sprint=story.assigned_sprint size="sm" %}</span>
+    {%- if primary_sprint -%}
+      <span class="story-card__sprint">{% include notation-badge.html sprint=primary_sprint size="sm" %}</span>
     {%- else -%}
       <span class="story-card__sprint story-card__sprint--backlog">Backlog</span>
     {%- endif -%}

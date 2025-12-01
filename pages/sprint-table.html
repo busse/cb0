@@ -62,13 +62,17 @@ permalink: /sprint-table/
                 </td>
                 {%- for sprint_num in (1..26) -%}
                   {%- assign sprint_id = 2600 | plus: sprint_num -%}
-                  {%- assign cell_stories = site.stories | where: "idea_number", idea.idea_number | where: "assigned_sprint", sprint_id | sort: "story_number" -%}
+                  {%- assign cell_stories = site.stories
+                    | where_exp: "story", "story.related_ideas contains idea.idea_number"
+                    | where_exp: "story", "story.related_sprints contains sprint_id"
+                    | sort: "story_number"
+                  -%}
                   <td class="sprint-table__cell">
                     {%- if cell_stories.size > 0 -%}
                       <div class="sprint-table__stories">
                         {%- for story in cell_stories -%}
                           <a href="{{ story.url | relative_url }}" class="sprint-table__story-link" title="{{ story.title }}">
-                            {% include notation-badge.html idea=story.idea_number story=story.story_number size="sm" %}
+                            {% include notation-badge.html idea=idea.idea_number story=story.story_number size="sm" %}
                           </a>
                         {%- endfor -%}
                       </div>

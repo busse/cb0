@@ -1,19 +1,37 @@
 {%- comment -%}
   Get all figures related to a story
   Parameters:
-    - idea_number: The idea number of the story
-    - story_number: The story number
+    - story: Story object (preferred)
+    - idea_number / story_number: legacy fallback
   Output:
     - figures_list: Array of figure objects
   Note: Stories are referenced as "idea.story" in related_stories array
 {%- endcomment -%}
-{%- assign idea_num = include.idea_number | default: page.idea_number -%}
-{%- assign story_num = include.story_number | default: page.story_number -%}
-{%- assign story_ref = idea_num | append: "." | append: story_num -%}
+{%- assign current_story = include.story | default: page -%}
+{%- assign story_num = include.story_number | default: current_story.story_number -%}
+{%- assign idea_numbers = include.idea_numbers | default: current_story.related_ideas -%}
+{%- if idea_numbers == nil or idea_numbers == "" -%}
+  {%- assign fallback_idea = include.idea_number | default: page.idea_number -%}
+  {%- if fallback_idea != nil -%}
+    {%- assign idea_numbers = "" | split: "" | push: fallback_idea | uniq -%}
+  {%- else -%}
+    {%- assign idea_numbers = "" | split: "" -%}
+  {%- endif -%}
+{%- endif -%}
 {%- assign figures_list = "" | split: "" -%}
 {%- for figure in site.figures -%}
-  {%- if figure.related_stories and figure.related_stories contains story_ref -%}
-    {%- assign figures_list = figures_list | push: figure -%}
+  {%- if figure.related_stories -%}
+    {%- assign matches_story = false -%}
+    {%- for idea_number in idea_numbers -%}
+      {%- assign idea_value = idea_number | plus: 0 -%}
+      {%- assign story_ref = idea_value | append: "." | append: story_num -%}
+      {%- if figure.related_stories contains story_ref -%}
+        {%- assign matches_story = true -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if matches_story -%}
+      {%- assign figures_list = figures_list | push: figure -%}
+    {%- endif -%}
   {%- endif -%}
 {%- endfor -%}
 {%- assign figures_list = figures_list | sort: "figure_number" -%}

@@ -154,12 +154,14 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
           <label>Related Stories</label>
           <select name="related_stories" multiple size="6">
             ${state.stories
-              .map((story) => {
-                const ref = `${story.idea_number}.${story.story_number}`;
-                return `<option value="${ref}" ${selectedStorySet.has(ref) ? 'selected' : ''}>${ref} — ${escapeHtml(
-                  story.title
-                )}</option>`;
-              })
+              .flatMap((story) =>
+                story.related_ideas.map((ideaNumber) => {
+                  const ref = `${ideaNumber}.${story.story_number}`;
+                  return `<option value="${ref}" ${selectedStorySet.has(ref) ? 'selected' : ''}>i${ideaNumber} · s${
+                    story.story_number
+                  } — ${escapeHtml(story.title)}</option>`;
+                })
+              )
               .join('')}
           </select>
           <div class="helper-text">Format: idea.story (e.g., 5.2). Hold Cmd/Ctrl to select.</div>

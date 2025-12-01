@@ -14,7 +14,11 @@ export function renderIdeas(): void {
 
   listElement.innerHTML = state.ideas
     .map(
-      (idea) => `
+      (idea) => {
+        const relatedStoryCount = state.stories.filter((story) =>
+          (story.related_ideas ?? []).includes(idea.idea_number)
+        ).length;
+        return `
         <div class="item-card">
           <div class="item-header">
             <span class="item-title">${escapeHtml(idea.title || 'Untitled')}</span>
@@ -25,13 +29,15 @@ export function renderIdeas(): void {
             <span>Status: ${idea.status}</span>
             <span>Created: ${idea.created}</span>
             ${idea.tags && idea.tags.length ? `<span>Tags: ${idea.tags.join(', ')}</span>` : ''}
+            <span>Stories: ${relatedStoryCount}</span>
           </div>
           <div class="item-actions">
             <button class="btn btn-secondary" type="button" data-action="edit-idea" data-idea="${idea.idea_number}">Edit</button>
             <button class="btn btn-danger" type="button" data-action="delete-idea" data-idea="${idea.idea_number}">Delete</button>
           </div>
         </div>
-      `
+      `;
+      }
     )
     .join('');
 }
@@ -46,26 +52,34 @@ export function renderStories(): void {
   }
 
   listElement.innerHTML = state.stories
-    .map(
-      (story) => `
+    .map((story) => {
+      const ideaList = story.related_ideas ?? [];
+      const ideaLabels = ideaList.length ? ideaList.map((ideaNumber) => `i${ideaNumber}`).join(', ') : 'None';
+      const sprintLabels = story.related_sprints?.length
+        ? story.related_sprints.join(', ')
+        : 'Backlog';
+      return `
         <div class="item-card">
           <div class="item-header">
             <span class="item-title">${escapeHtml(story.title || 'Untitled')}</span>
-            <span class="item-badge">${story.idea_number}.${story.story_number}</span>
+            <span class="item-badge">s${story.story_number}</span>
           </div>
           <div class="item-description">${escapeHtml(story.description || '')}</div>
           <div class="item-meta">
             <span>Status: ${story.status}</span>
             <span>Priority: ${story.priority}</span>
-            ${story.assigned_sprint ? `<span>Sprint: ${story.assigned_sprint}</span>` : ''}
+          </div>
+          <div class="item-meta">
+            <span>Ideas: ${ideaLabels}</span>
+            <span>Sprints: ${sprintLabels}</span>
           </div>
           <div class="item-actions">
-            <button class="btn btn-secondary" type="button" data-action="edit-story" data-idea="${story.idea_number}" data-story="${story.story_number}">Edit</button>
-            <button class="btn btn-danger" type="button" data-action="delete-story" data-idea="${story.idea_number}" data-story="${story.story_number}">Delete</button>
+            <button class="btn btn-secondary" type="button" data-action="edit-story" data-story="${story.story_number}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-story" data-story="${story.story_number}">Delete</button>
           </div>
         </div>
-      `
-    )
+      `;
+    })
     .join('');
 }
 
@@ -79,8 +93,11 @@ export function renderSprints(): void {
   }
 
   listElement.innerHTML = state.sprints
-    .map(
-      (sprint) => `
+    .map((sprint) => {
+      const relatedStoryCount = state.stories.filter((story) =>
+        story.related_sprints?.includes(sprint.sprint_id)
+      ).length;
+      return `
         <div class="item-card">
           <div class="item-header">
             <span class="item-title">Sprint ${sprint.sprint_id}</span>
@@ -93,14 +110,15 @@ export function renderSprints(): void {
             <span>Status: ${sprint.status}</span>
             <span>Year: ${sprint.year}</span>
             <span>Sprint #${sprint.sprint_number}</span>
+            <span>Stories: ${relatedStoryCount}</span>
           </div>
           <div class="item-actions">
             <button class="btn btn-secondary" type="button" data-action="edit-sprint" data-sprint="${sprint.sprint_id}">Edit</button>
             <button class="btn btn-danger" type="button" data-action="delete-sprint" data-sprint="${sprint.sprint_id}">Delete</button>
           </div>
         </div>
-      `
-    )
+      `;
+    })
     .join('');
 }
 
