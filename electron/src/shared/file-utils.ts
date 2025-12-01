@@ -66,7 +66,7 @@ export async function readIdeas(): Promise<IdeaRecord[]> {
     const filePath = path.join(PATHS.ideas, file);
     const content = await fs.readFile(filePath, 'utf-8');
     const parsed = matter(content);
-    const data = parsed.data as Idea;
+    const data = normalizeIdeaData(parsed.data as Idea);
     ideas.push({
       ...data,
       body: parsed.content?.trim() ?? '',
@@ -118,10 +118,9 @@ export async function readSprints(): Promise<SprintRecord[]> {
     const filePath = path.join(PATHS.sprints, file);
     const content = await fs.readFile(filePath, 'utf-8');
     const parsed = matter(content);
-    const data = parsed.data as Sprint;
+    const data = normalizeSprintData(parsed.data as Sprint);
     sprints.push({
       ...data,
-      sprint_id: String(data.sprint_id), // Ensure sprint_id is always a string
       body: parsed.content?.trim() ?? '',
     });
   }
@@ -141,10 +140,9 @@ export async function readUpdates(): Promise<UpdateRecord[]> {
     const filePath = path.join(PATHS.updates, file);
     const content = await fs.readFile(filePath, 'utf-8');
     const parsed = matter(content);
-    const data = parsed.data as Update;
+    const data = normalizeUpdateData(parsed.data as Update);
     updates.push({
       ...data,
-      sprint_id: String(data.sprint_id), // Ensure sprint_id is always a string
       body: parsed.content?.trim() ?? '',
     });
   }
@@ -172,7 +170,7 @@ export async function readFigures(): Promise<FigureRecord[]> {
     const filePath = path.join(PATHS.figures, file);
     const content = await fs.readFile(filePath, 'utf-8');
     const parsed = matter(content);
-    const data = parsed.data as Figure;
+    const data = normalizeFigureData(parsed.data as Figure);
     figures.push({
       ...data,
       body: parsed.content?.trim() ?? '',
@@ -207,6 +205,11 @@ export async function readNotes(): Promise<NoteRecord[]> {
       slug: data.slug ?? slugFromFile,
       body: parsed.content?.trim() ?? '',
       filename: file,
+      related_ideas: normalizeNumberArray(data.related_ideas),
+      related_stories: normalizeNumberArray(data.related_stories),
+      related_sprints: normalizeStringArray(data.related_sprints),
+      related_figures: normalizeNumberArray(data.related_figures),
+      related_updates: normalizeStringArray(data.related_updates),
     });
   }
 
@@ -225,19 +228,40 @@ async function safeReaddir(dir: string): Promise<string[]> {
   }
 }
 
+function normalizeNumberArray(value: unknown): number[] | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  const values = Array.isArray(value) ? value : [value];
+  const numbers = values
+    .map((entry) => Number(entry))
+    .filter((entry) => Number.isFinite(entry));
+  return numbers.length ? numbers : undefined;
+}
+
+function normalizeStringArray(value: unknown): string[] | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  const values = Array.isArray(value) ? value : [value];
+  const strings = values
+    .map((entry) => String(entry).trim())
+    .filter((entry) => entry.length > 0);
+  return strings.length ? strings : undefined;
+}
+
 function normalizeStoryRecord(parsed: matter.GrayMatterFile<string>): StoryRecord {
   const data = parsed.data as RawStoryFrontMatter;
-  const relatedIdeas = Array.isArray(data.related_ideas)
-    ? data.related_ideas.map((value) => Number(value))
-    : data.idea_number !== undefined
-      ? [Number(data.idea_number)]
-      : [];
-
-  const relatedSprints = Array.isArray(data.related_sprints)
-    ? data.related_sprints.map((value) => String(value))
-    : data.assigned_sprint
-      ? [String(data.assigned_sprint)]
-      : undefined;
+  const relatedIdeas =
+    normalizeNumberArray(data.related_ideas) ??
+    (data.idea_number !== undefined ? [Number(data.idea_number)] : undefined) ??
+    [];
+  const relatedSprints =
+    normalizeStringArray(data.related_sprints) ??
+    (data.assigned_sprint ? [String(data.assigned_sprint)] : undefined);
+  const relatedNotes = normalizeStringArray(data.related_notes);
+  const relatedFigures = normalizeNumberArray(data.related_figures);
+  const relatedUpdates = normalizeStringArray(data.related_updates);
 
   const normalized: Story = {
     layout: 'story',
@@ -249,11 +273,60 @@ function normalizeStoryRecord(parsed: matter.GrayMatterFile<string>): StoryRecor
     created: data.created ?? '',
     related_ideas: relatedIdeas,
     related_sprints: relatedSprints,
+    related_notes: relatedNotes,
+    related_figures: relatedFigures,
+    related_updates: relatedUpdates,
   };
 
   return {
     ...normalized,
     body: parsed.content?.trim() ?? '',
+  };
+}
+
+function normalizeIdeaData(data: Idea): Idea {
+  return {
+    ...data,
+    related_stories: normalizeNumberArray(data.related_stories),
+    related_sprints: normalizeStringArray(data.related_sprints),
+    related_notes: normalizeStringArray(data.related_notes),
+    related_figures: normalizeNumberArray(data.related_figures),
+    related_updates: normalizeStringArray(data.related_updates),
+  };
+}
+
+function normalizeSprintData(data: Sprint): Sprint {
+  return {
+    ...data,
+    sprint_id: String(data.sprint_id),
+    related_ideas: normalizeNumberArray(data.related_ideas),
+    related_stories: normalizeNumberArray(data.related_stories),
+    related_notes: normalizeStringArray(data.related_notes),
+    related_figures: normalizeNumberArray(data.related_figures),
+    related_updates: normalizeStringArray(data.related_updates),
+  };
+}
+
+function normalizeUpdateData(data: Update): Update {
+  return {
+    ...data,
+    sprint_id: String(data.sprint_id),
+    related_ideas: normalizeNumberArray(data.related_ideas),
+    related_stories: normalizeNumberArray(data.related_stories),
+    related_figures: normalizeNumberArray(data.related_figures),
+    related_notes: normalizeStringArray(data.related_notes),
+    related_sprints: normalizeStringArray(data.related_sprints),
+  };
+}
+
+function normalizeFigureData(data: Figure): Figure {
+  return {
+    ...data,
+    related_ideas: normalizeNumberArray(data.related_ideas),
+    related_stories: normalizeStringArray(data.related_stories),
+    related_sprints: normalizeStringArray(data.related_sprints),
+    related_notes: normalizeStringArray(data.related_notes),
+    related_updates: normalizeStringArray(data.related_updates),
   };
 }
 

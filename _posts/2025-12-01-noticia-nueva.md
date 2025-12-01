@@ -6,6 +6,13 @@ date: '2025-12-01'
 tags:
   - test
 excerpt: Short excerpt
+related_ideas:
+  - 4
+related_stories: []
+related_sprints:
+  - '2603'
+related_figures: []
+related_updates: []
 ---
 # Hello World
 

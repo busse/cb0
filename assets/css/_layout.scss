@@ -16,7 +16,7 @@
 // Header Region (4/5 + 1/5 layout)
 .header-region {
   display: grid;
-  grid-template-columns: 4fr 1.2fr;
+  grid-template-columns: minmax(0, 4fr) minmax(240px, 1fr);
   gap: var(--grid-gutter);
   padding: var(--spacing-md);
   background: var(--color-surface);

@@ -1,19 +1,29 @@
-import type { Idea, IdeaRecord, IdeaStatus, Story } from '@shared/types';
+import type { Idea, IdeaRecord, IdeaStatus } from '@shared/types';
 
 import { IDEA_STATUSES } from '../../constants';
 import {
   ensureStories,
+  ensureSprints,
+  ensureNotes,
+  ensureFigures,
+  ensureUpdates,
   fetchIdeas,
   fetchStories,
+  fetchSprints,
+  fetchNotes,
+  fetchFigures,
+  fetchUpdates,
   getNextIdeaNumber,
   saveIdea,
-  saveStory,
 } from '../../api';
 import { renderIdeas } from '../lists';
 import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
 import { state } from '../../state';
 import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
+import { createMultiSelect } from '../multi-select';
+import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): Promise<void> {
   if (mode === 'edit' && !idea) {
@@ -36,36 +46,74 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
     return;
   }
 
-  await ensureStories();
+  await Promise.all([ensureStories(), ensureSprints(), ensureNotes(), ensureFigures(), ensureUpdates()]);
   const storyOptions = state.stories;
-  const relatedStoryNumbers = storyOptions
-    .filter((story) => (story.related_ideas ?? []).includes(ideaNumber as number))
-    .map((story) => story.story_number);
+  const sprintOptions = state.sprints;
+  const noteOptions = state.notes;
+  const figureOptions = state.figures;
+  const updateOptions = state.updates;
+  const resolvedIdeaNumber = ideaNumber as number;
 
-  const relatedStoriesField = `
-    <div class="form-field">
-      <label>Related Stories</label>
-      ${
-        storyOptions.length
-          ? `<select name="related_stories" multiple size="6">
-              ${storyOptions
-                .map((story) => {
-                  const labelIdeas = (story.related_ideas ?? [])
-                    .map((id) => `i${id}`)
-                    .join(', ');
-                  return `<option value="${story.story_number}" ${
-                    relatedStoryNumbers.includes(story.story_number) ? 'selected' : ''
-                  }>s${story.story_number} — ${escapeHtml(story.title || 'Untitled')} ${
-                    labelIdeas ? `(${labelIdeas})` : ''
-                  }</option>`;
-                })
-                .join('')}
-            </select>
-            <div class="helper-text">Stories selected here will include this idea relationship.</div>`
-          : '<div class="helper-text">No stories available yet. Create a story to link it to this idea.</div>'
-      }
-    </div>
-  `;
+  const derivedStorySelections =
+    idea?.related_stories ??
+    storyOptions
+      .filter((story) => story.related_ideas.includes(resolvedIdeaNumber))
+      .map((story) => story.story_number);
+
+  const storiesMultiSelect = createMultiSelect({
+    name: 'related_stories',
+    options: storyOptions.map((story) => ({
+      value: String(story.story_number),
+      label: `s${story.story_number} — ${escapeHtml(story.title || 'Untitled')}`,
+    })),
+    selected: derivedStorySelections.map(String),
+    placeholder: storyOptions.length ? 'Search stories...' : 'No stories available',
+  });
+
+  const sprintsMultiSelect = createMultiSelect({
+    name: 'related_sprints',
+    options: sprintOptions.map((sprint) => ({
+      value: sprint.sprint_id,
+      label: `${sprint.sprint_id} — Sprint ${sprint.sprint_number}`,
+    })),
+    selected: idea?.related_sprints ?? [],
+    placeholder: 'Search sprints...',
+  });
+
+  const notesMultiSelect = createMultiSelect({
+    name: 'related_notes',
+    options: noteOptions
+      .filter((note) => (note.slug ?? note.filename)?.length)
+      .map((note) => {
+        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+        return {
+          value,
+          label: `${note.title || value}`,
+        };
+      }),
+    selected: idea?.related_notes ?? [],
+    placeholder: 'Search notes...',
+  });
+
+  const figuresMultiSelect = createMultiSelect({
+    name: 'related_figures',
+    options: figureOptions.map((figure) => ({
+      value: String(figure.figure_number),
+      label: `fig_${figure.figure_number} — ${escapeHtml(figure.title || 'Untitled')}`,
+    })),
+    selected: idea?.related_figures?.map(String) ?? [],
+    placeholder: 'Search figures...',
+  });
+
+  const updatesMultiSelect = createMultiSelect({
+    name: 'related_updates',
+    options: updateOptions.map((update) => ({
+      value: update.notation,
+      label: `${update.notation} (${update.type})`,
+    })),
+    selected: idea?.related_updates ?? [],
+    placeholder: 'Search updates...',
+  });
 
   const defaults = {
     title: idea?.title ?? '',
@@ -119,9 +167,70 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
         <label>Body (Markdown)</label>
         <textarea name="body" placeholder="Additional markdown content">${escapeHtml(defaults.body)}</textarea>
       </div>
-      ${relatedStoriesField}
+      <section class="form-section">
+        <h2 class="form-section__title">Relationships</h2>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Stories</label>
+            ${storiesMultiSelect.html}
+            <div class="helper-text">Stories selected here will include this idea automatically.</div>
+          </div>
+          <div class="form-field">
+            <label>Sprints</label>
+            ${sprintsMultiSelect.html}
+            <div class="helper-text">Link sprints that track this idea.</div>
+          </div>
+          <div class="form-field">
+            <label>Notes</label>
+            ${notesMultiSelect.html}
+            <div class="helper-text">Attach research or planning notes.</div>
+          </div>
+          <div class="form-field">
+            <label>Figures</label>
+            ${figuresMultiSelect.html}
+            <div class="helper-text">Reference supporting figures.</div>
+          </div>
+          <div class="form-field">
+            <label>Updates</label>
+            ${updatesMultiSelect.html}
+            <div class="helper-text">Connect progress updates to this idea.</div>
+          </div>
+        </div>
+      </section>
     `,
+    onOpen: (form) => {
+      storiesMultiSelect.init(form);
+      sprintsMultiSelect.init(form);
+      notesMultiSelect.init(form);
+      figuresMultiSelect.init(form);
+      updatesMultiSelect.init(form);
+    },
     onSubmit: async (formData) => {
+      const getNumberSelections = (name: string) =>
+        Array.from(
+          new Set(
+            formData
+              .getAll(name)
+              .map((value) => Number(value))
+              .filter((num) => !Number.isNaN(num))
+          )
+        );
+      const getStringSelections = (name: string) =>
+        Array.from(
+          new Set(
+            formData
+              .getAll(name)
+              .map((value) => String(value).trim())
+              .filter(Boolean)
+          )
+        );
+
+      const relatedStories = getNumberSelections('related_stories');
+      const relatedFigures = getNumberSelections('related_figures');
+      const relatedSprints = getStringSelections('related_sprints');
+      const relatedNotes = getStringSelections('related_notes');
+      const relatedUpdates = getStringSelections('related_updates');
+
       const payload: Idea = {
         layout: 'idea',
         idea_number: Number(formData.get('idea_number')),
@@ -130,54 +239,29 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
         status: formData.get('status') as IdeaStatus,
         created: formData.get('created') as string,
         tags: parseTags(formData.get('tags') as string),
+        related_stories: relatedStories.length ? relatedStories : undefined,
+        related_figures: relatedFigures.length ? relatedFigures : undefined,
+        related_sprints: relatedSprints.length ? relatedSprints : undefined,
+        related_notes: relatedNotes.length ? relatedNotes : undefined,
+        related_updates: relatedUpdates.length ? relatedUpdates : undefined,
       };
 
       const content = (formData.get('body') as string) ?? '';
       await saveIdea(payload, content);
-      const selectedStoryNumbers = new Set<number>(
-        formData
-          .getAll('related_stories')
-          .filter((value): value is string => typeof value === 'string')
-          .map((value) => Number(value))
-      );
 
-      const storyUpdatePromises: Promise<void>[] = [];
-      for (const storyRecord of state.stories) {
-        const currentIdeas = Array.isArray(storyRecord.related_ideas)
-          ? storyRecord.related_ideas
-          : [];
-        const hasIdea = currentIdeas.includes(payload.idea_number);
-        const shouldHave = selectedStoryNumbers.has(storyRecord.story_number);
-        if (hasIdea === shouldHave) {
-          continue;
-        }
+      const ideaRecord: IdeaRecord = {
+        ...payload,
+        body: content,
+      };
 
-        const nextRelatedIdeas = shouldHave
-          ? Array.from(new Set([...currentIdeas, payload.idea_number]))
-          : currentIdeas.filter((id) => id !== payload.idea_number);
-
-        const updatedStory: Story = {
-          layout: 'story',
-          story_number: storyRecord.story_number,
-          title: storyRecord.title,
-          description: storyRecord.description,
-          status: storyRecord.status,
-          priority: storyRecord.priority,
-          created: storyRecord.created,
-          related_ideas: nextRelatedIdeas,
-          related_sprints: storyRecord.related_sprints,
-        };
-
-        storyUpdatePromises.push(saveStory(updatedStory, storyRecord.body ?? ''));
-      }
-
-      if (storyUpdatePromises.length) {
-        await Promise.all(storyUpdatePromises);
-        await fetchStories();
-      }
-
+      await syncRelationships('idea', ideaRecord);
+      await Promise.all([fetchStories(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       await fetchIdeas();
       renderIdeas();
+      refreshRelationshipsSidebar('ideas');
+      // Also refresh related tabs' sidebars
+      refreshRelationshipsSidebar('stories');
+      refreshRelationshipsSidebar('sprints');
       showToast(mode === 'create' ? 'Idea created' : 'Idea updated');
       return true;
     },

@@ -5,6 +5,13 @@ import {
   ensureIdeas,
   ensureSprints,
   ensureStories,
+  ensureNotes,
+  ensureFigures,
+  fetchIdeas,
+  fetchSprints,
+  fetchStories,
+  fetchNotes,
+  fetchFigures,
   fetchUpdates,
   saveUpdate,
 } from '../../api';
@@ -14,6 +21,9 @@ import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
 import { escapeHtml, today } from '../../utils/dom';
 import { formatNotation } from '../../utils/format';
+import { createMultiSelect } from '../multi-select';
+import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 import { buildStoryOptions } from './helpers';
 
 export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRecord): Promise<void> {
@@ -25,6 +35,8 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
   await ensureSprints();
   await ensureIdeas();
   await ensureStories();
+  await ensureNotes();
+  await ensureFigures();
 
   if (!state.sprints.length) {
     showError('Create a sprint before adding updates.');
@@ -50,7 +62,78 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
     type: update?.type ?? 'progress',
     date: update?.date ?? today(),
     body: update?.body ?? '',
+    related_ideas: update?.related_ideas ?? [],
+    related_stories: update?.related_stories ?? [],
+    related_sprints: update?.related_sprints ?? [],
+    related_notes: update?.related_notes ?? [],
+    related_figures: update?.related_figures ?? [],
   };
+
+  const ideaOptions = state.ideas;
+  const storyOptions = state.stories;
+  const sprintOptions = state.sprints;
+  const noteOptions = state.notes;
+  const figureOptions = state.figures;
+
+  const relatedIdeasMultiSelect = createMultiSelect({
+    name: 'related_ideas',
+    options: ideaOptions.map((idea) => ({
+      value: String(idea.idea_number),
+      label: `i${idea.idea_number} — ${idea.title}`,
+    })),
+    selected: defaults.related_ideas.map(String),
+    placeholder: 'Additional ideas...',
+    required: false,
+  });
+
+  const relatedStoriesMultiSelect = createMultiSelect({
+    name: 'related_stories',
+    options: storyOptions.map((story) => ({
+      value: String(story.story_number),
+      label: `s${story.story_number} — ${story.title || 'Untitled'}`,
+    })),
+    selected: defaults.related_stories.map(String),
+    placeholder: 'Additional stories...',
+    required: false,
+  });
+
+  const relatedSprintsMultiSelect = createMultiSelect({
+    name: 'related_sprints',
+    options: sprintOptions.map((sprint) => ({
+      value: sprint.sprint_id,
+      label: `${sprint.sprint_id} — Sprint ${sprint.sprint_number}`,
+    })),
+    selected: defaults.related_sprints,
+    placeholder: 'Additional sprints...',
+    required: false,
+  });
+
+  const relatedNotesMultiSelect = createMultiSelect({
+    name: 'related_notes',
+    options: noteOptions
+      .filter((note) => (note.slug ?? note.filename)?.length)
+      .map((note) => {
+        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+        return {
+          value,
+          label: `${note.title || value}`,
+        };
+      }),
+    selected: defaults.related_notes,
+    placeholder: 'Attach notes...',
+    required: false,
+  });
+
+  const relatedFiguresMultiSelect = createMultiSelect({
+    name: 'related_figures',
+    options: figureOptions.map((figure) => ({
+      value: String(figure.figure_number),
+      label: `fig_${figure.figure_number} — ${figure.title || 'Untitled'}`,
+    })),
+    selected: defaults.related_figures.map((figure) => String(figure)),
+    placeholder: 'Attach figures...',
+    required: false,
+  });
 
   openModal({
     title: mode === 'create' ? 'Create Update' : `Edit Update ${update?.notation}`,
@@ -115,6 +198,31 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
         <label>Body (Markdown)</label>
         <textarea name="body">${escapeHtml(defaults.body)}</textarea>
       </div>
+      <section class="form-section">
+        <h2 class="form-section__title">Additional Relationships</h2>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Ideas</label>
+            ${relatedIdeasMultiSelect.html}
+          </div>
+          <div class="form-field">
+            <label>Stories</label>
+            ${relatedStoriesMultiSelect.html}
+          </div>
+          <div class="form-field">
+            <label>Sprints</label>
+            ${relatedSprintsMultiSelect.html}
+          </div>
+          <div class="form-field">
+            <label>Notes</label>
+            ${relatedNotesMultiSelect.html}
+          </div>
+          <div class="form-field">
+            <label>Figures</label>
+            ${relatedFiguresMultiSelect.html}
+          </div>
+        </div>
+      </section>
     `,
     onOpen: (form) => {
       const sprintSelect = form.querySelector<HTMLSelectElement>('select[name="sprint_id"]');
@@ -153,6 +261,11 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
 
       updateStoryOptions(true);
       updateNotation();
+      relatedIdeasMultiSelect.init(form);
+      relatedStoriesMultiSelect.init(form);
+      relatedSprintsMultiSelect.init(form);
+      relatedNotesMultiSelect.init(form);
+      relatedFiguresMultiSelect.init(form);
     },
     onSubmit: async (formData) => {
       const sprintId = formData.get('sprint_id') as string;
@@ -169,6 +282,25 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
       const ideaNumber = Number(ideaValue);
       const storyNumber = Number(storyValue);
 
+      const getNumberSelections = (name: string) =>
+        Array.from(
+          new Set(
+            formData
+              .getAll(name)
+              .map((value) => Number(value))
+              .filter((num) => !Number.isNaN(num))
+          )
+        );
+      const getStringSelections = (name: string) =>
+        Array.from(
+          new Set(
+            formData
+              .getAll(name)
+              .map((value) => String(value).trim())
+              .filter(Boolean)
+          )
+        );
+
       const payload: Update = {
         layout: 'update',
         sprint_id: sprintId,
@@ -177,12 +309,23 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
         type: formData.get('type') as UpdateType,
         date: formData.get('date') as string,
         notation: formatNotation(sprintId, ideaNumber, storyNumber),
+        related_ideas: getNumberSelections('related_ideas'),
+        related_stories: getNumberSelections('related_stories'),
+        related_sprints: getStringSelections('related_sprints'),
+        related_notes: getStringSelections('related_notes'),
+        related_figures: getNumberSelections('related_figures'),
       };
 
       const content = (formData.get('body') as string) ?? '';
       await saveUpdate(payload, content);
-      await fetchUpdates();
+      const updateRecord: UpdateRecord = {
+        ...payload,
+        body: content,
+      };
+      await syncRelationships('update', updateRecord);
+      await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       renderUpdates();
+      refreshRelationshipsSidebar('updates');
       showToast(mode === 'create' ? 'Update created' : 'Update updated');
       return true;
     },

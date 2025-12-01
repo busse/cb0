@@ -58,19 +58,7 @@ layout: default
     </div>
     
     <aside class="header-sidebar">
-      {% include navigation/related-items.html figure=page %}
-      
-      <h2 class="sidebar-heading">NOTES</h2>
-      {%- if site.posts.size > 0 -%}
-        <div class="note-list">
-          {%- for post in site.posts limit:5 -%}
-            {% include note-item.html post=post %}
-          {%- endfor -%}
-        </div>
-        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL NOTES →</a>
-      {%- else -%}
-        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No notes yet.</p>
-      {%- endif -%}
+      {% include helpers/relationships-sidebar.html record=page layout=page.layout %}
     </aside>
   </section>
   

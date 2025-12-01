@@ -14,50 +14,59 @@ layout: default
   {%- assign primary_parent_number = primary_parent.idea_number | default: (page.related_ideas | first) -%}
   {% include navigation/breadcrumbs.html idea=primary_parent story=page %}
   
-  <article class="story-detail">
-    <header class="story-detail__header">
-      <div class="story-header">
-        {% include notation-badge.html idea=primary_parent_number story=page.story_number size="lg" %}
-        <span class="status-indicator status-indicator--{{ page.status }}">{{ page.status | replace: "-", " " | upcase }}</span>
-        <span class="priority-indicator priority-indicator--{{ page.priority }}">{{ page.priority | upcase }} PRIORITY</span>
-      </div>
-      
-      <h1 class="page-title">{{ page.title }}</h1>
-      
-      <div class="story-detail__meta">
-        {%- if page.related_sprints and page.related_sprints != '' and page.related_sprints.size > 0 -%}
-          <span class="story-detail__sprint">
-            Sprints:
-            {%- for sprint_id in page.related_sprints -%}
-              <a href="{{ '/sprint/' | append: sprint_id | append: '/' | relative_url }}">{% include notation-badge.html sprint=sprint_id size="sm" %}</a>{% unless forloop.last %}, {% endunless %}
-            {%- endfor -%}
-          </span>
-        {%- else -%}
-          <span class="story-detail__sprint story-detail__sprint--backlog">Backlog</span>
-        {%- endif -%}
-        <time class="story-detail__date" datetime="{{ page.created }}">Created: {{ page.created | date: "%B %d, %Y" }}</time>
-      </div>
-      
-      {%- if story_parent_ideas.size > 0 -%}
-        <p class="story-detail__parent">
-          Part of:
-          {%- for idea in story_parent_ideas -%}
-            <a href="{{ idea.url | relative_url }}">{% include notation-badge.html idea=idea.idea_number size="sm" %} {{ idea.title }}</a>{% unless forloop.last %}, {% endunless %}
-          {%- endfor -%}
-        </p>
-      {%- endif -%}
-    </header>
+  <section class="header-region">
+    <div class="header-primary">
+      <article class="story-detail">
+        <header class="story-detail__header">
+          <div class="story-header">
+            {% include notation-badge.html idea=primary_parent_number story=page.story_number size="lg" %}
+            <span class="status-indicator status-indicator--{{ page.status }}">{{ page.status | replace: "-", " " | upcase }}</span>
+            <span class="priority-indicator priority-indicator--{{ page.priority }}">{{ page.priority | upcase }} PRIORITY</span>
+          </div>
+          
+          <h1 class="page-title">{{ page.title }}</h1>
+          
+          <div class="story-detail__meta">
+            {%- if page.related_sprints and page.related_sprints != '' and page.related_sprints.size > 0 -%}
+              <span class="story-detail__sprint">
+                Sprints:
+                {%- for sprint_id in page.related_sprints -%}
+                  <a href="{{ '/sprint/' | append: sprint_id | append: '/' | relative_url }}">{% include notation-badge.html sprint=sprint_id size="sm" %}</a>{% unless forloop.last %}, {% endunless %}
+                {%- endfor -%}
+              </span>
+            {%- else -%}
+              <span class="story-detail__sprint story-detail__sprint--backlog">Backlog</span>
+            {%- endif -%}
+            <time class="story-detail__date" datetime="{{ page.created }}">Created: {{ page.created | date: "%B %d, %Y" }}</time>
+          </div>
+          
+          {%- if story_parent_ideas.size > 0 -%}
+            <p class="story-detail__parent">
+              Part of:
+              {%- for idea in story_parent_ideas -%}
+                <a href="{{ idea.url | relative_url }}">{% include notation-badge.html idea=idea.idea_number size="sm" %} {{ idea.title }}</a>{% unless forloop.last %}, {% endunless %}
+              {%- endfor -%}
+            </p>
+          {%- endif -%}
+        </header>
 
-    {%- if page.description -%}
-      <div class="story-detail__description">
-        <h2 class="section-title">DESCRIPTION</h2>
-        <p>{{ page.description }}</p>
-      </div>
-    {%- endif -%}
-    
-    <div class="story-content">
-      {{ content }}
+        {%- if page.description -%}
+          <div class="story-detail__description">
+            <h2 class="section-title">DESCRIPTION</h2>
+            <p>{{ page.description }}</p>
+          </div>
+        {%- endif -%}
+        
+        <div class="story-content">
+          {{ content }}
+        </div>
+      </article>
     </div>
+    
+    <aside class="header-sidebar">
+      {% include helpers/relationships-sidebar.html record=page layout=page.layout %}
+    </aside>
+  </section>
 
     {%- include helpers/updates-for-story.html story=page -%}
     {%- if story_updates.size > 0 -%}
@@ -78,8 +87,5 @@ layout: default
         </ul>
       </section>
     {%- endif -%}
-    
-    {% include navigation/related-items.html story=page %}
-  </article>
 </main>
 

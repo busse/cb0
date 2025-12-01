@@ -1,16 +1,29 @@
 import type { Story, StoryRecord, StoryPriority, StoryStatus } from '@shared/types';
 
+import { STORY_PRIORITIES, STORY_STATUSES } from '../../constants';
 import {
-  STORY_PRIORITIES,
-  STORY_STATUSES,
-} from '../../constants';
-import { ensureIdeas, ensureSprints, fetchStories, getNextStoryNumber, saveStory } from '../../api';
+  ensureIdeas,
+  ensureSprints,
+  ensureNotes,
+  ensureFigures,
+  ensureUpdates,
+  fetchIdeas,
+  fetchSprints,
+  fetchNotes,
+  fetchFigures,
+  fetchUpdates,
+  fetchStories,
+  getNextStoryNumber,
+  saveStory,
+} from '../../api';
 import { state } from '../../state';
 import { renderStories } from '../lists';
 import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
 import { escapeAttr, escapeHtml, today } from '../../utils/dom';
 import { createMultiSelect } from '../multi-select';
+import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord): Promise<void> {
   if (mode === 'edit' && !story) {
@@ -18,10 +31,12 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
     return;
   }
 
-  await ensureIdeas();
-  await ensureSprints();
+  await Promise.all([ensureIdeas(), ensureSprints(), ensureNotes(), ensureFigures(), ensureUpdates()]);
 
   const ideaOptions = state.ideas;
+  const noteOptions = state.notes;
+  const figureOptions = state.figures;
+  const updateOptions = state.updates;
   if (!ideaOptions.length) {
     showError('Create an idea before adding stories.');
     return;
@@ -48,6 +63,9 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         ? story.related_ideas
         : [ideaOptions[0].idea_number],
     related_sprints: story?.related_sprints ?? [],
+    related_notes: story?.related_notes ?? [],
+    related_figures: story?.related_figures ?? [],
+    related_updates: story?.related_updates ?? [],
     body: story?.body ?? '',
   };
 
@@ -71,6 +89,44 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
     })),
     selected: defaults.related_sprints,
     placeholder: 'Search sprints...',
+    required: false,
+  });
+
+  const notesMultiSelect = createMultiSelect({
+    name: 'related_notes',
+    options: noteOptions
+      .filter((note) => (note.slug ?? note.filename)?.length)
+      .map((note) => {
+        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+        return {
+          value,
+          label: `${note.title || value}`,
+        };
+      }),
+    selected: defaults.related_notes,
+    placeholder: 'Search notes...',
+    required: false,
+  });
+
+  const figuresMultiSelect = createMultiSelect({
+    name: 'related_figures',
+    options: figureOptions.map((figure) => ({
+      value: String(figure.figure_number),
+      label: `fig_${figure.figure_number} — ${figure.title || 'Untitled'}`,
+    })),
+    selected: defaults.related_figures.map((figure) => String(figure)),
+    placeholder: 'Search figures...',
+    required: false,
+  });
+
+  const updatesMultiSelect = createMultiSelect({
+    name: 'related_updates',
+    options: updateOptions.map((update) => ({
+      value: update.notation,
+      label: `${update.notation} (${update.type})`,
+    })),
+    selected: defaults.related_updates,
+    placeholder: 'Search updates...',
     required: false,
   });
 
@@ -132,14 +188,59 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         <label>Body (Markdown)</label>
         <textarea name="body">${escapeHtml(defaults.body)}</textarea>
       </div>
+      <section class="form-section">
+        <h2 class="form-section__title">Relationships</h2>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Notes</label>
+            ${notesMultiSelect.html}
+            <div class="helper-text">Reference supporting notes.</div>
+          </div>
+          <div class="form-field">
+            <label>Figures</label>
+            ${figuresMultiSelect.html}
+            <div class="helper-text">Link visual assets to this story.</div>
+          </div>
+          <div class="form-field">
+            <label>Updates</label>
+            ${updatesMultiSelect.html}
+            <div class="helper-text">Attach updates beyond the canonical notation.</div>
+          </div>
+        </div>
+      </section>
     `,
     onOpen: (form) => {
       ideasMultiSelect.init(form);
       sprintsMultiSelect.init(form);
+      notesMultiSelect.init(form);
+      figuresMultiSelect.init(form);
+      updatesMultiSelect.init(form);
     },
     onSubmit: async (formData) => {
-      const relatedIdeas = formData.getAll('related_ideas').map((value) => Number(value));
-      const relatedSprints = formData.getAll('related_sprints').map((value) => String(value));
+      const getNumberSelections = (name: string) =>
+        Array.from(
+          new Set(
+            formData
+              .getAll(name)
+              .map((value) => Number(value))
+              .filter((num) => !Number.isNaN(num))
+          )
+        );
+      const getStringSelections = (name: string) =>
+        Array.from(
+          new Set(
+            formData
+              .getAll(name)
+              .map((value) => String(value).trim())
+              .filter(Boolean)
+          )
+        );
+
+      const relatedIdeas = getNumberSelections('related_ideas');
+      const relatedSprints = getStringSelections('related_sprints');
+      const relatedNotes = getStringSelections('related_notes');
+      const relatedFigures = getNumberSelections('related_figures');
+      const relatedUpdates = getStringSelections('related_updates');
       const payload: Story = {
         layout: 'story',
         story_number: Number(formData.get('story_number')),
@@ -150,12 +251,24 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         created: formData.get('created') as string,
         related_ideas: relatedIdeas,
         related_sprints: relatedSprints.length ? relatedSprints : undefined,
+        related_notes: relatedNotes.length ? relatedNotes : undefined,
+        related_figures: relatedFigures.length ? relatedFigures : undefined,
+        related_updates: relatedUpdates.length ? relatedUpdates : undefined,
       };
       const content = (formData.get('body') as string) ?? '';
 
       await saveStory(payload, content);
+      const storyRecord: StoryRecord = {
+        ...payload,
+        body: content,
+      };
+      await syncRelationships('story', storyRecord);
+      await Promise.all([fetchIdeas(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       await fetchStories();
       renderStories();
+      refreshRelationshipsSidebar('stories');
+      // Also refresh sprints sidebar if a sprint card is selected (stories can be related to sprints)
+      refreshRelationshipsSidebar('sprints');
       showToast(mode === 'create' ? 'Story created' : 'Story updated');
       return true;
     },

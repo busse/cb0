@@ -19,7 +19,7 @@ export function renderIdeas(): void {
           (story.related_ideas ?? []).includes(idea.idea_number)
         ).length;
         return `
-        <div class="item-card">
+        <div class="item-card" data-card-type="ideas" data-idea-number="${idea.idea_number}" tabindex="0">
           <div class="item-header">
             <span class="item-title">${escapeHtml(idea.title || 'Untitled')}</span>
             <span class="item-badge">i${idea.idea_number}</span>
@@ -59,7 +59,7 @@ export function renderStories(): void {
         ? story.related_sprints.join(', ')
         : 'Backlog';
       return `
-        <div class="item-card">
+        <div class="item-card" data-card-type="stories" data-story-number="${story.story_number}" tabindex="0">
           <div class="item-header">
             <span class="item-title">${escapeHtml(story.title || 'Untitled')}</span>
             <span class="item-badge">s${story.story_number}</span>
@@ -98,7 +98,7 @@ export function renderSprints(): void {
         story.related_sprints?.includes(sprint.sprint_id)
       ).length;
       return `
-        <div class="item-card">
+        <div class="item-card" data-card-type="sprints" data-sprint-id="${escapeAttr(sprint.sprint_id)}" tabindex="0">
           <div class="item-header">
             <span class="item-title">Sprint ${sprint.sprint_id}</span>
             <span class="item-badge">${sprint.sprint_id}</span>
@@ -134,7 +134,7 @@ export function renderUpdates(): void {
   listElement.innerHTML = state.updates
     .map(
       (update) => `
-        <div class="item-card">
+        <div class="item-card" data-card-type="updates" data-sprint-id="${escapeAttr(update.sprint_id)}" data-idea-number="${update.idea_number}" data-story-number="${update.story_number}" tabindex="0">
           <div class="item-header">
             <span class="item-title">Update ${update.notation}</span>
             <span class="item-badge">${update.notation}</span>
@@ -181,7 +181,7 @@ export async function renderFigures(): Promise<void> {
         .join(' • ');
 
       return `
-        <div class="item-card">
+        <div class="item-card" data-card-type="figures" data-figure-number="${figure.figure_number}" tabindex="0">
           <div class="item-header">
             <span class="item-title">${escapeHtml(figure.title || 'Untitled figure')}</span>
             <span class="item-badge">${formatFigureNotation(figure.figure_number)}</span>
@@ -223,7 +223,7 @@ export function renderNotes(): void {
   listElement.innerHTML = state.notes
     .map(
       (note) => `
-        <div class="item-card">
+        <div class="item-card" data-card-type="notes" data-note-slug="${escapeAttr(note.slug)}" tabindex="0">
           <div class="item-header">
             <span class="item-title">${escapeHtml(note.title || 'Untitled note')}</span>
             <span class="item-badge">${escapeHtml(note.slug)}</span>
