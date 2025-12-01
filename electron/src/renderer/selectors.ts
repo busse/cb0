@@ -1,6 +1,7 @@
 import type {
   FigureRecord,
   IdeaRecord,
+  NoteRecord,
   SprintRecord,
   StoryRecord,
   UpdateRecord,
@@ -43,6 +44,12 @@ export function getFigureFromDataset(el: HTMLElement): FigureRecord | undefined 
   const figureNumber = Number(el.dataset.figure);
   if (Number.isNaN(figureNumber)) return undefined;
   return state.figures.find((figure) => figure.figure_number === figureNumber);
+}
+
+export function getNoteFromDataset(el: HTMLElement): NoteRecord | undefined {
+  const filename = el.dataset.note;
+  if (!filename) return undefined;
+  return state.notes.find((note) => note.filename === filename);
 }
 
 

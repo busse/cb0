@@ -74,11 +74,26 @@ export type MarkdownDocument = {
   body?: string;
 };
 
+export interface Note {
+  layout: 'post';
+  title: string;
+  date: string; // YYYY-MM-DD
+  author?: string;
+  tags?: string[];
+  excerpt?: string;
+  slug?: string;
+}
+
 export type IdeaRecord = Idea & MarkdownDocument;
 export type StoryRecord = Story & MarkdownDocument;
 export type SprintRecord = Sprint & MarkdownDocument;
 export type UpdateRecord = Update & MarkdownDocument;
 export type FigureRecord = Figure & MarkdownDocument;
+export type NoteRecord = Note &
+  MarkdownDocument & {
+    filename: string;
+    slug: string;
+  };
 
 export interface TaxonomyData {
   ideas: IdeaRecord[];
@@ -86,5 +101,6 @@ export interface TaxonomyData {
   sprints: SprintRecord[];
   updates: UpdateRecord[];
   figures: FigureRecord[];
+  notes: NoteRecord[];
 }
 

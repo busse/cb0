@@ -1,4 +1,4 @@
-import type { Figure, Idea, Sprint, Story, Update } from '@shared/types';
+import type { Figure, Idea, Note, Sprint, Story, Update } from '@shared/types';
 
 import { state } from './state';
 
@@ -57,6 +57,14 @@ export async function fetchFigures(): Promise<void> {
   state.figures = result.data;
 }
 
+export async function fetchNotes(): Promise<void> {
+  const result = await window.electronAPI.readNotes();
+  if (!result.success || !result.data) {
+    throw new Error(result.error || 'Failed to load notes');
+  }
+  state.notes = result.data;
+}
+
 export async function ensureIdeas(): Promise<void> {
   if (!state.ideas.length) {
     await fetchIdeas();
@@ -78,6 +86,12 @@ export async function ensureSprints(): Promise<void> {
 export async function ensureFigures(): Promise<void> {
   if (!state.figures.length) {
     await fetchFigures();
+  }
+}
+
+export async function ensureNotes(): Promise<void> {
+  if (!state.notes.length) {
+    await fetchNotes();
   }
 }
 
@@ -116,6 +130,13 @@ export async function saveFigure(figure: Figure, content: string): Promise<void>
   }
 }
 
+export async function saveNote(note: Note & { filename?: string }, content: string): Promise<void> {
+  const result = await window.electronAPI.writeNote(note, content);
+  if (!result.success) {
+    throw new Error(result.error || 'Unable to save note');
+  }
+}
+
 export async function deleteIdeaRemote(ideaNumber: number): Promise<void> {
   const result = await window.electronAPI.deleteIdea(ideaNumber);
   if (!result.success) {
@@ -148,6 +169,13 @@ export async function deleteFigureRemote(figureNumber: number): Promise<void> {
   const result = await window.electronAPI.deleteFigure(figureNumber);
   if (!result.success) {
     throw new Error(result.error || 'Unable to delete figure');
+  }
+}
+
+export async function deleteNoteRemote(filename: string): Promise<void> {
+  const result = await window.electronAPI.deleteNote(filename);
+  if (!result.success) {
+    throw new Error(result.error || 'Unable to delete note');
   }
 }
 

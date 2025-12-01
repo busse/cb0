@@ -474,9 +474,10 @@
   <div class="container">
     <header>
       <h1>Ideas Taxonomy CMS</h1>
-      <p>Manage your Ideas, Stories, and Sprints</p>
+      <p>Manage your Ideas, Notes, Stories, and Sprints</p>
       <div class="tabs">
         <button class="tab active" data-tab="ideas">Ideas</button>
+        <button class="tab" data-tab="notes">Notes</button>
         <button class="tab" data-tab="stories">Stories</button>
         <button class="tab" data-tab="sprints">Sprints</button>
         <button class="tab" data-tab="updates">Updates</button>
@@ -493,6 +494,14 @@
           <button class="btn btn-secondary" type="button" data-action="refresh-ideas">Refresh</button>
         </div>
         <div id="ideas-list" class="list"></div>
+      </div>
+
+      <div id="notes-panel" class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-note">New Note</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-notes">Refresh</button>
+        </div>
+        <div id="notes-list" class="list"></div>
       </div>
 
       <div id="stories-panel" class="panel">

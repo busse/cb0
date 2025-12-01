@@ -23,7 +23,7 @@ test.describe('UI Interactions', () => {
 
   test.describe('Tab Navigation', () => {
     test('should switch between all tabs', async ({ page }) => {
-      const tabs = ['ideas', 'stories', 'sprints', 'updates'] as const;
+      const tabs = ['ideas', 'notes', 'stories', 'sprints', 'updates', 'figures'] as const;
       
       for (const tab of tabs) {
         await navigateToTab(page, tab);

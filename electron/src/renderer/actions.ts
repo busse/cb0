@@ -1,16 +1,25 @@
 import {
   deleteFigureRemote,
   deleteIdeaRemote,
+  deleteNoteRemote,
   deleteSprintRemote,
   deleteStoryRemote,
   deleteUpdateRemote,
   fetchFigures,
   fetchIdeas,
+  fetchNotes,
   fetchSprints,
   fetchStories,
   fetchUpdates,
 } from './api';
-import { renderFigures, renderIdeas, renderSprints, renderStories, renderUpdates } from './components/lists';
+import {
+  renderFigures,
+  renderIdeas,
+  renderNotes,
+  renderSprints,
+  renderStories,
+  renderUpdates,
+} from './components/lists';
 import { showError, showToast } from './toast';
 
 export async function deleteIdea(ideaNumber?: string): Promise<void> {
@@ -89,6 +98,20 @@ export async function deleteFigure(figureNumber?: string): Promise<void> {
     await fetchFigures();
     await renderFigures();
     showToast('Figure deleted');
+  } catch (error) {
+    showError((error as Error).message);
+  }
+}
+
+export async function deleteNote(filename?: string): Promise<void> {
+  if (!filename) return;
+  if (!confirm('Delete this note? This cannot be undone.')) return;
+
+  try {
+    await deleteNoteRemote(filename);
+    await fetchNotes();
+    renderNotes();
+    showToast('Note deleted');
   } catch (error) {
     showError((error as Error).message);
   }

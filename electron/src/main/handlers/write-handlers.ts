@@ -6,10 +6,12 @@ import {
   PATHS,
   readFigures,
   readIdeas,
+  readNotes,
   readSprints,
   readStories,
   writeFigure,
   writeIdea,
+  writeNote,
   writeSprint,
   writeStory,
   writeUpdate,
@@ -17,10 +19,11 @@ import {
 import {
   validateFigure,
   validateIdea,
+  validateNote,
   validateSprint,
   validateStory,
 } from '../../shared/validation';
-import type { Figure, Idea, Sprint, Story, Update } from '../../shared/types';
+import type { Figure, Idea, Note, Sprint, Story, Update } from '../../shared/types';
 
 export function registerWriteHandlers(): void {
   handleAsyncWithArgs('write-idea', async (idea: Idea, content: string) => {
@@ -93,6 +96,15 @@ export function registerWriteHandlers(): void {
       throw new Error(errors.join(', '));
     }
     await writeFigure(figure, content);
+  });
+
+  handleAsyncWithArgs('write-note', async (note: Note & { filename?: string }, content: string) => {
+    const existingNotes = await readNotes();
+    const errors = validateNote(note, existingNotes, note.filename);
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
+    await writeNote(note, content);
   });
 }
 
