@@ -2,7 +2,7 @@
  * Validation utilities for taxonomy system
  */
 
-import type { Idea, Story, Sprint, Update, Figure } from './types';
+import type { Idea, Story, Sprint, Update, Figure, StoryStatus } from './types';
 
 /**
  * Validate sprint ID format (YYSS)
@@ -270,8 +270,13 @@ export function validateStory(
 
   if (!story.status) {
     errors.push('status is required');
-  } else if (!['backlog', 'planned', 'in-progress', 'done'].includes(story.status)) {
-    errors.push('status must be one of: backlog, planned, in-progress, done');
+  } else {
+    const normalizedStatus = story.status.replace(/_/g, '-');
+    if (!['backlog', 'planned', 'in-progress', 'done'].includes(normalizedStatus)) {
+      errors.push('status must be one of: backlog, planned, in-progress, done');
+    } else if (normalizedStatus !== story.status) {
+      story.status = normalizedStatus as StoryStatus;
+    }
   }
 
   if (!story.priority) {
