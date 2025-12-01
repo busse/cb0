@@ -16,6 +16,48 @@
   {%- assign ids = ids | concat: record.related_stories -%}
 {%- endif -%}
 
+{%- comment -%} Bidirectional: For sprints, also check stories that reference this sprint {%- endcomment -%}
+{%- if record_layout == 'sprint' and record.sprint_id -%}
+  {%- for story in site.stories -%}
+    {%- if story.related_sprints and story.related_sprints contains record.sprint_id -%}
+      {%- assign ids = ids | push: story.story_number -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- comment -%} Bidirectional: For notes, check stories that reference this note {%- endcomment -%}
+{%- if record_layout == 'post' -%}
+  {%- assign current_slug = record.slug | default: record.filename | replace: '.md', '' -%}
+  {%- for story in site.stories -%}
+    {%- if story.related_notes and story.related_notes contains current_slug -%}
+      {%- assign ids = ids | push: story.story_number -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- comment -%} Bidirectional: For ideas, check stories that reference this idea {%- endcomment -%}
+{%- if record_layout == 'idea' and record.idea_number -%}
+  {%- for story in site.stories -%}
+    {%- if story.related_ideas and story.related_ideas contains record.idea_number -%}
+      {%- assign ids = ids | push: story.story_number -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- comment -%} Bidirectional: For figures, check stories that reference this figure {%- endcomment -%}
+{%- if record_layout == 'figure' and record.figure_number -%}
+  {%- for story in site.stories -%}
+    {%- if story.related_figures and story.related_figures contains record.figure_number -%}
+      {%- assign ids = ids | push: story.story_number -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- comment -%} Bidirectional: For updates, check stories that reference this update {%- endcomment -%}
+{%- if record_layout == 'update' and record.notation -%}
+  {%- for story in site.stories -%}
+    {%- if story.related_updates and story.related_updates contains record.notation -%}
+      {%- assign ids = ids | push: story.story_number -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
 {%- assign ids = ids | uniq -%}
 
 {%- for story_id in ids -%}

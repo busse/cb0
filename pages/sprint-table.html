@@ -62,16 +62,47 @@ permalink: /sprint-table/
                 </td>
                 {%- for sprint_num in (1..26) -%}
                   {%- assign sprint_id = 2600 | plus: sprint_num -%}
-                  {%- assign cell_stories = site.stories
-                    | where_exp: "story", "story.related_ideas contains idea.idea_number"
-                    | where_exp: "story", "story.related_sprints contains sprint_id"
-                    | sort: "story_number"
-                  -%}
+                  {%- assign sprint_id_str = sprint_id | append: "" -%}
+                  {%- assign cell_stories = '' | split: '' -%}
+                  {%- for story in site.stories -%}
+                    {%- assign has_idea = false -%}
+                    {%- assign has_sprint = false -%}
+                    {%- if story.related_ideas -%}
+                      {%- for related_idea in story.related_ideas -%}
+                        {%- if related_idea == idea.idea_number -%}
+                          {%- assign has_idea = true -%}
+                          {%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+                    {%- if story.related_sprints -%}
+                      {%- for related_sprint in story.related_sprints -%}
+                        {%- assign related_sprint_str = related_sprint | append: "" -%}
+                        {%- if related_sprint_str == sprint_id_str -%}
+                          {%- assign has_sprint = true -%}
+                          {%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+                    {%- if has_idea and has_sprint -%}
+                      {%- assign cell_stories = cell_stories | push: story -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- assign cell_stories = cell_stories | sort: "story_number" -%}
                   <td class="sprint-table__cell">
                     {%- if cell_stories.size > 0 -%}
                       <div class="sprint-table__stories">
                         {%- for story in cell_stories -%}
-                          <a href="{{ story.url | relative_url }}" class="sprint-table__story-link" title="{{ story.title }}">
+                          <a href="{{ story.url | relative_url }}" 
+                             class="sprint-table__story-link" 
+                             title="{{ story.title }}"
+                             data-story-number="{{ story.story_number }}"
+                             data-story-title="{{ story.title }}"
+                             data-story-description="{{ story.description | default: '' }}"
+                             data-story-status="{{ story.status | default: '' }}"
+                             data-story-priority="{{ story.priority | default: '' }}"
+                             data-story-created="{{ story.created | default: '' }}"
+                             data-idea-number="{{ idea.idea_number }}">
                             {% include notation-badge.html idea=idea.idea_number story=story.story_number size="sm" %}
                           </a>
                         {%- endfor -%}

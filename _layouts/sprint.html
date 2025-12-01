@@ -5,36 +5,44 @@ layout: default
   <div class="container">
     {% include navigation/breadcrumbs.html %}
     
-    <header class="sprint-board__header">
-      <div class="sprint-board__title">
-        {% include notation-badge.html sprint=page.sprint_id size="lg" %}
-        <h1>Sprint {{ page.sprint_number }}, {{ page.year }}</h1>
-        <span class="status-indicator status-indicator--{{ page.status }}">{{ page.status | upcase }}</span>
-      </div>
-      
-      <div class="sprint-board__dates">
-        <time>{{ page.start_date | date: "%b %d" }}</time>
-        <span>→</span>
-        <time>{{ page.end_date | date: "%b %d, %Y" }}</time>
-      </div>
-      
-      {%- if page.goals.size > 0 -%}
-        <div class="sprint-detail__goals">
-          <h2 class="section-title">SPRINT GOALS</h2>
-          <ul>
-            {%- for goal in page.goals -%}
-              <li>{{ goal }}</li>
-            {%- endfor -%}
-          </ul>
-        </div>
-      {%- endif -%}
-    </header>
+    <section class="header-region">
+      <div class="header-primary">
+        <header class="sprint-board__header">
+          <div class="sprint-board__title">
+            {% include notation-badge.html sprint=page.sprint_id size="lg" %}
+            <h1>Sprint {{ page.sprint_number }}, {{ page.year }}</h1>
+            <span class="status-indicator status-indicator--{{ page.status }}">{{ page.status | upcase }}</span>
+          </div>
+          
+          <div class="sprint-board__dates">
+            <time>{{ page.start_date | date: "%b %d" }}</time>
+            <span>→</span>
+            <time>{{ page.end_date | date: "%b %d, %Y" }}</time>
+          </div>
+          
+          {%- if page.goals.size > 0 -%}
+            <div class="sprint-detail__goals">
+              <h2 class="section-title">SPRINT GOALS</h2>
+              <ul>
+                {%- for goal in page.goals -%}
+                  <li>{{ goal }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        </header>
 
-    {%- if content != "" -%}
-      <div class="sprint-content">
-        {{ content }}
+        {%- if content != "" -%}
+          <div class="sprint-content">
+            {{ content }}
+          </div>
+        {%- endif -%}
       </div>
-    {%- endif -%}
+      
+      <aside class="header-sidebar">
+        {% include helpers/relationships-sidebar.html record=page layout=page.layout %}
+      </aside>
+    </section>
 
     {%- include helpers/stories-for-sprint.html sprint_id=page.sprint_id -%}
     {%- if sprint_stories.size > 0 -%}
@@ -101,8 +109,6 @@ layout: default
         </ul>
       </section>
     {%- endif -%}
-    
-    {% include navigation/related-items.html sprint=page %}
   </div>
 </main>
 

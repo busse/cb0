@@ -1,12 +1,85 @@
 {%- assign record = include.record | default: page -%}
+{%- assign record_layout = include.layout | default: record.layout -%}
 {%- assign relationships_items = '' | split: '' -%}
-{%- assign ids = record.related_notes -%}
+{%- assign ids = '' | split: '' -%}
 
-{%- if ids -%}
-  {%- assign ids = ids | uniq -%}
-{%- else -%}
-  {%- assign ids = '' | split: '' -%}
+{%- if record.related_notes -%}
+  {%- assign ids = ids | concat: record.related_notes -%}
 {%- endif -%}
+
+{%- comment -%} Bidirectional: Check if other records reference this note {%- endcomment -%}
+{%- if record_layout == 'post' -%}
+  {%- assign current_slug = record.slug | default: record.filename | replace: '.md', '' -%}
+  {%- for idea in site.ideas -%}
+    {%- if idea.related_notes and idea.related_notes contains current_slug -%}
+      {%- comment -%} Note is referenced by idea, but we're looking for other notes, so skip {%- endcomment -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for story in site.stories -%}
+    {%- if story.related_notes and story.related_notes contains current_slug -%}
+      {%- comment -%} Note is referenced by story, but we're looking for other notes, so skip {%- endcomment -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for sprint in site.sprints -%}
+    {%- if sprint.related_notes and sprint.related_notes contains current_slug -%}
+      {%- comment -%} Note is referenced by sprint, but we're looking for other notes, so skip {%- endcomment -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for figure in site.figures -%}
+    {%- if figure.related_notes and figure.related_notes contains current_slug -%}
+      {%- comment -%} Note is referenced by figure, but we're looking for other notes, so skip {%- endcomment -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for update in site.updates -%}
+    {%- if update.related_notes and update.related_notes contains current_slug -%}
+      {%- comment -%} Note is referenced by update, but we're looking for other notes, so skip {%- endcomment -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {%- comment -%} For non-note records, check if any notes reference this record {%- endcomment -%}
+  {%- if record_layout == 'idea' and record.idea_number -%}
+    {%- for note in site.posts -%}
+      {%- if note.related_ideas and note.related_ideas contains record.idea_number -%}
+        {%- assign note_slug = note.slug | default: note.filename | replace: '.md', '' -%}
+        {%- assign ids = ids | push: note_slug -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if record_layout == 'story' and record.story_number -%}
+    {%- for note in site.posts -%}
+      {%- if note.related_stories and note.related_stories contains record.story_number -%}
+        {%- assign note_slug = note.slug | default: note.filename | replace: '.md', '' -%}
+        {%- assign ids = ids | push: note_slug -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if record_layout == 'sprint' and record.sprint_id -%}
+    {%- for note in site.posts -%}
+      {%- if note.related_sprints and note.related_sprints contains record.sprint_id -%}
+        {%- assign note_slug = note.slug | default: note.filename | replace: '.md', '' -%}
+        {%- assign ids = ids | push: note_slug -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if record_layout == 'figure' and record.figure_number -%}
+    {%- for note in site.posts -%}
+      {%- if note.related_figures and note.related_figures contains record.figure_number -%}
+        {%- assign note_slug = note.slug | default: note.filename | replace: '.md', '' -%}
+        {%- assign ids = ids | push: note_slug -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if record_layout == 'update' and record.notation -%}
+    {%- for note in site.posts -%}
+      {%- if note.related_updates and note.related_updates contains record.notation -%}
+        {%- assign note_slug = note.slug | default: note.filename | replace: '.md', '' -%}
+        {%- assign ids = ids | push: note_slug -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- assign ids = ids | uniq -%}
 
 {%- for slug in ids -%}
   {%- assign note_hit = site.posts | where: "slug", slug | first -%}
