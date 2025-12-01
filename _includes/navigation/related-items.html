@@ -23,46 +23,89 @@
       {%- if story_idea_numbers == "" or story_idea_numbers == nil -%}
         {%- assign story_idea_numbers = "" | split: "" -%}
       {%- endif -%}
-      {%- assign primary_story_idea = story_idea_numbers | first -%}
-      {%- if primary_story_idea -%}
-        {%- assign siblings = site.stories
-          | where_exp: "s", "s.story_number != include.story.story_number"
-          | where_exp: "s", "s.related_ideas contains primary_story_idea"
-          | limit: limit
-        -%}
-      
-        {%- if siblings.size > 0 -%}
+      {%- if story_idea_numbers.size > 0 -%}
         <div class="related-items__section">
-          <h4 class="related-items__subheading">SAME IDEA</h4>
+          <h4 class="related-items__subheading">IDEAS</h4>
           <ul class="related-items__list">
-            {%- for story in siblings -%}
+            {%- for idea_number in story_idea_numbers -%}
+              {%- assign idea = site.ideas | where: "idea_number", idea_number | first -%}
+              {%- if idea -%}
+                <li>
+                  <a href="{{ idea.url | relative_url }}">
+                    {% include notation-badge.html idea=idea.idea_number size="sm" %}
+                    {{ idea.title | truncate: 30 }}
+                  </a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+
+        {%- assign primary_story_idea = story_idea_numbers | first -%}
+        {%- if primary_story_idea -%}
+          {%- assign siblings = site.stories
+            | where_exp: "s", "s.story_number != include.story.story_number"
+            | where_exp: "s", "s.related_ideas contains primary_story_idea"
+            | limit: limit
+          -%}
+        
+          {%- if siblings.size > 0 -%}
+          <div class="related-items__section">
+            <h4 class="related-items__subheading">SAME IDEA</h4>
+            <ul class="related-items__list">
+              {%- for story in siblings -%}
+              <li>
+                <a href="{{ story.url | relative_url }}">
+                  {% include notation-badge.html idea=primary_story_idea story=story.story_number size="sm" %}
+                  {{ story.title | truncate: 30 }}
+                </a>
+              </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+      
+      <!-- Related sprints -->
+      {%- assign story_sprints = include.story.related_sprints | default: "" -%}
+      {%- if story_sprints and story_sprints != "" and story_sprints.size > 0 -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">SPRINTS</h4>
+          <ul class="related-items__list">
+            {%- for sprint_id in story_sprints -%}
+              {%- assign sprint = site.sprints | where: "sprint_id", sprint_id | first -%}
+              {%- if sprint -%}
+                <li>
+                  <a href="{{ sprint.url | relative_url }}" class="related-items__sprint-link">
+                    {% include notation-badge.html sprint=sprint.sprint_id %}
+                    <span class="related-items__sprint-dates">
+                      {{ sprint.start_date | date: "%b %d" }} – {{ sprint.end_date | date: "%b %d" }}
+                    </span>
+                  </a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+      
+      <!-- Related figures -->
+      {%- include helpers/figures-for-story.html story=include.story -%}
+      {%- if figures_list.size > 0 -%}
+        <div class="related-items__section">
+          <h4 class="related-items__subheading">FIGURES</h4>
+          <ul class="related-items__list">
+            {%- for figure in figures_list limit: limit -%}
             <li>
-              <a href="{{ story.url | relative_url }}">
-                {% include notation-badge.html idea=primary_story_idea story=story.story_number size="sm" %}
-                {{ story.title | truncate: 30 }}
+              <a href="{{ figure.url | relative_url }}">
+                {% include notation-badge.html figure=figure.figure_number size="sm" %}
+                {{ figure.title | truncate: 30 }}
               </a>
             </li>
             {%- endfor -%}
           </ul>
         </div>
-        {%- endif -%}
-      {%- endif -%}
-      
-      <!-- Show sprint if assigned -->
-      {%- assign story_sprints = include.story.related_sprints | default: "" -%}
-      {%- if story_sprints and story_sprints != "" and story_sprints.size > 0 -%}
-        {%- assign sprint = site.sprints | where: "sprint_id", story_sprints[0] | first -%}
-        {%- if sprint -%}
-        <div class="related-items__section">
-          <h4 class="related-items__subheading">SPRINT</h4>
-          <a href="{{ sprint.url | relative_url }}" class="related-items__sprint-link">
-            {% include notation-badge.html sprint=sprint.sprint_id %}
-            <span class="related-items__sprint-dates">
-              {{ sprint.start_date | date: "%b %d" }} – {{ sprint.end_date | date: "%b %d" }}
-            </span>
-          </a>
-        </div>
-        {%- endif -%}
       {%- endif -%}
     {%- endif -%}
     
