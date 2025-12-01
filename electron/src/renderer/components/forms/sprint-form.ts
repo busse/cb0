@@ -13,6 +13,7 @@ import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
 import { state } from '../../state';
 import { escapeAttr, escapeHtml, parseLines, today } from '../../utils/dom';
+import { createMultiSelect } from '../multi-select';
 
 export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRecord): Promise<void> {
   if (mode === 'edit' && !sprint) {
@@ -39,24 +40,29 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
         .map((story) => story.story_number)
     : [];
 
+  // Create multi-select component for stories
+  const storiesMultiSelect = storyOptions.length
+    ? createMultiSelect({
+        name: 'related_stories',
+        options: storyOptions.map((story) => {
+          const ideasLabel = (story.related_ideas ?? []).map((id) => `i${id}`).join(', ');
+          return {
+            value: String(story.story_number),
+            label: `s${story.story_number} — ${story.title || 'Untitled'}${ideasLabel ? ` (${ideasLabel})` : ''}`,
+          };
+        }),
+        selected: relatedStoryNumbers.map(String),
+        placeholder: 'Search stories...',
+        required: false,
+      })
+    : null;
+
   const relatedStoriesField = `
     <div class="form-field">
       <label>Related Stories</label>
       ${
-        storyOptions.length
-          ? `<select name="related_stories" multiple size="6">
-              ${storyOptions
-                .map((story) => {
-                  const ideasLabel = (story.related_ideas ?? []).map((id) => `i${id}`).join(', ');
-                  return `<option value="${story.story_number}" ${
-                    relatedStoryNumbers.includes(story.story_number) ? 'selected' : ''
-                  }>s${story.story_number} — ${escapeHtml(story.title || 'Untitled')} ${
-                    ideasLabel ? `(${ideasLabel})` : ''
-                  }</option>`;
-                })
-                .join('')}
-            </select>
-            <div class="helper-text">Assign stories to this sprint (Cmd/Ctrl-click for multi-select).</div>`
+        storiesMultiSelect
+          ? storiesMultiSelect.html + '<div class="helper-text">Assign stories to this sprint.</div>'
           : '<div class="helper-text">No stories available yet. Create a story to assign it here.</div>'
       }
     </div>
@@ -107,6 +113,11 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
       </div>
       ${relatedStoriesField}
     `,
+    onOpen: (form) => {
+      if (storiesMultiSelect) {
+        storiesMultiSelect.init(form);
+      }
+    },
     onSubmit: async (formData) => {
       const payload: Sprint = {
         layout: 'sprint',

@@ -10,6 +10,7 @@ import { renderStories } from '../lists';
 import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
 import { escapeAttr, escapeHtml, today } from '../../utils/dom';
+import { createMultiSelect } from '../multi-select';
 
 export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord): Promise<void> {
   if (mode === 'edit' && !story) {
@@ -50,6 +51,29 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
     body: story?.body ?? '',
   };
 
+  // Create multi-select components
+  const ideasMultiSelect = createMultiSelect({
+    name: 'related_ideas',
+    options: ideaOptions.map((idea) => ({
+      value: String(idea.idea_number),
+      label: `i${idea.idea_number} — ${idea.title}`,
+    })),
+    selected: defaults.related_ideas.map(String),
+    placeholder: 'Search ideas...',
+    required: true,
+  });
+
+  const sprintsMultiSelect = createMultiSelect({
+    name: 'related_sprints',
+    options: state.sprints.map((sprint) => ({
+      value: sprint.sprint_id,
+      label: `${sprint.sprint_id} (${sprint.start_date} → ${sprint.end_date})`,
+    })),
+    selected: defaults.related_sprints,
+    placeholder: 'Search sprints...',
+    required: false,
+  });
+
   openModal({
     title: mode === 'create' ? 'Create Story' : `Edit Story s${story?.story_number}`,
     width: 'lg',
@@ -58,17 +82,8 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
       <div class="form-grid">
         <div class="form-field">
           <label>Ideas</label>
-          <select name="related_ideas" multiple size="5" required>
-            ${ideaOptions
-              .map(
-                (idea) =>
-                  `<option value="${idea.idea_number}" ${
-                    defaults.related_ideas.includes(idea.idea_number) ? 'selected' : ''
-                  }>i${idea.idea_number} — ${escapeHtml(idea.title)}</option>`
-              )
-              .join('')}
-          </select>
-          <div class="helper-text">Select one or more ideas (Cmd/Ctrl-click for multi-select).</div>
+          ${ideasMultiSelect.html}
+          <div class="helper-text">Select one or more ideas.</div>
         </div>
         <div class="form-field">
           <label>Story Number</label>
@@ -99,16 +114,7 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         </div>
         <div class="form-field">
           <label>Sprints</label>
-          <select name="related_sprints" multiple size="5">
-            ${state.sprints
-              .map(
-                (sprint) =>
-                  `<option value="${sprint.sprint_id}" ${
-                    defaults.related_sprints.includes(sprint.sprint_id) ? 'selected' : ''
-                  }>${sprint.sprint_id} (${sprint.start_date} → ${sprint.end_date})</option>`
-              )
-              .join('')}
-          </select>
+          ${sprintsMultiSelect.html}
           <div class="helper-text">Select sprints to associate (leave empty for backlog).</div>
         </div>
       </div>
@@ -127,7 +133,10 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         <textarea name="body">${escapeHtml(defaults.body)}</textarea>
       </div>
     `,
-    onOpen: () => undefined,
+    onOpen: (form) => {
+      ideasMultiSelect.init(form);
+      sprintsMultiSelect.init(form);
+    },
     onSubmit: async (formData) => {
       const relatedIdeas = formData.getAll('related_ideas').map((value) => Number(value));
       const relatedSprints = formData.getAll('related_sprints').map((value) => String(value));
