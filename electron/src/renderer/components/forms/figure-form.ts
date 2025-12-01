@@ -19,6 +19,7 @@ import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
 import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
 import { formatFigureNotation } from '../../utils/format';
+import { createMultiSelect } from '../multi-select';
 
 export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRecord): Promise<void> {
   if (mode === 'edit' && !figure) {
@@ -53,6 +54,34 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
 
   const selectedIdeaSet = new Set(figure?.related_ideas ?? []);
   const selectedStorySet = new Set(figure?.related_stories ?? []);
+
+  // Create multi-select components
+  const ideasMultiSelect = createMultiSelect({
+    name: 'related_ideas',
+    options: state.ideas.map((idea) => ({
+      value: String(idea.idea_number),
+      label: `i${idea.idea_number} — ${idea.title}`,
+    })),
+    selected: Array.from(selectedIdeaSet).map(String),
+    placeholder: 'Search ideas...',
+    required: false,
+  });
+
+  const storiesMultiSelect = createMultiSelect({
+    name: 'related_stories',
+    options: state.stories.flatMap((story) =>
+      story.related_ideas.map((ideaNumber) => {
+        const ref = `${ideaNumber}.${story.story_number}`;
+        return {
+          value: ref,
+          label: `i${ideaNumber} · s${story.story_number} — ${story.title}`,
+        };
+      })
+    ),
+    selected: Array.from(selectedStorySet),
+    placeholder: 'Search stories...',
+    required: false,
+  });
 
   openModal({
     title:
@@ -138,33 +167,13 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
       <div class="form-grid">
         <div class="form-field">
           <label>Related Ideas</label>
-          <select name="related_ideas" multiple size="5">
-            ${state.ideas
-              .map(
-                (idea) =>
-                  `<option value="${idea.idea_number}" ${
-                    selectedIdeaSet.has(idea.idea_number) ? 'selected' : ''
-                  }>i${idea.idea_number} — ${escapeHtml(idea.title)}</option>`
-              )
-              .join('')}
-          </select>
-          <div class="helper-text">Hold Cmd/Ctrl to select multiple ideas.</div>
+          ${ideasMultiSelect.html}
+          <div class="helper-text">Select one or more ideas.</div>
         </div>
         <div class="form-field">
           <label>Related Stories</label>
-          <select name="related_stories" multiple size="6">
-            ${state.stories
-              .flatMap((story) =>
-                story.related_ideas.map((ideaNumber) => {
-                  const ref = `${ideaNumber}.${story.story_number}`;
-                  return `<option value="${ref}" ${selectedStorySet.has(ref) ? 'selected' : ''}>i${ideaNumber} · s${
-                    story.story_number
-                  } — ${escapeHtml(story.title)}</option>`;
-                })
-              )
-              .join('')}
-          </select>
-          <div class="helper-text">Format: idea.story (e.g., 5.2). Hold Cmd/Ctrl to select.</div>
+          ${storiesMultiSelect.html}
+          <div class="helper-text">Format: idea.story (e.g., 5.2).</div>
         </div>
       </div>
       <div class="form-field">
@@ -173,6 +182,10 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
       </div>
     `,
     onOpen: (form) => {
+      // Initialize multi-select components
+      ideasMultiSelect.init(form);
+      storiesMultiSelect.init(form);
+
       const browseButton = form.querySelector<HTMLButtonElement>('[data-image-browse]');
       const imagePathInput = form.querySelector<HTMLInputElement>('input[name="image_path"]');
       const figureNumberInput = form.querySelector<HTMLInputElement>('input[name="figure_number"]');

@@ -410,6 +410,116 @@
       color: var(--color-muted);
     }
 
+    /* Multi-Select Component */
+    .multi-select {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .multi-select__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 24px;
+    }
+
+    .multi-select__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .multi-select__tag-remove {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .multi-select__tag-remove:hover {
+      opacity: 1;
+    }
+
+    .multi-select__input {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+    }
+
+    .multi-select__input:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+
+    .multi-select__dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      margin-top: 4px;
+    }
+
+    .multi-select__dropdown.hidden {
+      display: none;
+    }
+
+    .multi-select__option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .multi-select__option:hover {
+      background: var(--color-bg);
+    }
+
+    .multi-select__option input[type="checkbox"] {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .multi-select__option label {
+      cursor: pointer;
+      font-size: 14px;
+      flex: 1;
+      user-select: none;
+    }
+
     /* Toasts */
     .toast-container {
       position: fixed;
@@ -474,9 +584,10 @@
   <div class="container">
     <header>
       <h1>Ideas Taxonomy CMS</h1>
-      <p>Manage your Ideas, Stories, and Sprints</p>
+      <p>Manage your Ideas, Notes, Stories, and Sprints</p>
       <div class="tabs">
         <button class="tab active" data-tab="ideas">Ideas</button>
+        <button class="tab" data-tab="notes">Notes</button>
         <button class="tab" data-tab="stories">Stories</button>
         <button class="tab" data-tab="sprints">Sprints</button>
         <button class="tab" data-tab="updates">Updates</button>
@@ -493,6 +604,14 @@
           <button class="btn btn-secondary" type="button" data-action="refresh-ideas">Refresh</button>
         </div>
         <div id="ideas-list" class="list"></div>
+      </div>
+
+      <div id="notes-panel" class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-note">New Note</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-notes">Refresh</button>
+        </div>
+        <div id="notes-list" class="list"></div>
       </div>
 
       <div id="stories-panel" class="panel">

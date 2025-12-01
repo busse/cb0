@@ -839,7 +839,7 @@ permalink: /timeline/
   <nav class="mobile-nav__secondary">
     <ul class="mobile-nav__list mobile-nav__list--secondary">
       <li><a href="{{ '/glossary/' | relative_url }}">Glossary</a></li>
-      <li><a href="{{ '/blog/' | relative_url }}">Articles</a></li>
+      <li><a href="{{ '/blog/' | relative_url }}">Notes</a></li>
       <li><a href="{{ '/i/0/' | relative_url }}">About (i0)</a></li>
     </ul>
   </nav>

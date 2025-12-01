@@ -12,14 +12,17 @@ import type {
   Sprint,
   Update,
   Figure,
+  Note,
   IdeaRecord,
   StoryRecord,
   SprintRecord,
   UpdateRecord,
   FigureRecord,
+  NoteRecord,
   StoryPriority,
   StoryStatus,
 } from './types';
+import { slugify } from './strings';
 
 // Get content directory relative to the Jekyll site root
 // When compiled, shared code is in out/main/shared
@@ -47,6 +50,7 @@ export const PATHS = {
   sprints: path.join(CONTENT_DIR, '_sprints'),
   updates: path.join(CONTENT_DIR, '_updates'),
   figures: path.join(CONTENT_DIR, '_figures'),
+  notes: path.join(CONTENT_DIR, '_posts'),
   figureImages: path.join(CONTENT_DIR, 'assets', 'figures'),
 };
 
@@ -178,6 +182,37 @@ export async function readFigures(): Promise<FigureRecord[]> {
   return figures.sort((a, b) => a.figure_number - b.figure_number);
 }
 
+/**
+ * Read all notes (blog posts)
+ */
+export async function readNotes(): Promise<NoteRecord[]> {
+  const files = await safeReaddir(PATHS.notes);
+  const notes: NoteRecord[] = [];
+
+  for (const file of files) {
+    if (!file.endsWith('.md')) continue;
+    const filePath = path.join(PATHS.notes, file);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const parsed = matter(content);
+    const data = parsed.data as Note;
+    const dateFromFile = extractDateFromFilename(file);
+    const slugFromFile = extractSlugFromFilename(file);
+    notes.push({
+      layout: data.layout ?? 'post',
+      title: data.title ?? '',
+      date: data.date ?? dateFromFile,
+      author: data.author,
+      tags: data.tags,
+      excerpt: data.excerpt,
+      slug: data.slug ?? slugFromFile,
+      body: parsed.content?.trim() ?? '',
+      filename: file,
+    });
+  }
+
+  return notes.sort((a, b) => b.date.localeCompare(a.date));
+}
+
 async function safeReaddir(dir: string): Promise<string[]> {
   try {
     return await fs.readdir(dir);
@@ -289,6 +324,33 @@ export async function writeFigure(figure: Figure, content: string): Promise<void
 }
 
 /**
+ * Write note file (create or update)
+ */
+export async function writeNote(notePayload: Note & { filename?: string }, content: string): Promise<string> {
+  await fs.mkdir(PATHS.notes, { recursive: true });
+  const { filename: existingFilename, ...frontMatterNote } = notePayload;
+  const normalizedDate = normalizeDate(frontMatterNote.date);
+  const resolvedSlug = frontMatterNote.slug?.trim() || slugify(frontMatterNote.title || 'note');
+  const filename = `${normalizedDate}-${resolvedSlug}.md`;
+  const filePath = path.join(PATHS.notes, filename);
+
+  const cleaned = removeUndefined({
+    ...frontMatterNote,
+    layout: frontMatterNote.layout ?? 'post',
+    date: normalizedDate,
+    slug: resolvedSlug,
+  });
+  const frontMatter = matter.stringify(content, cleaned);
+  await fs.writeFile(filePath, frontMatter, 'utf-8');
+
+  if (existingFilename && existingFilename !== filename) {
+    await fs.unlink(path.join(PATHS.notes, existingFilename)).catch(() => undefined);
+  }
+
+  return filename;
+}
+
+/**
  * Delete idea file
  */
 export async function deleteIdea(ideaNumber: number): Promise<void> {
@@ -330,6 +392,14 @@ export async function deleteFigure(figureNumber: number): Promise<void> {
 }
 
 /**
+ * Delete note file
+ */
+export async function deleteNote(filename: string): Promise<void> {
+  const filePath = path.join(PATHS.notes, filename);
+  await fs.unlink(filePath);
+}
+
+/**
  * Copy an image file into the figures assets directory
  */
 export async function copyImageFile(
@@ -366,4 +436,21 @@ function formatFileSize(bytes: number): string {
   const value = bytes / Math.pow(1024, index);
   return `${value.toFixed(value >= 10 || index === 0 ? 0 : 1)}${units[index]}`;
 }
+
+function extractDateFromFilename(filename: string): string {
+  const match = filename.match(/^(\d{4}-\d{2}-\d{2})-/);
+  return match ? match[1] : new Date().toISOString().slice(0, 10);
+}
+
+function extractSlugFromFilename(filename: string): string {
+  return filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+}
+
+function normalizeDate(dateValue?: string): string {
+  if (dateValue && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+    return dateValue;
+  }
+  return new Date().toISOString().slice(0, 10);
+}
+
 

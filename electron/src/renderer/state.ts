@@ -1,6 +1,7 @@
 import type {
   FigureRecord,
   IdeaRecord,
+  NoteRecord,
   SprintRecord,
   StoryRecord,
   UpdateRecord,
@@ -12,9 +13,10 @@ export type AppState = {
   sprints: SprintRecord[];
   updates: UpdateRecord[];
   figures: FigureRecord[];
+  notes: NoteRecord[];
 };
 
-export type Tab = 'ideas' | 'stories' | 'sprints' | 'updates' | 'figures';
+export type Tab = 'ideas' | 'stories' | 'sprints' | 'updates' | 'figures' | 'notes';
 
 export const state: AppState = {
   ideas: [],
@@ -22,6 +24,7 @@ export const state: AppState = {
   sprints: [],
   updates: [],
   figures: [],
+  notes: [],
 };
 
 let currentTab: Tab = 'ideas';

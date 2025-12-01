@@ -211,4 +211,45 @@ export async function renderFigures(): Promise<void> {
     .join('');
 }
 
+export function renderNotes(): void {
+  const listElement = document.getElementById('notes-list');
+  if (!listElement) return;
+
+  if (state.notes.length === 0) {
+    listElement.innerHTML = '<div class="loading">No notes yet. Create one to share updates.</div>';
+    return;
+  }
+
+  listElement.innerHTML = state.notes
+    .map(
+      (note) => `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">${escapeHtml(note.title || 'Untitled note')}</span>
+            <span class="item-badge">${escapeHtml(note.slug)}</span>
+          </div>
+          <div class="item-meta">
+            <span>Date: ${note.date}</span>
+            ${note.author ? `<span>Author: ${escapeHtml(note.author)}</span>` : ''}
+            ${
+              note.tags?.length
+                ? `<span>Tags: ${note.tags.map((tag) => escapeHtml(tag)).join(', ')}</span>`
+                : ''
+            }
+          </div>
+          <div class="item-description">${escapeHtml(note.excerpt || note.body?.slice(0, 140) || '')}</div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-note" data-note="${escapeAttr(
+              note.filename
+            )}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-note" data-note="${escapeAttr(
+              note.filename
+            )}">Delete</button>
+          </div>
+        </div>
+      `
+    )
+    .join('');
+}
+
 

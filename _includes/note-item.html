@@ -1,0 +1,14 @@
+{%- comment -%}
+  Note item for sidebar display
+  Parameters:
+    - post: The post object from site.posts
+{%- endcomment -%}
+{%- assign post = include.post -%}
+
+<article class="note-item">
+  <time class="note-item__date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+  <h5 class="note-item__title">
+    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+  </h5>
+</article>
+

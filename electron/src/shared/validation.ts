@@ -2,7 +2,7 @@
  * Validation utilities for taxonomy system
  */
 
-import type { Idea, Story, Sprint, Update, Figure, StoryStatus } from './types';
+import type { Idea, Story, Sprint, Update, Figure, Note, NoteRecord, StoryStatus } from './types';
 
 /**
  * Validate sprint ID format (YYSS)
@@ -30,6 +30,10 @@ export function isValidStoryNumber(storyNumber: number): boolean {
  */
 export function isValidFigureNumber(figureNumber: number): boolean {
   return Number.isInteger(figureNumber) && figureNumber >= 0;
+}
+
+export function isValidDateString(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
 /**
@@ -341,7 +345,7 @@ export function validateFigure(
 
   if (!figure.created) {
     errors.push('created date is required');
-  } else if (!/^\d{4}-\d{2}-\d{2}$/.test(figure.created)) {
+  } else if (!isValidDateString(figure.created)) {
     errors.push('created must be in YYYY-MM-DD format');
   }
 
@@ -427,6 +431,46 @@ export function validateSprint(sprint: Partial<Sprint>, existingSprints: Sprint[
     const end = new Date(sprint.end_date);
     if (end <= start) {
       errors.push('end_date must be after start_date');
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate note (blog post) front matter
+ */
+export function validateNote(
+  note: Partial<Note> & { filename?: string },
+  existingNotes: NoteRecord[],
+  currentFilename?: string
+): string[] {
+  const errors: string[] = [];
+
+  if (!note.title || note.title.trim() === '') {
+    errors.push('title is required');
+  }
+
+  if (!note.date) {
+    errors.push('date is required');
+  } else if (!isValidDateString(note.date)) {
+    errors.push('date must be in YYYY-MM-DD format');
+  }
+
+  const slugValue = note.slug?.trim();
+  if (!slugValue || slugValue.length === 0) {
+    errors.push('slug is required');
+  } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slugValue)) {
+    errors.push('slug must contain lowercase letters, numbers, and dashes only');
+  }
+
+  const targetFilename = note.date && slugValue ? `${note.date}-${slugValue}.md` : undefined;
+  if (targetFilename) {
+    const collision = existingNotes.find(
+      (existing) => existing.filename === targetFilename && existing.filename !== currentFilename
+    );
+    if (collision) {
+      errors.push(`A note already exists for ${note.date} with slug "${slugValue}"`);
     }
   }
 

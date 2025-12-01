@@ -3,6 +3,7 @@ import { Action } from './constants';
 import {
   fetchFigures,
   fetchIdeas,
+  fetchNotes,
   fetchSprints,
   fetchStories,
   fetchUpdates,
@@ -10,6 +11,7 @@ import {
 import {
   renderFigures,
   renderIdeas,
+  renderNotes,
   renderSprints,
   renderStories,
   renderUpdates,
@@ -17,6 +19,7 @@ import {
 import {
   openFigureForm,
   openIdeaForm,
+  openNoteForm,
   openSprintForm,
   openStoryForm,
   openUpdateForm,
@@ -24,6 +27,7 @@ import {
 import {
   deleteFigure,
   deleteIdea,
+  deleteNote,
   deleteSprint,
   deleteStory,
   deleteUpdate,
@@ -31,6 +35,7 @@ import {
 import {
   getFigureFromDataset,
   getIdeaFromDataset,
+  getNoteFromDataset,
   getSprintFromDataset,
   getStoryFromDataset,
   getUpdateFromDataset,
@@ -77,6 +82,10 @@ async function loadTabData(tab: Tab): Promise<void> {
           await fetchStories();
         }
         renderIdeas();
+        break;
+      case 'notes':
+        await fetchNotes();
+        renderNotes();
         break;
       case 'stories':
         await fetchStories();
@@ -129,6 +138,18 @@ function handleActionClick(event: Event): void {
       break;
     case 'refresh-ideas':
       void loadTabData('ideas');
+      break;
+    case 'new-note':
+      void openNoteForm('create');
+      break;
+    case 'edit-note':
+      void openNoteForm('edit', getNoteFromDataset(target));
+      break;
+    case 'delete-note':
+      void deleteNote(target.dataset.note);
+      break;
+    case 'refresh-notes':
+      void loadTabData('notes');
       break;
     case 'new-story':
       void openStoryForm('create');

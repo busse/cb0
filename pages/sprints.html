@@ -25,16 +25,16 @@ permalink: /sprints/
     </div>
     
     <aside class="header-sidebar">
-      <h2 class="sidebar-heading">ARTICLES</h2>
+      <h2 class="sidebar-heading">NOTES</h2>
       {%- if site.posts.size > 0 -%}
-        <div class="article-list">
+        <div class="note-list">
           {%- for post in site.posts limit:5 -%}
-            {% include article-item.html post=post %}
+            {% include note-item.html post=post %}
           {%- endfor -%}
         </div>
-        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL ARTICLES →</a>
+        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL NOTES →</a>
       {%- else -%}
-        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No articles yet.</p>
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No notes yet.</p>
       {%- endif -%}
     </aside>
   </section>
