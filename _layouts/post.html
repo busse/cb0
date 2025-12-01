@@ -1,16 +1,23 @@
 ---
 layout: default
 ---
-<main class="container">
-  <article class="post">
-    <header class="post__header">
-      <h1 class="page-title">{{ page.title }}</h1>
-      <p class="post__meta">
-        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time>
-        {%- if page.author -%} • <span>{{ page.author }}</span>{%- endif -%}
-      </p>
-    </header>
+<main class="container page-post">
+  <section class="header-region">
+    <div class="header-primary">
+      <header class="post__header">
+        <h1 class="page-title">{{ page.title }}</h1>
+        <p class="post__meta">
+          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time>
+          {%- if page.author -%} • <span>{{ page.author }}</span>{%- endif -%}
+        </p>
+      </header>
+    </div>
+    <aside class="header-sidebar">
+      {% include navigation/related-items.html note=page %}
+    </aside>
+  </section>
 
+  <article class="post">
     <div class="post__content">
       {{ content }}
     </div>

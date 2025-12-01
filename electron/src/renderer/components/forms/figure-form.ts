@@ -7,6 +7,14 @@ import {
   ensureFigures,
   ensureIdeas,
   ensureStories,
+  ensureSprints,
+  ensureNotes,
+  ensureUpdates,
+  fetchIdeas,
+  fetchStories,
+  fetchSprints,
+  fetchNotes,
+  fetchUpdates,
   fetchFigures,
   getNextFigureNumber,
   resolveAssetUrl,
@@ -20,6 +28,7 @@ import { showError, showToast } from '../../toast';
 import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
 import { formatFigureNotation } from '../../utils/format';
 import { createMultiSelect } from '../multi-select';
+import { syncRelationships } from '../../utils/relationships';
 
 export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRecord): Promise<void> {
   if (mode === 'edit' && !figure) {
@@ -27,7 +36,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
     return;
   }
 
-  await Promise.all([ensureIdeas(), ensureStories(), ensureFigures()]);
+  await Promise.all([ensureIdeas(), ensureStories(), ensureFigures(), ensureSprints(), ensureNotes(), ensureUpdates()]);
 
   const figureNumber =
     figure?.figure_number ??
@@ -50,10 +59,19 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
     file_size: figure?.file_size ?? '',
     tags: figure?.tags?.join(', ') ?? '',
     body: figure?.body ?? '',
+    related_sprints: figure?.related_sprints ?? [],
+    related_notes: figure?.related_notes ?? [],
+    related_updates: figure?.related_updates ?? [],
   };
 
   const selectedIdeaSet = new Set(figure?.related_ideas ?? []);
   const selectedStorySet = new Set(figure?.related_stories ?? []);
+  const selectedSprintSet = new Set(figure?.related_sprints ?? []);
+  const selectedNoteSet = new Set(figure?.related_notes ?? []);
+  const selectedUpdateSet = new Set(figure?.related_updates ?? []);
+  const sprintOptions = state.sprints;
+  const noteOptions = state.notes;
+  const updateOptions = state.updates;
 
   // Create multi-select components
   const ideasMultiSelect = createMultiSelect({
@@ -80,6 +98,44 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
     ),
     selected: Array.from(selectedStorySet),
     placeholder: 'Search stories...',
+    required: false,
+  });
+
+  const sprintsMultiSelect = createMultiSelect({
+    name: 'related_sprints',
+    options: sprintOptions.map((sprint) => ({
+      value: sprint.sprint_id,
+      label: `${sprint.sprint_id} — Sprint ${sprint.sprint_number}`,
+    })),
+    selected: Array.from(selectedSprintSet),
+    placeholder: 'Search sprints...',
+    required: false,
+  });
+
+  const notesMultiSelect = createMultiSelect({
+    name: 'related_notes',
+    options: noteOptions
+      .filter((note) => (note.slug ?? note.filename)?.length)
+      .map((note) => {
+        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+        return {
+          value,
+          label: `${note.title || value}`,
+        };
+      }),
+    selected: Array.from(selectedNoteSet),
+    placeholder: 'Search notes...',
+    required: false,
+  });
+
+  const updatesMultiSelect = createMultiSelect({
+    name: 'related_updates',
+    options: updateOptions.map((update) => ({
+      value: update.notation,
+      label: `${update.notation} (${update.type})`,
+    })),
+    selected: Array.from(selectedUpdateSet),
+    placeholder: 'Search updates...',
     required: false,
   });
 
@@ -176,6 +232,23 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
           <div class="helper-text">Format: idea.story (e.g., 5.2).</div>
         </div>
       </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Sprints</label>
+          ${sprintsMultiSelect.html}
+          <div class="helper-text">Link sprints where this figure appears.</div>
+        </div>
+        <div class="form-field">
+          <label>Notes</label>
+          ${notesMultiSelect.html}
+          <div class="helper-text">Attach supporting notes or research.</div>
+        </div>
+        <div class="form-field">
+          <label>Updates</label>
+          ${updatesMultiSelect.html}
+          <div class="helper-text">Associate relevant updates.</div>
+        </div>
+      </div>
       <div class="form-field">
         <label>Body (Markdown)</label>
         <textarea name="body">${escapeHtml(defaults.body)}</textarea>
@@ -185,6 +258,9 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
       // Initialize multi-select components
       ideasMultiSelect.init(form);
       storiesMultiSelect.init(form);
+      sprintsMultiSelect.init(form);
+      notesMultiSelect.init(form);
+      updatesMultiSelect.init(form);
 
       const browseButton = form.querySelector<HTMLButtonElement>('[data-image-browse]');
       const imagePathInput = form.querySelector<HTMLInputElement>('input[name="image_path"]');
@@ -254,7 +330,10 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
         .map((value) => Number(value))
         .filter((value) => !Number.isNaN(value));
 
-      const relatedStories = (formData.getAll('related_stories') as string[]).filter(Boolean);
+      const relatedStories = Array.from(new Set((formData.getAll('related_stories') as string[]).filter(Boolean)));
+      const relatedSprints = Array.from(new Set((formData.getAll('related_sprints') as string[]).filter(Boolean)));
+      const relatedNotes = Array.from(new Set((formData.getAll('related_notes') as string[]).filter(Boolean)));
+      const relatedUpdates = Array.from(new Set((formData.getAll('related_updates') as string[]).filter(Boolean)));
 
       const payload: Figure = {
         layout: 'figure',
@@ -272,12 +351,20 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
         tags: parseTags(formData.get('tags') as string),
         related_ideas: relatedIdeas.length ? relatedIdeas : undefined,
         related_stories: relatedStories.length ? relatedStories : undefined,
+        related_sprints: relatedSprints.length ? relatedSprints : undefined,
+        related_notes: relatedNotes.length ? relatedNotes : undefined,
+        related_updates: relatedUpdates.length ? relatedUpdates : undefined,
       };
 
       const content = (formData.get('body') as string) ?? '';
       await saveFigure(payload, content);
+      const figureRecord: FigureRecord = {
+        ...payload,
+        body: content,
+      };
+      await syncRelationships('figure', figureRecord);
+      await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchNotes(), fetchUpdates(), fetchFigures()]);
       clearFigureCache();
-      await fetchFigures();
       await renderFigures();
       showToast(mode === 'create' ? 'Figure created' : 'Figure updated');
       return true;

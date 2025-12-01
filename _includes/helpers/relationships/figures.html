@@ -1,0 +1,18 @@
+{%- assign record = include.record | default: page -%}
+{%- assign relationships_items = '' | split: '' -%}
+{%- assign ids = record.related_figures -%}
+
+{%- if ids -%}
+  {%- assign ids = ids | uniq -%}
+{%- else -%}
+  {%- assign ids = '' | split: '' -%}
+{%- endif -%}
+
+{%- for figure_id in ids -%}
+  {%- assign figure_number = figure_id | plus: 0 -%}
+  {%- assign figure_hit = site.figures | where: "figure_number", figure_number | first -%}
+  {%- if figure_hit -%}
+    {%- assign relationships_items = relationships_items | push: figure_hit -%}
+  {%- endif -%}
+{%- endfor -%}
+

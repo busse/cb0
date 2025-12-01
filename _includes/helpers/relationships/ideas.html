@@ -1,0 +1,21 @@
+{%- assign record = include.record | default: page -%}
+{%- assign record_layout = include.layout | default: record.layout -%}
+{%- assign relationships_items = '' | split: '' -%}
+{%- assign ids = '' | split: '' -%}
+
+{%- if record_layout == 'update' and record.idea_number -%}
+  {%- assign ids = ids | push: record.idea_number -%}
+{%- endif -%}
+{%- if record.related_ideas -%}
+  {%- assign ids = ids | concat: record.related_ideas -%}
+{%- endif -%}
+{%- assign ids = ids | uniq -%}
+
+{%- for idea_id in ids -%}
+  {%- assign idea_number = idea_id | plus: 0 -%}
+  {%- assign idea_hit = site.ideas | where: "idea_number", idea_number | first -%}
+  {%- if idea_hit -%}
+    {%- assign relationships_items = relationships_items | push: idea_hit -%}
+  {%- endif -%}
+{%- endfor -%}
+

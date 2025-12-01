@@ -1,0 +1,20 @@
+{%- assign record = include.record | default: page -%}
+{%- assign record_layout = include.layout | default: record.layout -%}
+{%- assign relationships_items = '' | split: '' -%}
+{%- assign ids = '' | split: '' -%}
+
+{%- if record_layout == 'update' and record.sprint_id -%}
+  {%- assign ids = ids | push: record.sprint_id -%}
+{%- endif -%}
+{%- if record.related_sprints -%}
+  {%- assign ids = ids | concat: record.related_sprints -%}
+{%- endif -%}
+{%- assign ids = ids | uniq -%}
+
+{%- for sprint_id in ids -%}
+  {%- assign sprint_hit = site.sprints | where: "sprint_id", sprint_id | first -%}
+  {%- if sprint_hit -%}
+    {%- assign relationships_items = relationships_items | push: sprint_hit -%}
+  {%- endif -%}
+{%- endfor -%}
+

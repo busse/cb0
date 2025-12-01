@@ -1,0 +1,86 @@
+{%- assign record = include.record | default: page -%}
+{%- assign sidebar_title = include.title | default: record.title | default: record.notation -%}
+{%- assign relationship_order = "ideas|stories|sprints|notes|figures|updates" | split: "|" -%}
+{%- assign record_layout = include.layout | default: record.layout -%}
+{%- assign section_limit = include.limit | default: 0 -%}
+
+<div class="panel-sidebar__header">
+  <h3 class="panel-sidebar__title">
+    {%- case record_layout -%}
+      {%- when 'idea' -%}Idea i{{ record.idea_number }}
+      {%- when 'story' -%}Story s{{ record.story_number }}
+      {%- when 'sprint' -%}Sprint {{ record.sprint_id }}
+      {%- when 'post' -%}Note {{ record.slug }}
+      {%- when 'figure' -%}{{ record.figure_number | prepend: "Figure " }}
+      {%- when 'update' -%}Update {{ record.notation }}
+      {%- else -%}{{ sidebar_title }}
+    {%- endcase -%}
+  </h3>
+  {%- if sidebar_title -%}
+    <p class="panel-sidebar__subtitle">{{ sidebar_title }}</p>
+  {%- endif -%}
+</div>
+
+{%- assign rendered_sections = 0 -%}
+
+{%- for kind in relationship_order -%}
+  {%- capture section_html -%}
+    {%- assign items = '' | split: '' -%}
+    {%- case kind -%}
+      {%- when 'ideas' -%}
+        {%- include helpers/relationships/ideas.html record=record layout=record_layout -%}
+      {%- when 'stories' -%}
+        {%- include helpers/relationships/stories.html record=record layout=record_layout -%}
+      {%- when 'sprints' -%}
+        {%- include helpers/relationships/sprints.html record=record layout=record_layout -%}
+      {%- when 'notes' -%}
+        {%- include helpers/relationships/notes.html record=record layout=record_layout -%}
+      {%- when 'figures' -%}
+        {%- include helpers/relationships/figures.html record=record layout=record_layout -%}
+      {%- when 'updates' -%}
+        {%- include helpers/relationships/updates.html record=record layout=record_layout -%}
+    {%- endcase -%}
+    {%- assign items = relationships_items -%}
+    {%- assign relationships_items = '' | split: '' -%}
+
+    {%- assign total_items = items | size -%}
+    {%- if total_items > 0 -%}
+      {%- assign render_items = items -%}
+      {%- if section_limit != 0 and total_items > section_limit -%}
+        {%- assign render_items = items | slice: 0, section_limit -%}
+      {%- endif -%}
+      <section class="relationships-group">
+        <h4>{{ kind | upcase }}</h4>
+        <ul class="relationships-list">
+          {%- for item in render_items -%}
+            <li>
+              {%- case item.layout -%}
+                {%- when 'idea' -%}
+                  <a href="{{ item.url | relative_url }}">i{{ item.idea_number }} — {{ item.title }}</a>
+                {%- when 'story' -%}
+                  <a href="{{ item.url | relative_url }}">s{{ item.story_number }} — {{ item.title }}</a>
+                {%- when 'sprint' -%}
+                  <a href="{{ item.url | relative_url }}">{{ item.sprint_id }} • {{ item.start_date }} → {{ item.end_date }}</a>
+                {%- when 'post' -%}
+                  <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+                {%- when 'figure' -%}
+                  <a href="{{ item.url | relative_url }}">{{ item.figure_number }} — {{ item.title }}</a>
+                {%- when 'update' -%}
+                  <a href="{{ item.url | relative_url }}">{{ item.notation }} ({{ item.type }})</a>
+                {%- else -%}
+                  <a href="{{ item.url | relative_url }}">{{ item.title | default: item.slug | default: item.notation }}</a>
+              {%- endcase -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </section>
+      {%- assign rendered_sections = rendered_sections | plus: 1 -%}
+    {%- endif -%}
+  {%- endcapture -%}
+  {{- section_html -}}
+{%- endfor -%}
+
+{%- if rendered_sections == 0 -%}
+  <div class="sidebar-placeholder">No relationships documented for this record yet.</div>
+{%- endif -%}
+

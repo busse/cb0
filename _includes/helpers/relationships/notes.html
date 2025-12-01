@@ -1,0 +1,17 @@
+{%- assign record = include.record | default: page -%}
+{%- assign relationships_items = '' | split: '' -%}
+{%- assign ids = record.related_notes -%}
+
+{%- if ids -%}
+  {%- assign ids = ids | uniq -%}
+{%- else -%}
+  {%- assign ids = '' | split: '' -%}
+{%- endif -%}
+
+{%- for slug in ids -%}
+  {%- assign note_hit = site.posts | where: "slug", slug | first -%}
+  {%- if note_hit -%}
+    {%- assign relationships_items = relationships_items | push: note_hit -%}
+  {%- endif -%}
+{%- endfor -%}
+

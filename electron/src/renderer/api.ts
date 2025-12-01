@@ -95,6 +95,12 @@ export async function ensureNotes(): Promise<void> {
   }
 }
 
+export async function ensureUpdates(): Promise<void> {
+  if (!state.updates.length) {
+    await fetchUpdates();
+  }
+}
+
 export async function saveIdea(idea: Idea, content: string): Promise<void> {
   const result = await window.electronAPI.writeIdea(idea, content);
   if (!result.success) {

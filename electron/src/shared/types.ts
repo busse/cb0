@@ -17,6 +17,11 @@ export interface Idea {
   status: IdeaStatus;
   created: string; // ISO date
   tags?: string[];
+  related_stories?: number[];
+  related_sprints?: string[];
+  related_notes?: string[];
+  related_figures?: number[];
+  related_updates?: string[];
 }
 
 export interface Story {
@@ -29,6 +34,9 @@ export interface Story {
   created: string; // ISO date
   related_ideas: number[];
   related_sprints?: string[];
+  related_notes?: string[];
+  related_figures?: number[];
+  related_updates?: string[];
 }
 
 export interface Sprint {
@@ -40,6 +48,11 @@ export interface Sprint {
   end_date: string; // ISO date
   status: SprintStatus;
   goals?: string[];
+  related_ideas?: number[];
+  related_stories?: number[];
+  related_notes?: string[];
+  related_figures?: number[];
+  related_updates?: string[];
 }
 
 export interface Update {
@@ -50,6 +63,11 @@ export interface Update {
   notation: string; // e.g., "2609.5.56"
   date: string; // ISO date
   type: UpdateType;
+  related_ideas?: number[];
+  related_stories?: number[];
+  related_figures?: number[];
+  related_notes?: string[];
+  related_sprints?: string[];
 }
 
 export interface Figure {
@@ -61,6 +79,9 @@ export interface Figure {
   alt_text?: string;
   related_ideas?: number[];
   related_stories?: string[];
+  related_sprints?: string[];
+  related_notes?: string[];
+  related_updates?: string[];
   created: string;
   uploaded_date?: string;
   file_type?: string;
@@ -82,6 +103,11 @@ export interface Note {
   tags?: string[];
   excerpt?: string;
   slug?: string;
+  related_ideas?: number[];
+  related_stories?: number[];
+  related_sprints?: string[];
+  related_figures?: number[];
+  related_updates?: string[];
 }
 
 export type IdeaRecord = Idea & MarkdownDocument;
