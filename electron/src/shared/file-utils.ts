@@ -17,6 +17,8 @@ import type {
   SprintRecord,
   UpdateRecord,
   FigureRecord,
+  StoryPriority,
+  StoryStatus,
 } from './types';
 
 // Get content directory relative to the Jekyll site root
@@ -33,6 +35,11 @@ const getContentDir = () => {
 };
 
 const CONTENT_DIR = getContentDir();
+
+type RawStoryFrontMatter = Partial<Story> & {
+  idea_number?: number;
+  assigned_sprint?: string;
+};
 
 export const PATHS = {
   ideas: path.join(CONTENT_DIR, '_ideas'),
@@ -70,33 +77,29 @@ export async function readIdeas(): Promise<IdeaRecord[]> {
  */
 export async function readStories(): Promise<StoryRecord[]> {
   const stories: StoryRecord[] = [];
-  const ideaDirs = await fs.readdir(PATHS.stories);
+  const entries = await safeReaddir(PATHS.stories);
 
-  for (const ideaDir of ideaDirs) {
-    const ideaPath = path.join(PATHS.stories, ideaDir);
-    const stat = await fs.stat(ideaPath);
-    if (!stat.isDirectory()) continue;
+  for (const entry of entries) {
+    const entryPath = path.join(PATHS.stories, entry);
+    const stat = await fs.stat(entryPath).catch(() => undefined);
+    if (!stat) continue;
 
-    const storyFiles = await fs.readdir(ideaPath);
-    for (const file of storyFiles) {
-      if (!file.endsWith('.md')) continue;
-      const filePath = path.join(ideaPath, file);
-      const content = await fs.readFile(filePath, 'utf-8');
-      const parsed = matter(content);
-      const data = parsed.data as Story;
-      stories.push({
-        ...data,
-        body: parsed.content?.trim() ?? '',
-      });
+    if (stat.isDirectory()) {
+      // Legacy structure: _stories/{idea_number}/{story_number}.md
+      const storyFiles = await fs.readdir(entryPath);
+      for (const file of storyFiles) {
+        if (!file.endsWith('.md')) continue;
+        const filePath = path.join(entryPath, file);
+        stories.push(normalizeStoryRecord(matter(await fs.readFile(filePath, 'utf-8'))));
+      }
+      continue;
     }
+
+    if (!entry.endsWith('.md')) continue;
+    stories.push(normalizeStoryRecord(matter(await fs.readFile(entryPath, 'utf-8'))));
   }
 
-  return stories.sort((a, b) => {
-    if (a.idea_number !== b.idea_number) {
-      return a.idea_number - b.idea_number;
-    }
-    return a.story_number - b.story_number;
-  });
+  return stories.sort((a, b) => a.story_number - b.story_number);
 }
 
 /**
@@ -187,6 +190,38 @@ async function safeReaddir(dir: string): Promise<string[]> {
   }
 }
 
+function normalizeStoryRecord(parsed: matter.GrayMatterFile<string>): StoryRecord {
+  const data = parsed.data as RawStoryFrontMatter;
+  const relatedIdeas = Array.isArray(data.related_ideas)
+    ? data.related_ideas.map((value) => Number(value))
+    : data.idea_number !== undefined
+      ? [Number(data.idea_number)]
+      : [];
+
+  const relatedSprints = Array.isArray(data.related_sprints)
+    ? data.related_sprints.map((value) => String(value))
+    : data.assigned_sprint
+      ? [String(data.assigned_sprint)]
+      : undefined;
+
+  const normalized: Story = {
+    layout: 'story',
+    story_number: Number(data.story_number),
+    title: data.title ?? '',
+    description: data.description ?? '',
+    status: (data.status as StoryStatus) ?? 'backlog',
+    priority: (data.priority as StoryPriority) ?? 'medium',
+    created: data.created ?? '',
+    related_ideas: relatedIdeas,
+    related_sprints: relatedSprints,
+  };
+
+  return {
+    ...normalized,
+    body: parsed.content?.trim() ?? '',
+  };
+}
+
 /**
  * Remove undefined values from an object (YAML can't serialize undefined)
  */
@@ -214,9 +249,8 @@ export async function writeIdea(idea: Idea, content: string): Promise<void> {
  * Write story file
  */
 export async function writeStory(story: Story, content: string): Promise<void> {
-  const ideaDir = path.join(PATHS.stories, story.idea_number.toString());
-  await fs.mkdir(ideaDir, { recursive: true });
-  const filePath = path.join(ideaDir, `${story.story_number}.md`);
+  await fs.mkdir(PATHS.stories, { recursive: true });
+  const filePath = path.join(PATHS.stories, `${story.story_number}.md`);
   const cleaned = removeUndefined(story);
   const frontMatter = matter.stringify(content, cleaned);
   await fs.writeFile(filePath, frontMatter, 'utf-8');
@@ -265,8 +299,8 @@ export async function deleteIdea(ideaNumber: number): Promise<void> {
 /**
  * Delete story file
  */
-export async function deleteStory(ideaNumber: number, storyNumber: number): Promise<void> {
-  const filePath = path.join(PATHS.stories, ideaNumber.toString(), `${storyNumber}.md`);
+export async function deleteStory(storyNumber: number): Promise<void> {
+  const filePath = path.join(PATHS.stories, `${storyNumber}.md`);
   await fs.unlink(filePath);
 }
 

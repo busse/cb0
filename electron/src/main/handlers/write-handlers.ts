@@ -38,15 +38,17 @@ export function registerWriteHandlers(): void {
   });
 
   handleAsyncWithArgs('write-story', async (story: Story, content: string) => {
-    const [existingStories, existingIdeas] = await Promise.all([readStories(), readIdeas()]);
-    const existingStory = existingStories.find(
-      (s) => s.idea_number === story.idea_number && s.story_number === story.story_number
-    );
+    const [existingStories, existingIdeas, existingSprints] = await Promise.all([
+      readStories(),
+      readIdeas(),
+      readSprints(),
+    ]);
+    const existingStory = existingStories.find((s) => s.story_number === story.story_number);
     const errors = validateStory(
       story,
       existingStories,
       existingIdeas,
-      existingStory ? story.idea_number : undefined,
+      existingSprints,
       existingStory ? story.story_number : undefined
     );
     if (errors.length > 0) {

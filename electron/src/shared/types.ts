@@ -21,14 +21,14 @@ export interface Idea {
 
 export interface Story {
   layout: 'story';
-  idea_number: number;
   story_number: number;
   title: string;
   description: string;
   status: StoryStatus;
   priority: StoryPriority;
   created: string; // ISO date
-  assigned_sprint?: string; // YYSS format
+  related_ideas: number[];
+  related_sprints?: string[];
 }
 
 export interface Sprint {

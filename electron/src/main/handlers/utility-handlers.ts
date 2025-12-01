@@ -26,9 +26,9 @@ export function registerUtilityHandlers(): void {
     return getNextIdeaNumber(existingIdeas);
   });
 
-  handleAsyncWithArgs('get-next-story-number', async (ideaNumber: number) => {
+  handleAsync('get-next-story-number', async () => {
     const existingStories = await readStories();
-    return getNextStoryNumber(ideaNumber, existingStories);
+    return getNextStoryNumber(existingStories);
   });
 
   handleAsync('get-next-figure-number', async () => {

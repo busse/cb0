@@ -52,9 +52,10 @@
     <!-- Story level -->
     {%- if include.story or page.layout == 'story' -%}
       {%- assign story = include.story | default: page -%}
+      {%- assign primary_story_idea = story.related_ideas | first -%}
       <li class="breadcrumbs__item" aria-current="page">
         <span class="breadcrumbs__separator" aria-hidden="true">→</span>
-        <span class="notation-badge notation-badge--sm">{{ story.idea_number }}.{{ story.story_number }}</span>
+        {% include notation-badge.html idea=primary_story_idea story=story.story_number size="sm" %}
       </li>
     {%- endif -%}
     

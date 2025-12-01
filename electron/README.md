@@ -139,19 +139,19 @@ The renderer communicates with the main process through `window.electronAPI`:
 
 ### Delete Operations
 - `deleteIdea(ideaNumber)` - Delete idea
-- `deleteStory(ideaNumber, storyNumber)` - Delete story
+- `deleteStory(storyNumber)` - Delete story
 - `deleteSprint(sprintId)` - Delete sprint
 - `deleteUpdate(sprintId, ideaNumber, storyNumber)` - Delete update
 
 ### Utilities
 - `getNextIdeaNumber()` - Get next available idea number
-- `getNextStoryNumber(ideaNumber)` - Get next available story number for an idea
+- `getNextStoryNumber()` - Get next available global story number
 
 ## File Paths
 
 The app reads/writes files relative to the Jekyll site root:
 - Ideas: `_ideas/{n}.md`
-- Stories: `_stories/{idea}/{story}.md`
+- Stories: `_stories/{story_number}.md`
 - Sprints: `_sprints/{YYSS}.md`
 - Updates: `_updates/{sprint}-{idea}-{story}.md`
 

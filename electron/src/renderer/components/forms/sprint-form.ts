@@ -1,10 +1,17 @@
-import type { Sprint, SprintRecord, SprintStatus } from '@shared/types';
+import type { Sprint, SprintRecord, SprintStatus, Story } from '@shared/types';
 
 import { SPRINT_STATUSES } from '../../constants';
-import { fetchSprints, saveSprint } from '../../api';
+import {
+  ensureStories,
+  fetchSprints,
+  fetchStories,
+  saveSprint,
+  saveStory,
+} from '../../api';
 import { renderSprints } from '../lists';
 import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
+import { state } from '../../state';
 import { escapeAttr, escapeHtml, parseLines, today } from '../../utils/dom';
 
 export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRecord): Promise<void> {
@@ -23,6 +30,37 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
     goals: sprint?.goals?.join('\n') ?? '',
     body: sprint?.body ?? '',
   };
+
+  await ensureStories();
+  const storyOptions = state.stories;
+  const relatedStoryNumbers = defaults.sprint_id
+    ? storyOptions
+        .filter((story) => (story.related_sprints ?? []).includes(defaults.sprint_id))
+        .map((story) => story.story_number)
+    : [];
+
+  const relatedStoriesField = `
+    <div class="form-field">
+      <label>Related Stories</label>
+      ${
+        storyOptions.length
+          ? `<select name="related_stories" multiple size="6">
+              ${storyOptions
+                .map((story) => {
+                  const ideasLabel = (story.related_ideas ?? []).map((id) => `i${id}`).join(', ');
+                  return `<option value="${story.story_number}" ${
+                    relatedStoryNumbers.includes(story.story_number) ? 'selected' : ''
+                  }>s${story.story_number} — ${escapeHtml(story.title || 'Untitled')} ${
+                    ideasLabel ? `(${ideasLabel})` : ''
+                  }</option>`;
+                })
+                .join('')}
+            </select>
+            <div class="helper-text">Assign stories to this sprint (Cmd/Ctrl-click for multi-select).</div>`
+          : '<div class="helper-text">No stories available yet. Create a story to assign it here.</div>'
+      }
+    </div>
+  `;
 
   openModal({
     title: mode === 'create' ? 'Create Sprint' : `Edit Sprint ${sprint?.sprint_id}`,
@@ -67,6 +105,7 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
         <label>Body (Markdown)</label>
         <textarea name="body" rows="6">${escapeHtml(defaults.body)}</textarea>
       </div>
+      ${relatedStoriesField}
     `,
     onSubmit: async (formData) => {
       const payload: Sprint = {
@@ -82,6 +121,48 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
       const content = (formData.get('body') as string) ?? '';
 
       await saveSprint(payload, content);
+      const selectedStoryNumbers = new Set<number>(
+        formData
+          .getAll('related_stories')
+          .filter((value): value is string => typeof value === 'string')
+          .map((value) => Number(value))
+      );
+
+      const storyUpdatePromises: Promise<void>[] = [];
+      for (const storyRecord of state.stories) {
+        const hasSprint = storyRecord.related_sprints?.includes(payload.sprint_id) ?? false;
+        const shouldHave = selectedStoryNumbers.has(storyRecord.story_number);
+        if (hasSprint === shouldHave) continue;
+
+        const baseSprints = storyRecord.related_sprints ?? [];
+        const nextRelatedSprints = shouldHave
+          ? Array.from(new Set([...baseSprints, payload.sprint_id]))
+          : baseSprints.filter((id) => id !== payload.sprint_id);
+
+        const relatedIdeas = Array.isArray(storyRecord.related_ideas)
+          ? storyRecord.related_ideas
+          : [];
+
+        const updatedStory: Story = {
+          layout: 'story',
+          story_number: storyRecord.story_number,
+          title: storyRecord.title,
+          description: storyRecord.description,
+          status: storyRecord.status,
+          priority: storyRecord.priority,
+          created: storyRecord.created,
+          related_ideas: relatedIdeas,
+          related_sprints: nextRelatedSprints.length ? nextRelatedSprints : undefined,
+        };
+
+        storyUpdatePromises.push(saveStory(updatedStory, storyRecord.body ?? ''));
+      }
+
+      if (storyUpdatePromises.length) {
+        await Promise.all(storyUpdatePromises);
+        await fetchStories();
+      }
+
       await fetchSprints();
       renderSprints();
       showToast(mode === 'create' ? 'Sprint created' : 'Sprint updated');

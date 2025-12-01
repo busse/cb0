@@ -4,5 +4,8 @@
   Parameters:
     - sprint_id: The sprint ID (YYSS format) to filter stories by
 {%- endcomment -%}
-{%- assign sprint_stories = site.stories | where: "assigned_sprint", include.sprint_id | sort: "idea_number" -%}
+{%- assign sprint_stories = site.stories
+  | where_exp: "story", "story.related_sprints contains include.sprint_id"
+  | sort: "story_number"
+-%}
 

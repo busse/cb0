@@ -15,12 +15,9 @@ export function getIdeaFromDataset(el: HTMLElement): IdeaRecord | undefined {
 }
 
 export function getStoryFromDataset(el: HTMLElement): StoryRecord | undefined {
-  const ideaNumber = Number(el.dataset.idea);
   const storyNumber = Number(el.dataset.story);
-  if (Number.isNaN(ideaNumber) || Number.isNaN(storyNumber)) return undefined;
-  return state.stories.find(
-    (story) => story.idea_number === ideaNumber && story.story_number === storyNumber
-  );
+  if (Number.isNaN(storyNumber)) return undefined;
+  return state.stories.find((story) => story.story_number === storyNumber);
 }
 
 export function getSprintFromDataset(el: HTMLElement): SprintRecord | undefined {

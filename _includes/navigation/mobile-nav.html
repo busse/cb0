@@ -30,7 +30,7 @@
       <li>
         <a href="{{ '/backlog/' | relative_url }}" class="mobile-nav__link">
           BACKLOG
-          {%- assign backlog_count = site.stories | where: "assigned_sprint", nil | size -%}
+          {%- assign backlog_count = site.stories | where_exp: "story", "story.related_sprints == nil or story.related_sprints == empty" | size -%}
           <span class="mobile-nav__count">{{ backlog_count }}</span>
         </a>
       </li>

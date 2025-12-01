@@ -2,9 +2,9 @@ import { state } from '../../state';
 import { escapeHtml } from '../../utils/dom';
 
 export function buildStoryOptions(ideaNumber: number, selectedStory?: number): string {
-  const stories = state.stories.filter((story) => story.idea_number === ideaNumber);
+  const stories = state.stories.filter((story) => story.related_ideas.includes(ideaNumber));
   if (!stories.length) {
-    return '<option value="">No stories available</option>';
+    return '<option value="">No stories available for this idea</option>';
   }
 
   return stories
@@ -12,7 +12,7 @@ export function buildStoryOptions(ideaNumber: number, selectedStory?: number): s
       (story) => `
         <option value="${story.story_number}" ${
           story.story_number === selectedStory ? 'selected' : ''
-        }>${story.idea_number}.${story.story_number} — ${escapeHtml(story.title)}</option>
+        }>${ideaNumber}.${story.story_number} — ${escapeHtml(story.title)}</option>
       `
     )
     .join('');

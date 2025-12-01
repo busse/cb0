@@ -14,7 +14,10 @@
     {%- assign parts = story_ref | split: "." -%}
     {%- assign idea_num = parts[0] | plus: 0 -%}
     {%- assign story_num = parts[1] | plus: 0 -%}
-    {%- assign related_story = site.stories | where: "idea_number", idea_num | where: "story_number", story_num | first -%}
+    {%- assign related_story = site.stories
+      | where: "story_number", story_num
+      | where_exp: "story", "story.related_ideas contains idea_num"
+      | first -%}
     {%- if related_story -%}
       {%- assign stories_list = stories_list | push: related_story -%}
     {%- endif -%}

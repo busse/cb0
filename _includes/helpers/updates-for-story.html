@@ -1,9 +1,20 @@
 {%- comment -%}
-  Usage: {% include helpers/updates-for-story.html idea_number=5 story_number=56 %}
+  Usage: {% include helpers/updates-for-story.html story=page %}
   Sets: story_updates variable
   Parameters:
-    - idea_number: The idea number
-    - story_number: The story number
+    - story: The story object
 {%- endcomment -%}
-{%- assign story_updates = site.updates | where: "idea_number", include.idea_number | where: "story_number", include.story_number | sort: "date" | reverse -%}
+{%- assign target_story = include.story -%}
+{%- assign story_number = include.story_number | default: target_story.story_number -%}
+{%- assign idea_numbers = include.idea_numbers | default: target_story.related_ideas -%}
+{%- if idea_numbers == nil or idea_numbers == "" -%}
+  {%- assign fallback_idea = include.idea_number -%}
+  {%- if fallback_idea != nil -%}
+    {%- assign idea_numbers = "" | split: "" | push: fallback_idea | uniq -%}
+  {%- else -%}
+    {%- assign idea_numbers = "" | split: "" -%}
+  {%- endif -%}
+{%- endif -%}
+{%- assign story_updates = site.updates | where: "story_number", story_number -%}
+{%- assign story_updates = story_updates | where_exp: "update", "idea_numbers contains update.idea_number" | sort: "date" | reverse -%}
 

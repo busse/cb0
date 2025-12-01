@@ -29,15 +29,14 @@ export async function deleteIdea(ideaNumber?: string): Promise<void> {
   }
 }
 
-export async function deleteStory(ideaNumber?: string, storyNumber?: string): Promise<void> {
-  if (!ideaNumber || !storyNumber) return;
-  const idea = Number(ideaNumber);
+export async function deleteStory(storyNumber?: string): Promise<void> {
+  if (!storyNumber) return;
   const story = Number(storyNumber);
-  if (Number.isNaN(idea) || Number.isNaN(story)) return;
-  if (!confirm(`Delete Story ${idea}.${story}? This cannot be undone.`)) return;
+  if (Number.isNaN(story)) return;
+  if (!confirm(`Delete Story s${story}? This cannot be undone.`)) return;
 
   try {
-    await deleteStoryRemote(idea, story);
+    await deleteStoryRemote(story);
     await fetchStories();
     renderStories();
     showToast('Story deleted');

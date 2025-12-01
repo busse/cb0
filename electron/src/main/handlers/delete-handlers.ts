@@ -6,8 +6,8 @@ export function registerDeleteHandlers(): void {
     await deleteIdea(ideaNumber);
   });
 
-  handleAsyncWithArgs('delete-story', async (ideaNumber: number, storyNumber: number) => {
-    await deleteStory(ideaNumber, storyNumber);
+  handleAsyncWithArgs('delete-story', async (storyNumber: number) => {
+    await deleteStory(storyNumber);
   });
 
   handleAsyncWithArgs('delete-sprint', async (sprintId: string) => {
