@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { Idea, Story, Sprint, Update, Figure } from '../shared/types';
+import type { IpcResult } from './ipc-factory';
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -38,58 +39,47 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getFigureImage: (assetPath: string) => ipcRenderer.invoke('get-figure-image', assetPath),
 });
 
-// Type definitions for the exposed API
+type FigureImageMetadata = {
+  relativePath: string;
+  absolutePath: string;
+  fileType: string;
+  fileSize: string;
+  fileUrl: string;
+};
+
+type FigureSelection = {
+  path?: string;
+  canceled: boolean;
+};
+
+type ElectronAPI = {
+  readIdeas: () => Promise<IpcResult<Idea[]>>;
+  readStories: () => Promise<IpcResult<Story[]>>;
+  readSprints: () => Promise<IpcResult<Sprint[]>>;
+  readUpdates: () => Promise<IpcResult<Update[]>>;
+  readFigures: () => Promise<IpcResult<Figure[]>>;
+  writeIdea: (idea: Idea, content: string) => Promise<IpcResult<void>>;
+  writeStory: (story: Story, content: string) => Promise<IpcResult<void>>;
+  writeSprint: (sprint: Sprint, content: string) => Promise<IpcResult<void>>;
+  writeUpdate: (update: Update, content: string) => Promise<IpcResult<void>>;
+  writeFigure: (figure: Figure, content: string) => Promise<IpcResult<void>>;
+  deleteIdea: (ideaNumber: number) => Promise<IpcResult<void>>;
+  deleteStory: (ideaNumber: number, storyNumber: number) => Promise<IpcResult<void>>;
+  deleteSprint: (sprintId: string) => Promise<IpcResult<void>>;
+  deleteUpdate: (sprintId: string, ideaNumber: number, storyNumber: number) => Promise<IpcResult<void>>;
+  deleteFigure: (figureNumber: number) => Promise<IpcResult<void>>;
+  getNextIdeaNumber: () => Promise<IpcResult<number>>;
+  getNextStoryNumber: (ideaNumber: number) => Promise<IpcResult<number>>;
+  getNextFigureNumber: () => Promise<IpcResult<number>>;
+  selectFigureImage: () => Promise<IpcResult<FigureSelection>>;
+  copyFigureImage: (sourcePath: string, figureNumber: number) => Promise<IpcResult<FigureImageMetadata>>;
+  resolveAssetPath: (assetPath: string) => Promise<IpcResult<{ absolutePath: string; fileUrl: string }>>;
+  getFigureImage: (assetPath: string) => Promise<IpcResult<string>>;
+};
+
 declare global {
   interface Window {
-    electronAPI: {
-      readIdeas: () => Promise<{ success: boolean; data?: Idea[]; error?: string }>;
-      readStories: () => Promise<{ success: boolean; data?: Story[]; error?: string }>;
-      readSprints: () => Promise<{ success: boolean; data?: Sprint[]; error?: string }>;
-      readUpdates: () => Promise<{ success: boolean; data?: Update[]; error?: string }>;
-      readFigures: () => Promise<{ success: boolean; data?: Figure[]; error?: string }>;
-      writeIdea: (idea: Idea, content: string) => Promise<{ success: boolean; error?: string }>;
-      writeStory: (story: Story, content: string) => Promise<{ success: boolean; error?: string }>;
-      writeSprint: (sprint: Sprint, content: string) => Promise<{ success: boolean; error?: string }>;
-      writeUpdate: (update: Update, content: string) => Promise<{ success: boolean; error?: string }>;
-      writeFigure: (figure: Figure, content: string) => Promise<{ success: boolean; error?: string }>;
-      deleteIdea: (ideaNumber: number) => Promise<{ success: boolean; error?: string }>;
-      deleteStory: (ideaNumber: number, storyNumber: number) => Promise<{ success: boolean; error?: string }>;
-      deleteSprint: (sprintId: string) => Promise<{ success: boolean; error?: string }>;
-      deleteUpdate: (sprintId: string, ideaNumber: number, storyNumber: number) => Promise<{ success: boolean; error?: string }>;
-      deleteFigure: (figureNumber: number) => Promise<{ success: boolean; error?: string }>;
-      getNextIdeaNumber: () => Promise<{ success: boolean; data?: number; error?: string }>;
-      getNextStoryNumber: (ideaNumber: number) => Promise<{ success: boolean; data?: number; error?: string }>;
-      getNextFigureNumber: () => Promise<{ success: boolean; data?: number; error?: string }>;
-      selectFigureImage: () => Promise<{ success: boolean; path?: string; canceled?: boolean; error?: string }>;
-      copyFigureImage: (
-        sourcePath: string,
-        figureNumber: number
-      ) => Promise<{
-        success: boolean;
-        data?: {
-          relativePath: string;
-          absolutePath: string;
-          fileType: string;
-          fileSize: string;
-          fileUrl: string;
-        };
-        error?: string;
-      }>;
-      resolveAssetPath: (
-        assetPath: string
-      ) => Promise<{
-        success: boolean;
-        data?: { absolutePath: string; fileUrl: string };
-        error?: string;
-      }>;
-      getFigureImage: (
-        assetPath: string
-      ) => Promise<{
-        success: boolean;
-        data?: string;
-        error?: string;
-      }>;
-    };
+    electronAPI: ElectronAPI;
   }
 }
 

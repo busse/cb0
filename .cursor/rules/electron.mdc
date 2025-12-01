@@ -1,0 +1,26 @@
+---
+description: Electron architecture guardrails
+globs:
+  - "electron/src/**/*.ts"
+  - "electron/tests/**/*.ts"
+alwaysApply: true
+---
+
+# Electron Architecture Rules
+
+## Main Process
+- Keep `electron/src/main/index.ts` focused on lifecycle orchestration only (app readiness, window creation, handler registration). Any new IPC logic must live under `electron/src/main/handlers/**` and use the `handleAsync` / `handleAsyncWithArgs` helpers from `ipc-factory.ts`.
+- If `index.ts` approaches ~200 lines, extract whatever is growing into a handler or utility module immediately. The file should stay lean enough to scan quickly.
+- Shared utilities that are consumed in both the main and renderer processes belong in `electron/src/shared/**`.
+
+## Renderer Entry Point
+- `electron/src/renderer/main.ts` is an orchestrator. It should only wire up tabs, modal initialization, action handling, and initial data loads by calling helpers in `state.ts`, `api.ts`, `actions.ts`, `selectors.ts`, `components/**`, and `utils/**`.
+- Keep the renderer entry <200 lines. When adding new UI or workflows, implement them inside `components/` (lists, forms, widgets) and expose minimal functions that `main.ts` can call.
+- Modal behavior belongs in `renderer/modal.ts`, toast/notification logic in `renderer/toast.ts`, shared DOM helpers in `renderer/utils/dom.ts`, and formatting helpers in `renderer/utils/format.ts`. Do not recreate bespoke helpers in `main.ts`.
+- Entity create/edit flows should live in dedicated modules under `renderer/components/forms/` and be exported via `renderer/components/forms/index.ts`. Reuse `api.ts` for IPC access instead of calling `window.electronAPI` directly.
+
+## Testing Expectations
+- When touching renderer state management or IPC wiring, add/adjust Playwright specs inside `electron/tests/playwright-mcp/**` so coverage tracks the modular structure.
+- The `npm run test:electron` script (root or workspace) must remain the canonical way to run the suite; keep configs (`playwright.config.ts`, `tests/playwright-mcp/**`) aligned with any architectural shifts.
+
+These guardrails exist to keep the Electron entry points readable and enforce the current modular layout. If a change causes either `src/main/index.ts` or `src/renderer/main.ts` to bloat, refactor before committing.***

@@ -67,6 +67,20 @@ npm run electron:build
 npm run electron:dist
 ```
 
+### Testing
+
+```bash
+# Run the full Playwright Electron suite
+npm run test:electron
+
+# From the electron workspace
+cd electron
+npm run test:electron
+```
+
+- The test script compiles the main + preload bundles, launches the dev web server defined in `playwright.config.ts`, and executes the Playwright specs in `tests/playwright-mcp`.
+- Use `npm run test:electron:ui` or `npm run test:electron:debug` (either from the repo root or inside `electron/`) for interactive debugging modes.
+
 ## Architecture
 
 ### Directory Structure

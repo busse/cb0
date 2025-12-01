@@ -13,7 +13,10 @@
     "build": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json && vite build",
     "dist": "electron-builder",
     "start": "electron .",
-    "test:server": "npm run build:once && concurrently \"npm run dev:main\" \"npm run dev:preload\" \"npm run dev:renderer\""
+    "test:server": "npm run build:once && concurrently \"npm run dev:main\" \"npm run dev:preload\" \"npm run dev:renderer\"",
+    "test:electron": "npm run build:once && playwright test",
+    "test:electron:ui": "npm run build:once && playwright test --ui",
+    "test:electron:debug": "npm run build:once && playwright test --debug"
   },
   "dependencies": {
     "electron-updater": "^6.1.7",

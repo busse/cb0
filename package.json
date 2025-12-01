@@ -11,9 +11,9 @@
     "electron:dev": "npm run dev --workspace=electron",
     "electron:build": "npm run build --workspace=electron",
     "electron:dist": "npm run dist --workspace=electron",
-    "test:electron": "cd electron && npx playwright test tests/playwright-mcp",
-    "test:electron:ui": "cd electron && npx playwright test tests/playwright-mcp --ui",
-    "test:electron:debug": "cd electron && npx playwright test tests/playwright-mcp --debug"
+    "test:electron": "npm run test:electron --workspace=electron",
+    "test:electron:ui": "npm run test:electron:ui --workspace=electron",
+    "test:electron:debug": "npm run test:electron:debug --workspace=electron"
   },
   "devDependencies": {
     "@playwright/mcp": "latest"

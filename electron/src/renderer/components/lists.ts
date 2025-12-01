@@ -1,0 +1,196 @@
+import { state } from '../state';
+import { escapeAttr, escapeHtml } from '../utils/dom';
+import { formatFigureNotation } from '../utils/format';
+import { resolveAssetUrl } from '../api';
+
+export function renderIdeas(): void {
+  const listElement = document.getElementById('ideas-list');
+  if (!listElement) return;
+
+  if (state.ideas.length === 0) {
+    listElement.innerHTML = '<div class="loading">No ideas yet. Create one to get started.</div>';
+    return;
+  }
+
+  listElement.innerHTML = state.ideas
+    .map(
+      (idea) => `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">${escapeHtml(idea.title || 'Untitled')}</span>
+            <span class="item-badge">i${idea.idea_number}</span>
+          </div>
+          <div class="item-description">${escapeHtml(idea.description || '')}</div>
+          <div class="item-meta">
+            <span>Status: ${idea.status}</span>
+            <span>Created: ${idea.created}</span>
+            ${idea.tags && idea.tags.length ? `<span>Tags: ${idea.tags.join(', ')}</span>` : ''}
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-idea" data-idea="${idea.idea_number}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-idea" data-idea="${idea.idea_number}">Delete</button>
+          </div>
+        </div>
+      `
+    )
+    .join('');
+}
+
+export function renderStories(): void {
+  const listElement = document.getElementById('stories-list');
+  if (!listElement) return;
+
+  if (state.stories.length === 0) {
+    listElement.innerHTML = '<div class="loading">No stories yet. Create one to get started.</div>';
+    return;
+  }
+
+  listElement.innerHTML = state.stories
+    .map(
+      (story) => `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">${escapeHtml(story.title || 'Untitled')}</span>
+            <span class="item-badge">${story.idea_number}.${story.story_number}</span>
+          </div>
+          <div class="item-description">${escapeHtml(story.description || '')}</div>
+          <div class="item-meta">
+            <span>Status: ${story.status}</span>
+            <span>Priority: ${story.priority}</span>
+            ${story.assigned_sprint ? `<span>Sprint: ${story.assigned_sprint}</span>` : ''}
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-story" data-idea="${story.idea_number}" data-story="${story.story_number}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-story" data-idea="${story.idea_number}" data-story="${story.story_number}">Delete</button>
+          </div>
+        </div>
+      `
+    )
+    .join('');
+}
+
+export function renderSprints(): void {
+  const listElement = document.getElementById('sprints-list');
+  if (!listElement) return;
+
+  if (state.sprints.length === 0) {
+    listElement.innerHTML = '<div class="loading">No sprints yet. Create one to get started.</div>';
+    return;
+  }
+
+  listElement.innerHTML = state.sprints
+    .map(
+      (sprint) => `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">Sprint ${sprint.sprint_id}</span>
+            <span class="item-badge">${sprint.sprint_id}</span>
+          </div>
+          <div class="item-description">
+            ${sprint.start_date} – ${sprint.end_date}
+          </div>
+          <div class="item-meta">
+            <span>Status: ${sprint.status}</span>
+            <span>Year: ${sprint.year}</span>
+            <span>Sprint #${sprint.sprint_number}</span>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-sprint" data-sprint="${sprint.sprint_id}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-sprint" data-sprint="${sprint.sprint_id}">Delete</button>
+          </div>
+        </div>
+      `
+    )
+    .join('');
+}
+
+export function renderUpdates(): void {
+  const listElement = document.getElementById('updates-list');
+  if (!listElement) return;
+
+  if (state.updates.length === 0) {
+    listElement.innerHTML = '<div class="loading">No updates yet. Create one to get started.</div>';
+    return;
+  }
+
+  listElement.innerHTML = state.updates
+    .map(
+      (update) => `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">Update ${update.notation}</span>
+            <span class="item-badge">${update.notation}</span>
+          </div>
+          <div class="item-meta">
+            <span>Type: ${update.type}</span>
+            <span>Date: ${update.date}</span>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-update" data-sprint="${update.sprint_id}" data-idea="${update.idea_number}" data-story="${update.story_number}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-update" data-sprint="${update.sprint_id}" data-idea="${update.idea_number}" data-story="${update.story_number}">Delete</button>
+          </div>
+        </div>
+      `
+    )
+    .join('');
+}
+
+export async function renderFigures(): Promise<void> {
+  const listElement = document.getElementById('figures-list');
+  if (!listElement) return;
+
+  if (state.figures.length === 0) {
+    listElement.innerHTML = '<div class="loading">No figures yet. Add one to document your work.</div>';
+    return;
+  }
+
+  const figuresWithSrc = await Promise.all(
+    state.figures.map(async (figure) => ({
+      figure,
+      imageSrc: figure.image_path ? await resolveAssetUrl(figure.image_path) : undefined,
+    }))
+  );
+
+  listElement.innerHTML = figuresWithSrc
+    .map(({ figure, imageSrc }) => {
+      const ideaCount = figure.related_ideas?.length ?? 0;
+      const storyCount = figure.related_stories?.length ?? 0;
+      const relationshipText = [
+        ideaCount ? `${ideaCount} ${ideaCount === 1 ? 'idea' : 'ideas'}` : '',
+        storyCount ? `${storyCount} ${storyCount === 1 ? 'story' : 'stories'}` : '',
+      ]
+        .filter(Boolean)
+        .join(' • ');
+
+      return `
+        <div class="item-card">
+          <div class="item-header">
+            <span class="item-title">${escapeHtml(figure.title || 'Untitled figure')}</span>
+            <span class="item-badge">${formatFigureNotation(figure.figure_number)}</span>
+          </div>
+          <div class="figure-card__preview">
+            ${
+              imageSrc
+                ? `<img src="${escapeAttr(imageSrc)}" alt="${escapeAttr(
+                    figure.alt_text || figure.title || 'Figure preview'
+                  )}" />`
+                : '<div class="helper-text">No image selected</div>'
+            }
+          </div>
+          <div class="item-description">${escapeHtml(figure.description || '')}</div>
+          <div class="item-meta">
+            <span>Status: ${figure.status}</span>
+            <span>Created: ${figure.created}</span>
+            ${relationshipText ? `<span>${relationshipText}</span>` : ''}
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-secondary" type="button" data-action="edit-figure" data-figure="${figure.figure_number}">Edit</button>
+            <button class="btn btn-danger" type="button" data-action="delete-figure" data-figure="${figure.figure_number}">Delete</button>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+

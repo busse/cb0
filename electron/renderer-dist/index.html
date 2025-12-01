@@ -189,6 +189,21 @@
       gap: 8px;
     }
 
+    .figure-card__preview {
+      margin: 12px 0;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--color-surface-muted);
+      max-height: 220px;
+    }
+
+    .figure-card__preview img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
     .btn {
       padding: 9px 16px;
       border-radius: 999px;
@@ -362,6 +377,34 @@
       padding: 8px 0 0;
     }
 
+    .figure-input-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .figure-input-group input {
+      flex: 1;
+    }
+
+    .figure-preview {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      margin: 12px 0;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface-muted);
+      overflow: hidden;
+    }
+
+    .figure-preview img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
     .helper-text {
       font-size: 12px;
       color: var(--color-muted);
@@ -426,7 +469,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/index-lCL8clqb.js"></script>
+  <script type="module" crossorigin src="/assets/index-Cb_FgTDa.js"></script>
 </head>
 <body>
   <div class="container">
@@ -438,6 +481,7 @@
         <button class="tab" data-tab="stories">Stories</button>
         <button class="tab" data-tab="sprints">Sprints</button>
         <button class="tab" data-tab="updates">Updates</button>
+        <button class="tab" data-tab="figures">Figures</button>
       </div>
     </header>
 
@@ -474,6 +518,14 @@
           <button class="btn btn-secondary" type="button" data-action="refresh-updates">Refresh</button>
         </div>
         <div id="updates-list" class="list"></div>
+      </div>
+
+      <div id="figures-panel" class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" type="button" data-action="new-figure">New Figure</button>
+          <button class="btn btn-secondary" type="button" data-action="refresh-figures">Refresh</button>
+        </div>
+        <div id="figures-list" class="list"></div>
       </div>
     </div>
   </div>

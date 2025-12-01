@@ -28,14 +28,21 @@ export const test = base.extend<ElectronFixtures>({
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Launch Electron app
-    const electronApp = await electron.launch({
-      args: [ELECTRON_MAIN_PATH],
-      cwd: REPO_ROOT,
-      env: {
-        ...process.env,
-        NODE_ENV: 'test',
-      },
-    });
+    // Playwright's electron.launch() expects the executable path or will find it automatically
+    // The main script path should be passed as an argument
+    let electronApp: ElectronApplication;
+    try {
+      electronApp = await electron.launch({
+        args: [ELECTRON_MAIN_PATH],
+        cwd: REPO_ROOT,
+        env: {
+          ...process.env,
+          NODE_ENV: 'test',
+        },
+      });
+    } catch (error) {
+      throw new Error(`Failed to launch Electron app: ${error instanceof Error ? error.message : String(error)}`);
+    }
 
     await use(electronApp);
 
@@ -44,6 +51,10 @@ export const test = base.extend<ElectronFixtures>({
   },
 
   page: async ({ electronApp }, use) => {
+    if (!electronApp) {
+      throw new Error('Electron app failed to launch');
+    }
+    
     // Get all windows and find the app window (not DevTools)
     const windows = electronApp.windows();
     let appWindow = windows.find(w => !w.url().includes('devtools://'));
