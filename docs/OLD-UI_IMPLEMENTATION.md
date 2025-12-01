@@ -94,7 +94,7 @@ assets/css/
 - Story count + "VIEW BOARD →" link
 - Status-based border color
 
-#### Article Item (Sidebar)
+#### Note Item (Sidebar)
 - Condensed format for 1/5 sidebar
 - Date (monospace) + title
 - Minimal styling, high density
@@ -223,7 +223,7 @@ Enhanced `assets/js/main.js`:
 - `_includes/idea-card.html` - Swiss-styled idea card
 - `_includes/story-card.html` - Swiss-styled story card
 - `_includes/sprint-card.html` - Swiss-styled sprint card
-- `_includes/article-item.html` - NEW: Sidebar article item
+- `_includes/note-item.html` - NEW: Sidebar note item
 
 ### Layouts
 - `_layouts/default.html` - Base template
@@ -253,7 +253,7 @@ Enhanced `assets/js/main.js`:
 - [x] Sprint cards show dates and goals
 - [x] Kanban board 3-column layout
 - [x] Header region 4/5 + 1/5 split
-- [x] Articles sidebar populated
+- [x] Notes sidebar populated
 - [x] Filter buttons work
 - [x] Backlog grouped by idea
 - [x] Responsive at all breakpoints

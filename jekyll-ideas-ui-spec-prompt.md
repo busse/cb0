@@ -172,7 +172,7 @@ Colors are **semantic only**—they communicate meaning, not aesthetics.
 │                                                                     │
 │  ┌───────────────────────────────────────────┬─────────────────┐   │
 │  │                                           │                 │   │
-│  │  PRIMARY CONTENT AREA                     │  ARTICLES       │   │
+│  │  PRIMARY CONTENT AREA                     │  NOTES       │   │
 │  │  (4/5 width)                              │  SIDEBAR        │   │
 │  │                                           │  (1/5 width)    │   │
 │  │  Static content from include file         │                 │   │
@@ -662,30 +662,30 @@ Similar to idea card but with sprint assignment context.
 </article>
 ```
 
-### 6. Article List Item (Sidebar)
+### 6. Note List Item (Sidebar)
 
 Condensed format for the 1/5 articles sidebar.
 
 ```html
-<article class="article-item">
-  <time class="article-item__date">2025-01-15</time>
-  <h5 class="article-item__title">
-    <a href="/blog/article-slug/">Article Title Here</a>
+<article class="note-item">
+  <time class="note-item__date">2025-01-15</time>
+  <h5 class="note-item__title">
+    <a href="/blog/article-slug/">Note Title Here</a>
   </h5>
 </article>
 ```
 
 ```css
-.article-item {
+.note-item {
   padding: 8px 0;
   border-bottom: 1px solid var(--color-border);
 }
 
-.article-item:last-child {
+.note-item:last-child {
   border-bottom: none;
 }
 
-.article-item__date {
+.note-item__date {
   display: block;
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
@@ -693,19 +693,19 @@ Condensed format for the 1/5 articles sidebar.
   margin-bottom: 2px;
 }
 
-.article-item__title {
+.note-item__title {
   font-size: var(--text-sm);
   font-weight: 500;
   margin: 0;
   line-height: 1.3;
 }
 
-.article-item__title a {
+.note-item__title a {
   color: var(--color-text-primary);
   text-decoration: none;
 }
 
-.article-item__title a:hover {
+.note-item__title a:hover {
   text-decoration: underline;
 }
 ```
@@ -725,13 +725,13 @@ Condensed format for the 1/5 articles sidebar.
     </div>
     
     <aside class="header-sidebar">
-      <h2 class="sidebar-heading">ARTICLES</h2>
-      <div class="article-list">
+      <h2 class="sidebar-heading">NOTES</h2>
+      <div class="note-list">
         {% for post in site.posts limit:5 %}
-          {% include article-item.html post=post %}
+          {% include note-item.html post=post %}
         {% endfor %}
       </div>
-      <a href="/blog/" class="sidebar-more">ALL ARTICLES →</a>
+      <a href="/blog/" class="sidebar-more">ALL NOTES →</a>
     </aside>
   </section>
   
@@ -781,7 +781,7 @@ Condensed format for the 1/5 articles sidebar.
     </div>
     
     <aside class="header-sidebar">
-      <h2 class="sidebar-heading">ARTICLES</h2>
+      <h2 class="sidebar-heading">NOTES</h2>
       <!-- ... -->
     </aside>
   </section>
@@ -818,7 +818,7 @@ Condensed format for the 1/5 articles sidebar.
     </div>
     
     <aside class="header-sidebar">
-      <h2 class="sidebar-heading">ARTICLES</h2>
+      <h2 class="sidebar-heading">NOTES</h2>
       <!-- ... -->
     </aside>
   </section>
@@ -1091,7 +1091,7 @@ The backlog is **implicitly derived** from stories and their sprint assignments:
         <h3 class="footer-heading">META</h3>
         <ul class="footer-list">
           <li><a href="/i/0/">About (i0)</a></li>
-          <li><a href="/blog/">Articles</a></li>
+          <li><a href="/blog/">Notes</a></li>
           <li><a href="/feed.xml">RSS Feed</a></li>
         </ul>
       </div>
