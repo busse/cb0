@@ -300,3 +300,156 @@ export async function refreshTab(
   await waitForListLoad(page, `${tab}-list`);
 }
 
+/**
+ * Select an option in a multi-select component
+ */
+export async function selectMultiSelectOption(
+  page: Page,
+  fieldName: string,
+  value: string
+): Promise<void> {
+  const multiSelect = page.locator(`[data-multi-select="${fieldName}"]`);
+  await expect(multiSelect).toBeVisible({ timeout: 5000 });
+  
+  // Click the input to open dropdown
+  const input = multiSelect.locator('.multi-select__input');
+  await input.click();
+  await page.waitForTimeout(200); // Wait for dropdown to open
+  
+  // Find and click the checkbox for the option
+  const option = multiSelect.locator(`[data-option="${value}"]`);
+  const checkbox = option.locator('input[type="checkbox"]');
+  
+  // Check if already selected
+  const isChecked = await checkbox.isChecked();
+  if (!isChecked) {
+    await checkbox.click();
+    await page.waitForTimeout(200); // Wait for selection to register
+  }
+  
+  // Click outside to close dropdown
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+}
+
+/**
+ * Get selected options from a multi-select component
+ */
+export async function getSelectedMultiSelectOptions(
+  page: Page,
+  fieldName: string
+): Promise<string[]> {
+  const multiSelect = page.locator(`[data-multi-select="${fieldName}"]`);
+  await expect(multiSelect).toBeVisible({ timeout: 5000 });
+  
+  // Get all checked checkboxes
+  const checkedBoxes = multiSelect.locator('input[type="checkbox"]:checked');
+  const count = await checkedBoxes.count();
+  const selected: string[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const value = await checkedBoxes.nth(i).getAttribute('value');
+    if (value) {
+      selected.push(value);
+    }
+  }
+  
+  return selected;
+}
+
+/**
+ * Verify a relationship appears in the sidebar
+ */
+export async function verifyRelationshipInSidebar(
+  page: Page,
+  tab: 'ideas' | 'notes' | 'stories' | 'sprints' | 'updates' | 'figures',
+  relationshipType: string,
+  expectedText: string
+): Promise<void> {
+  const sidebar = page.locator(`#${tab}-sidebar`);
+  await expect(sidebar).toBeVisible({ timeout: 5000 });
+  
+  // Find the relationship section
+  const section = sidebar.locator(`section:has-text("${relationshipType}")`);
+  await expect(section).toBeVisible({ timeout: 2000 });
+  
+  // Verify the expected text appears in that section
+  const relationshipItem = section.locator(`text=${expectedText}`);
+  await expect(relationshipItem).toBeVisible({ timeout: 2000 });
+}
+
+/**
+ * Verify a relationship does not appear in the sidebar
+ */
+export async function verifyRelationshipNotInSidebar(
+  page: Page,
+  tab: 'ideas' | 'notes' | 'stories' | 'sprints' | 'updates' | 'figures',
+  relationshipType: string,
+  text: string
+): Promise<void> {
+  const sidebar = page.locator(`#${tab}-sidebar`);
+  await expect(sidebar).toBeVisible({ timeout: 5000 });
+  
+  // Find the relationship section if it exists
+  const section = sidebar.locator(`section:has-text("${relationshipType}")`);
+  const sectionExists = await section.count() > 0;
+  
+  if (sectionExists) {
+    // If section exists, verify the text is not in it
+    const relationshipItem = section.locator(`text=${text}`);
+    await expect(relationshipItem).not.toBeVisible({ timeout: 1000 });
+  }
+  // If section doesn't exist, that's fine - relationship is not shown
+}
+
+/**
+ * Get sidebar content as text
+ */
+export async function getSidebarContent(
+  page: Page,
+  tab: 'ideas' | 'notes' | 'stories' | 'sprints' | 'updates' | 'figures'
+): Promise<string> {
+  const sidebar = page.locator(`#${tab}-sidebar`);
+  await expect(sidebar).toBeVisible({ timeout: 5000 });
+  return await sidebar.textContent() || '';
+}
+
+/**
+ * Click a card to select it and show relationships
+ */
+export async function clickCard(
+  page: Page,
+  tab: 'ideas' | 'notes' | 'stories' | 'sprints' | 'updates' | 'figures',
+  identifier: string
+): Promise<void> {
+  await navigateToTab(page, tab);
+  await waitForListLoad(page, `${tab}-list`);
+  
+  // Find the card by its data attribute
+  let card;
+  if (tab === 'ideas') {
+    card = page.locator(`.item-card[data-idea-number="${identifier}"]`);
+  } else if (tab === 'notes') {
+    card = page.locator(`.item-card[data-note-slug="${identifier}"]`);
+  } else if (tab === 'stories') {
+    card = page.locator(`.item-card[data-story-number="${identifier}"]`);
+  } else if (tab === 'sprints') {
+    card = page.locator(`.item-card[data-sprint-id="${identifier}"]`);
+  } else if (tab === 'updates') {
+    // Updates need sprint, idea, story
+    const parts = identifier.split('.');
+    if (parts.length === 3) {
+      card = page.locator(
+        `.item-card[data-sprint-id="${parts[0]}"][data-idea-number="${parts[1]}"][data-story-number="${parts[2]}"]`
+      );
+    }
+  } else if (tab === 'figures') {
+    card = page.locator(`.item-card[data-figure-number="${identifier}"]`);
+  }
+  
+  if (card && (await card.count()) > 0) {
+    await card.click();
+    await page.waitForTimeout(500); // Wait for sidebar to update
+  }
+}
+

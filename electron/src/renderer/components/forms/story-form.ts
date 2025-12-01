@@ -23,6 +23,7 @@ import { showError, showToast } from '../../toast';
 import { escapeAttr, escapeHtml, today } from '../../utils/dom';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord): Promise<void> {
   if (mode === 'edit' && !story) {
@@ -265,6 +266,9 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
       await Promise.all([fetchIdeas(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       await fetchStories();
       renderStories();
+      refreshRelationshipsSidebar('stories');
+      // Also refresh sprints sidebar if a sprint card is selected (stories can be related to sprints)
+      refreshRelationshipsSidebar('sprints');
       showToast(mode === 'create' ? 'Story created' : 'Story updated');
       return true;
     },

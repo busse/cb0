@@ -22,6 +22,7 @@ import { state } from '../../state';
 import { escapeAttr, escapeHtml, parseLines, today } from '../../utils/dom';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRecord): Promise<void> {
   if (mode === 'edit' && !sprint) {
@@ -252,6 +253,9 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
       await Promise.all([fetchIdeas(), fetchStories(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       await fetchSprints();
       renderSprints();
+      refreshRelationshipsSidebar('sprints');
+      // Also refresh stories sidebar if stories are related to this sprint
+      refreshRelationshipsSidebar('stories');
       showToast(mode === 'create' ? 'Sprint created' : 'Sprint updated');
       return true;
     },

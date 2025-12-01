@@ -22,6 +22,7 @@ import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
 import { state } from '../../state';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): Promise<void> {
   if (mode === 'edit' && !note) {
@@ -246,6 +247,7 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
         await syncRelationships('note', noteRecord);
         await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchFigures(), fetchUpdates(), fetchNotes()]);
         renderNotes();
+        refreshRelationshipsSidebar('notes');
         showToast(mode === 'create' ? 'Note created' : 'Note updated');
         return true;
       } catch (error) {

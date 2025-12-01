@@ -23,6 +23,7 @@ import { escapeHtml, today } from '../../utils/dom';
 import { formatNotation } from '../../utils/format';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 import { buildStoryOptions } from './helpers';
 
 export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRecord): Promise<void> {
@@ -324,6 +325,7 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
       await syncRelationships('update', updateRecord);
       await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       renderUpdates();
+      refreshRelationshipsSidebar('updates');
       showToast(mode === 'create' ? 'Update created' : 'Update updated');
       return true;
     },

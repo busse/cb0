@@ -23,6 +23,7 @@ import { state } from '../../state';
 import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): Promise<void> {
   if (mode === 'edit' && !idea) {
@@ -257,6 +258,10 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
       await Promise.all([fetchStories(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
       await fetchIdeas();
       renderIdeas();
+      refreshRelationshipsSidebar('ideas');
+      // Also refresh related tabs' sidebars
+      refreshRelationshipsSidebar('stories');
+      refreshRelationshipsSidebar('sprints');
       showToast(mode === 'create' ? 'Idea created' : 'Idea updated');
       return true;
     },

@@ -42,7 +42,7 @@ import {
 } from './selectors';
 import { showError } from './toast';
 import { setupModalHandlers } from './modal';
-import { clearRelationshipsSidebar, renderRelationshipsSidebar } from './components/relationships';
+import { clearRelationshipsSidebar, renderRelationshipsSidebar, refreshRelationshipsSidebar } from './components/relationships';
 
 const tabButtons = document.querySelectorAll<HTMLButtonElement>('.tab');
 const panels = document.querySelectorAll<HTMLDivElement>('.panel');

@@ -31,6 +31,59 @@ export function clearRelationshipsSidebar(tab: Tab): void {
   }
 }
 
+/**
+ * Refresh the sidebar for the currently selected card in a tab
+ */
+export function refreshRelationshipsSidebar(tab: Tab): void {
+  const panel = document.getElementById(`${tab}-panel`);
+  if (!panel) return;
+  
+  const selectedCard = panel.querySelector<HTMLDivElement>('.item-card--selected');
+  if (!selectedCard) return;
+  
+  // Get the record for the selected card
+  const record = getRecordForSelectedCard(tab, selectedCard);
+  if (record) {
+    renderRelationshipsSidebar(tab, record);
+  }
+}
+
+function getRecordForSelectedCard(tab: Tab, card: HTMLElement): RecordMap[Tab] | undefined {
+  switch (tab) {
+    case 'ideas': {
+      const ideaNumber = Number(card.dataset.ideaNumber);
+      return state.ideas.find((idea) => idea.idea_number === ideaNumber) as IdeaRecord | undefined;
+    }
+    case 'notes': {
+      const slug = card.dataset.noteSlug;
+      return state.notes.find((note) => note.slug === slug) as NoteRecord | undefined;
+    }
+    case 'stories': {
+      const storyNumber = Number(card.dataset.storyNumber);
+      return state.stories.find((story) => story.story_number === storyNumber) as StoryRecord | undefined;
+    }
+    case 'sprints': {
+      const sprintId = card.dataset.sprintId;
+      return state.sprints.find((sprint) => sprint.sprint_id === sprintId) as SprintRecord | undefined;
+    }
+    case 'updates': {
+      const sprintId = card.dataset.sprintId;
+      const ideaNumber = Number(card.dataset.ideaNumber);
+      const storyNumber = Number(card.dataset.storyNumber);
+      return state.updates.find(
+        (update) =>
+          update.sprint_id === sprintId && update.idea_number === ideaNumber && update.story_number === storyNumber
+      ) as UpdateRecord | undefined;
+    }
+    case 'figures': {
+      const figureNumber = Number(card.dataset.figureNumber);
+      return state.figures.find((figure) => figure.figure_number === figureNumber) as FigureRecord | undefined;
+    }
+    default:
+      return undefined;
+  }
+}
+
 export function renderRelationshipsSidebar(tab: Tab, record?: RecordMap[Tab]): void {
   const sidebar = document.getElementById(`${tab}-sidebar`);
   if (!sidebar) return;

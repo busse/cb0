@@ -29,6 +29,7 @@ import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
 import { formatFigureNotation } from '../../utils/format';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
+import { refreshRelationshipsSidebar } from '../relationships';
 
 export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRecord): Promise<void> {
   if (mode === 'edit' && !figure) {
@@ -366,6 +367,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
       await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchNotes(), fetchUpdates(), fetchFigures()]);
       clearFigureCache();
       await renderFigures();
+      refreshRelationshipsSidebar('figures');
       showToast(mode === 'create' ? 'Figure created' : 'Figure updated');
       return true;
     },
