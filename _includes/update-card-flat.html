@@ -1,0 +1,40 @@
+{%- comment -%}
+  Update card flat component for home page
+  Displays update information in a flat, grid-based card layout similar to idea-card-flat
+  Parameters:
+    - update: The update object from site.updates
+{%- endcomment -%}
+{%- assign update = include.update -%}
+
+<article class="update-card-flat update-card-flat--{{ update.type }}" 
+         data-update="{{ update.notation }}"
+         data-type="{{ update.type }}">
+  <header class="update-card-flat__header">
+    <span class="update-card-flat__notation">{% include notation-badge.html sprint=update.sprint_id idea=update.idea_number story=update.story_number size="sm" %}</span>
+    <h3 class="update-card-flat__title">
+      <a href="{{ update.url | relative_url }}">Update: {{ update.notation }}</a>
+    </h3>
+    <div class="update-card-flat__type-box">
+      <span class="update-card-flat__type-text">{{ update.type | upcase }}</span>
+    </div>
+  </header>
+  
+  <div class="update-card-flat__grid">
+    <div class="update-card-flat__row">
+      <div class="update-card-flat__cell update-card-flat__cell--label">DATE</div>
+      <div class="update-card-flat__cell update-card-flat__cell--value">
+        <time datetime="{{ update.date }}">{{ update.date | date: "%Y-%m-%d" }}</time>
+      </div>
+    </div>
+    
+    {%- if update.content -%}
+      <div class="update-card-flat__row">
+        <div class="update-card-flat__cell update-card-flat__cell--label">CONTENT</div>
+        <div class="update-card-flat__cell update-card-flat__cell--value update-card-flat__cell--secondary">
+          {{ update.content | markdownify | strip_html | truncatewords: 15 }}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</article>
+

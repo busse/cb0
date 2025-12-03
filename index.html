@@ -10,42 +10,80 @@ title: Home
         <h1 class="homepage__title">IDEAS ARRAY</h1>
         <p class="homepage__description">A systematic taxonomy for tracking Ideas, Stories, and Sprints</p>
         <div class="homepage__notation">
-          <p>Navigate by notation: {% include notation-badge.html idea=0 %} {% include notation-badge.html idea=1 %} or browse <a href="{{ '/ideas/' | relative_url }}">all ideas</a></p>
+          <p class="homepage__notation-key">
+            <span class="homepage__notation-label">Notation key:</span>
+            {%- assign first_idea = site.ideas | first -%}
+            {%- assign first_story = site.stories | first -%}
+            {%- assign first_sprint = site.sprints | first -%}
+            {%- assign first_figure = site.figures | first -%}
+            {%- if first_idea -%}
+              <a href="{{ first_idea.url | relative_url }}">{% include notation-badge.html idea=first_idea.idea_number %}</a>
+            {%- else -%}
+              {% include notation-badge.html idea=0 %}
+            {%- endif -%}
+            <span class="homepage__notation-separator">= Idea</span>
+            {%- if first_story -%}
+              {%- assign story_idea = first_story.related_ideas | first | default: 0 -%}
+              <a href="{{ first_story.url | relative_url }}">{% include notation-badge.html idea=story_idea story=first_story.story_number %}</a>
+            {%- else -%}
+              {% include notation-badge.html idea=0 story=0 %}
+            {%- endif -%}
+            <span class="homepage__notation-separator">= Story</span>
+            {%- if first_sprint -%}
+              <a href="{{ first_sprint.url | relative_url }}">{% include notation-badge.html sprint=first_sprint.sprint_id %}</a>
+            {%- else -%}
+              {% include notation-badge.html sprint=2601 %}
+            {%- endif -%}
+            <span class="homepage__notation-separator">= Sprint</span>
+            {%- if first_figure -%}
+              <a href="{{ first_figure.url | relative_url }}">{% include notation-badge.html figure=first_figure.figure_number %}</a>
+            {%- else -%}
+              {% include notation-badge.html figure=0 %}
+            {%- endif -%}
+            <span class="homepage__notation-separator">= Figure</span>
+            {%- if first_sprint and first_idea and first_story -%}
+              {%- assign story_idea_full = first_story.related_ideas | first | default: first_idea.idea_number -%}
+              <a href="{{ first_story.url | relative_url }}">{% include notation-badge.html sprint=first_sprint.sprint_id idea=story_idea_full story=first_story.story_number %}</a>
+            {%- else -%}
+              {% include notation-badge.html sprint=2601 idea=0 story=0 %}
+            {%- endif -%}
+            <span class="homepage__notation-separator">= Full reference</span>
+            <span class="homepage__notation-browse">or <a href="{{ '/ideas/' | relative_url }}">browse all</a></span>
+          </p>
         </div>
       </div>
-      
-      {%- assign recent_updates = site.updates | sort: "date" | reverse -%}
-      {%- if recent_updates.size > 0 -%}
-        <div style="margin-top: var(--spacing-xl);">
-          <h2 class="section-title">RECENT UPDATES</h2>
-          <ul class="update-timeline">
-            {%- for update in recent_updates limit:5 -%}
-              <li class="update-timeline__item">
-                <span class="update-timeline__notation">{% include notation-badge.html sprint=update.sprint_id idea=update.idea_number story=update.story_number size="sm" %}</span>
-                <time class="update-timeline__date" datetime="{{ update.date }}">{{ update.date | date: "%b %d, %Y" }}</time>
-                <span class="update-timeline__type">{{ update.type }}</span>
-                <a href="{{ update.url | relative_url }}" class="update-timeline__link">View update</a>
-              </li>
-            {%- endfor -%}
-          </ul>
-        </div>
-      {%- endif -%}
     </div>
     
     <aside class="header-sidebar">
-      <h2 class="sidebar-heading">NOTES</h2>
-      {%- if site.posts.size > 0 -%}
-        <div class="note-list">
-          {%- for post in site.posts limit:5 -%}
-            {% include note-item.html post=post %}
+      {%- assign recent_updates = site.updates | sort: "date" | reverse -%}
+      {%- if recent_updates.size > 0 -%}
+        <div class="updates-cards-flat-grid">
+          {%- for update in recent_updates limit:1 -%}
+            {% include update-card-flat.html update=update %}
           {%- endfor -%}
         </div>
-        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL NOTES →</a>
-      {%- else -%}
-        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No notes yet.</p>
+        <a href="{{ '/timeline/' | relative_url }}" class="sidebar-more">MORE UPDATES →</a>
       {%- endif -%}
     </aside>
   </section>
+  
+  {%- assign prod_figures = "" | split: "" -%}
+  {%- for figure in site.figures -%}
+    {%- if figure.tags and figure.tags contains "prod" -%}
+      {%- assign prod_figures = prod_figures | push: figure -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- assign sorted_prod_figures = prod_figures | sort: "figure_number" -%}
+  {%- if sorted_prod_figures.size > 0 -%}
+    <section class="content-section">
+      <div class="figure-gallery figure-gallery--horizontal">
+        {%- for figure in sorted_prod_figures -%}
+          {% include figure-thumbnail.html figure=figure %}
+        {%- endfor -%}
+        <a href="{{ '/figures/' | relative_url }}" class="figure-gallery__more-link">MORE FIGURES →</a>
+      </div>
+    </section>
+  {%- endif -%}
   
   {%- assign all_ideas = site.ideas | sort: "idea_number" -%}
   {%- if all_ideas.size > 0 -%}

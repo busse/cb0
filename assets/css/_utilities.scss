@@ -163,12 +163,15 @@
 
 // Homepage Hero
 .homepage__hero {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 0;
   padding: var(--spacing-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0;
   box-shadow: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .homepage__title {
@@ -183,10 +186,42 @@
 }
 
 .homepage__notation {
+  display: block;
+}
+
+.homepage__notation-key {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  line-height: 1.6;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.homepage__notation-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.homepage__notation-separator {
+  color: var(--color-text-secondary);
+  margin: 0 4px;
+  font-size: var(--text-xs);
+}
+
+.homepage__notation-browse {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+}
+
+.homepage__notation-key a {
+  text-decoration: none;
+}
+
+.homepage__notation-key a:hover .notation-badge {
+  background-color: var(--color-accent-secondary);
+  border-color: var(--color-accent-secondary);
 }
 
 // Idea Header (detail pages)

@@ -1,0 +1,16 @@
+{%- comment -%}
+  Thumbnail component for displaying a figure as a clickable thumbnail
+  Parameters:
+    - figure: The figure object from site.figures
+{%- endcomment -%}
+{%- assign figure = include.figure -%}
+
+<a href="{{ figure.url | relative_url }}" class="figure-thumbnail" data-figure="{{ figure.figure_number }}">
+  <div class="figure-thumbnail__image-wrapper">
+    <img src="{{ figure.image_path | relative_url }}" 
+         alt="{{ figure.alt_text | default: figure.title }}"
+         class="figure-thumbnail__image"
+         loading="lazy">
+  </div>
+</a>
+
