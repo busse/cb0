@@ -47,6 +47,13 @@
   --color-accent-secondary: #1A1A1A;
   --color-accent-tertiary: #000000;
   
+  /* Colors - Dark Blue (Functional Distinction) */
+  --color-blue-dark: #1E3A5F;        /* Very dark blue - strong emphasis, active states */
+  --color-blue-base: #2C4A6F;        /* Dark blue - interactive elements, hover states */
+  --color-blue-medium: #3A5F8F;      /* Medium-dark blue - borders, subtle emphasis */
+  --color-blue-light: #E8EDF5;       /* Light blue tint - backgrounds, subtle highlights */
+  --color-blue-border: #4A6FA5;      /* Blue border - card hovers, interactive borders */
+  
   /* Colors - Notation Badge */
   --color-notation-bg: #1A1A1A;
   --color-notation-text: #FFFFFF;
@@ -132,6 +139,11 @@
     --color-border-strong: #444444;
     --color-chip-neutral-bg: #2A2A2A;
     --color-chip-neutral-text: #E0E0E0;
+    --color-blue-dark: #5B8FC7;      /* Lighter blue for dark mode - strong emphasis */
+    --color-blue-base: #6BA3D9;      /* Lighter blue for dark mode - interactive elements */
+    --color-blue-medium: #7BB3E8;    /* Lighter blue for dark mode - borders */
+    --color-blue-light: #1A2A3A;     /* Dark blue tint for dark mode backgrounds */
+    --color-blue-border: #8BC4F0;    /* Lighter blue for dark mode borders */
     --color-notation-bg: #E3120B;
     --color-notation-text: #FFFFFF;
     --color-badge-active-bg: rgba(86, 101, 255, 0.22);

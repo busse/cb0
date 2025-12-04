@@ -84,7 +84,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-accent-secondary);
+  color: var(--color-blue-base);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -93,7 +93,7 @@
 }
 
 .section-link:hover {
-  color: var(--color-text-primary);
+  color: var(--color-blue-dark);
   gap: 10px;
   text-decoration: none;
 }
@@ -137,7 +137,7 @@
 }
 
 .sidebar-more:hover {
-  color: var(--color-text-primary);
+  color: var(--color-blue-base);
 }
 
 // Page Title

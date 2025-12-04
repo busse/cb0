@@ -22,7 +22,7 @@
 }
 
 .figure-card:hover {
-  border-color: var(--color-accent-secondary);
+  border-color: var(--color-blue-border);
 }
 
 .figure-card__image-wrapper {
@@ -175,13 +175,17 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-accent-secondary);
+  color: var(--color-blue-base);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: var(--spacing-sm);
   transition: color var(--transition-fast), gap var(--transition-fast);
+  
+  &:hover {
+    color: var(--color-blue-dark);
+  }
   align-self: flex-end;
 }
 
