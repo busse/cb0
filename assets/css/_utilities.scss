@@ -26,15 +26,15 @@
 
 .filter-btn:hover,
 .filter-button:hover {
-  border-color: var(--color-accent-secondary);
-  background: var(--color-background-muted);
-  color: var(--color-text-primary);
+  border-color: var(--color-blue-border);
+  background: var(--color-blue-light);
+  color: var(--color-blue-base);
 }
 
 .filter-btn--active,
 .filter-button--active {
-  border-color: var(--color-accent-secondary);
-  background: var(--color-accent-secondary);
+  border-color: var(--color-blue-dark);
+  background: var(--color-blue-dark);
   color: var(--color-background);
   box-shadow: none;
 }
@@ -154,9 +154,10 @@
   margin-left: auto;
   font-size: var(--text-sm);
   text-decoration: none;
-  color: var(--color-accent-secondary);
+  color: var(--color-blue-base);
   
   &:hover {
+    color: var(--color-blue-dark);
     text-decoration: underline;
   }
 }
@@ -220,8 +221,8 @@
 }
 
 .homepage__notation-key a:hover .notation-badge {
-  background-color: var(--color-accent-secondary);
-  border-color: var(--color-accent-secondary);
+  background-color: var(--color-blue-base);
+  border-color: var(--color-blue-base);
 }
 
 // Idea Header (detail pages)
@@ -856,7 +857,7 @@
   transition: color var(--transition-fast);
   
   &:hover {
-    color: var(--color-accent-secondary);
+    color: var(--color-blue-base);
     text-decoration: underline;
   }
 }
