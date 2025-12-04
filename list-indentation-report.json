@@ -1,0 +1,31 @@
+{
+  "evaluation_date": "2025-12-03",
+  "issue_summary": "Lists (ul/ol) across content pages have 0px margin-left and 0px padding-left, causing them to appear dedented instead of properly indented",
+  "affected_pages": [
+    {
+      "page": "Sprint Detail - 2605",
+      "url": "http://localhost:4000/sprint/2605/",
+      "lists_found": 4,
+      "issue": "All content lists have 0px indentation",
+      "examples": [
+        {
+          "tag": "ul",
+          "location": ".sprint-detail__goals",
+          "marginLeft": "0px",
+          "paddingLeft": "0px",
+          "textPreview": "Mobile app foundationsiOS and Android project setu"
+        },
+        {
+          "tag": "ol",
+          "location": ".sprint-content",
+          "marginLeft": "0px",
+          "paddingLeft": "0px",
+          "textPreview": "iOS App Foundation - Set up SwiftUI project and co"
+        }
+      ]
+    }
+  ],
+  "root_cause": "Base list styles (ul/ol) are missing from _typography.scss. Only specific contexts like .post__content and .glossary-content have list styling.",
+  "fix_required": "Add base ul/ol/li styles to _typography.scss with proper indentation (margin-left: 1.5em or similar)"
+}
+

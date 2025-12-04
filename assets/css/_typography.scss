@@ -88,6 +88,38 @@ pre code {
   background: none;
 }
 
+// Lists
+ul,
+ol {
+  margin-left: 1.5em;
+  margin-bottom: var(--spacing-sm);
+  padding-left: 0;
+  list-style-position: outside;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+li {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.5;
+}
+
+// Nested lists
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  margin-left: 1.5em;
+}
+
 // Tabular numerals for notation
 .notation-badge,
 time,

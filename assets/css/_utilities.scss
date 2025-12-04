@@ -411,11 +411,21 @@
 
 .post__content ul,
 .post__content ol {
-  margin-left: 20px;
+  margin-left: 1.5em;
   margin-bottom: var(--spacing-md);
+  padding-left: 0;
 }
 
 .post__content li {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.5;
+}
+
+.post__content ul ul,
+.post__content ol ol,
+.post__content ul ol,
+.post__content ol ul {
+  margin-top: var(--spacing-xs);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -1008,13 +1018,22 @@
 
 .glossary-content ul,
 .glossary-content ol {
-  margin-left: 20px;
+  margin-left: 1.5em;
   margin-bottom: var(--spacing-md);
+  padding-left: 0;
 }
 
 .glossary-content li {
   margin-bottom: var(--spacing-xs);
   line-height: 1.6;
+}
+
+.glossary-content ul ul,
+.glossary-content ol ol,
+.glossary-content ul ol,
+.glossary-content ol ul {
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
 }
 
 // Responsive utilities
