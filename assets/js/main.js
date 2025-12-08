@@ -26,12 +26,13 @@
           if (filter === 'all') {
             card.style.display = '';
           } else {
-            // Check if card has the matching status class
-            const hasStatus = card.classList.contains(`idea-card--${filter}`) ||
-                            card.classList.contains(`story-card--${filter}`) ||
+            // Check if card has the matching status class (skip idea-card as ideas don't have status)
+            const hasStatus = card.classList.contains(`story-card--${filter}`) ||
                             card.classList.contains(`sprint-card--${filter}`) ||
                             card.classList.contains(`figure-card--${filter}`);
-            card.style.display = hasStatus ? '' : 'none';
+            // Always show idea cards (they don't have status)
+            const isIdeaCard = card.classList.contains('idea-card');
+            card.style.display = (hasStatus || isIdeaCard) ? '' : 'none';
           }
         });
       });

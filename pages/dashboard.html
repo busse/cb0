@@ -14,8 +14,6 @@ permalink: /dashboard/
       
       {%- comment -%} Calculate totals for summary stats {%- endcomment -%}
       {%- assign total_ideas = site.ideas | size -%}
-      {%- assign active_ideas = site.ideas | where: "status", "active" | size -%}
-      {%- assign completed_ideas = site.ideas | where: "status", "completed" | size -%}
       
       {%- assign total_stories = site.stories | size -%}
       {%- assign done_stories = site.stories | where: "status", "done" | size -%}
@@ -51,7 +49,7 @@ permalink: /dashboard/
     <aside class="header-sidebar">
       <h2 class="sidebar-heading">QUICK STATS</h2>
       <ul class="quick-stats">
-        <li><span class="quick-stats__label">Active Ideas:</span> <span class="quick-stats__value">{{ active_ideas }}</span></li>
+        <li><span class="quick-stats__label">Total Ideas:</span> <span class="quick-stats__value">{{ total_ideas }}</span></li>
         <li><span class="quick-stats__label">In Progress:</span> <span class="quick-stats__value">{{ in_progress_stories }}</span></li>
         <li><span class="quick-stats__label">Active Sprints:</span> <span class="quick-stats__value">{{ active_sprints }}</span></li>
         <li><span class="quick-stats__label">Backlog:</span> <span class="quick-stats__value">{{ backlog_stories }}</span></li>
@@ -69,38 +67,6 @@ permalink: /dashboard/
     <div class="progress-overview">
       {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
       
-      {%- comment -%} Progress bar showing idea status distribution {%- endcomment -%}
-      <div class="progress-distribution">
-        <div class="progress-bar-stacked">
-          {%- if total_ideas > 0 -%}
-            {%- assign completed_pct = completed_ideas | times: 100.0 | divided_by: total_ideas -%}
-            {%- assign active_pct = active_ideas | times: 100.0 | divided_by: total_ideas -%}
-            {%- assign planned_ideas = site.ideas | where: "status", "planned" | size -%}
-            {%- assign planned_pct = planned_ideas | times: 100.0 | divided_by: total_ideas -%}
-            {%- assign archived_ideas = site.ideas | where: "status", "archived" | size -%}
-            {%- assign archived_pct = archived_ideas | times: 100.0 | divided_by: total_ideas -%}
-          {%- else -%}
-            {%- assign completed_pct = 0 -%}
-            {%- assign active_pct = 0 -%}
-            {%- assign planned_ideas = 0 -%}
-            {%- assign planned_pct = 0 -%}
-            {%- assign archived_ideas = 0 -%}
-            {%- assign archived_pct = 0 -%}
-          {%- endif -%}
-          
-          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--complete" style="width: {{ completed_pct }}%;" title="Completed: {{ completed_ideas }}"></div>
-          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--active" style="width: {{ active_pct }}%;" title="Active: {{ active_ideas }}"></div>
-          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--planned" style="width: {{ planned_pct }}%;" title="Planned: {{ planned_ideas }}"></div>
-          <div class="progress-bar-stacked__segment progress-bar-stacked__segment--archived" style="width: {{ archived_pct }}%;" title="Archived: {{ archived_ideas }}"></div>
-        </div>
-        <div class="progress-legend">
-          <span class="legend-item legend-item--complete"><span class="legend-dot"></span>Complete ({{ completed_ideas }})</span>
-          <span class="legend-item legend-item--active"><span class="legend-dot"></span>Active ({{ active_ideas }})</span>
-          <span class="legend-item legend-item--planned"><span class="legend-dot"></span>Planned ({{ planned_ideas }})</span>
-          <span class="legend-item legend-item--archived"><span class="legend-dot"></span>Archived ({{ archived_ideas }})</span>
-        </div>
-      </div>
-      
       {%- comment -%} Individual idea progress cards {%- endcomment -%}
       <div class="progress-grid">
         {%- for idea in sorted_ideas -%}
@@ -114,7 +80,7 @@ permalink: /dashboard/
             {%- assign idea_progress = 0 -%}
           {%- endif -%}
           
-          <div class="progress-card progress-card--{{ idea.status }}">
+          <div class="progress-card">
             <header class="progress-card__header">
               {% include notation-badge.html idea=idea.idea_number size="sm" %}
               <span class="progress-card__title">{{ idea.title | truncate: 25 }}</span>

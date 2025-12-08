@@ -127,15 +127,15 @@ title: Home
     </section>
   {%- endif -%}
   
-  {%- assign active_ideas = site.ideas | where: "status", "active" | sort: "idea_number" -%}
-  {%- if active_ideas.size > 0 -%}
+  {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
+  {%- if sorted_ideas.size > 0 -%}
     <section class="content-section">
       <header class="section-header">
-        <h2 class="section-title">ACTIVE IDEAS</h2>
+        <h2 class="section-title">IDEAS</h2>
         <a href="{{ '/ideas/' | relative_url }}" class="section-link">VIEW ALL →</a>
       </header>
       <div class="card-grid">
-        {%- for idea in active_ideas -%}
+        {%- for idea in sorted_ideas -%}
           {% include idea-card.html idea=idea %}
         {%- endfor -%}
       </div>
