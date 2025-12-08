@@ -186,23 +186,6 @@
   border-color: var(--color-blue-border);
 }
 
-.progress-card--active {
-  border-left-color: var(--color-status-active);
-}
-
-.progress-card--completed,
-.progress-card--complete {
-  border-left-color: var(--color-status-complete);
-}
-
-.progress-card--planned {
-  border-left-color: var(--color-status-planned);
-}
-
-.progress-card--archived {
-  border-left-color: var(--color-status-archived);
-}
-
 .progress-card__header {
   display: flex;
   align-items: center;

@@ -56,17 +56,13 @@
         {%- assign status_parts = "—" -%}
       {%- endif -%}
       
-      <article class="idea-card-flat idea-card-flat--{{ idea.status }}" 
-               data-idea="{{ idea.idea_number }}"
-               data-status="{{ idea.status }}">
+      <article class="idea-card-flat" 
+               data-idea="{{ idea.idea_number }}">
         <header class="idea-card-flat__header">
           <span class="idea-card-flat__notation">{% include helpers/notation-format.html idea=idea.idea_number %}</span>
           <h3 class="idea-card-flat__title">
             <a href="{{ idea.url | relative_url }}">{{ idea.title }}</a>
           </h3>
-          <div class="idea-card-flat__status-box">
-            <span class="idea-card-flat__status-text">{{ idea.status | upcase }}</span>
-          </div>
         </header>
         
         <div class="idea-card-flat__grid">

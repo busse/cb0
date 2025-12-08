@@ -10,7 +10,6 @@
         <tr>
           <th class="ideas-table__notation">NOT</th>
           <th class="ideas-table__title">TITLE</th>
-          <th class="ideas-table__status">STATUS</th>
           <th class="ideas-table__stories">STORIES</th>
           <th class="ideas-table__progress">PROGRESS</th>
           <th class="ideas-table__story-status">STORY STATUS</th>
@@ -74,9 +73,6 @@
             </td>
             <td class="ideas-table__title">
               <a href="{{ idea.url | relative_url }}" class="ideas-table__title-link">{{ idea.title }}</a>
-            </td>
-            <td class="ideas-table__status">
-              <span class="status-indicator status-indicator--{{ idea.status }}">{{ idea.status | upcase }}</span>
             </td>
             <td class="ideas-table__stories">
               {{ total_stories }}

@@ -13,19 +13,6 @@ permalink: /ideas/
       </p>
       
       {%- assign sorted_ideas = site.ideas | sort: "idea_number" -%}
-      {%- if sorted_ideas.size > 0 -%}
-        <div class="filter-bar">
-          <button class="filter-btn filter-btn--active" data-filter="all">ALL ({{ sorted_ideas.size }})</button>
-          {%- assign active = sorted_ideas | where: "status", "active" -%}
-          <button class="filter-btn" data-filter="active">ACTIVE ({{ active.size }})</button>
-          {%- assign planned = sorted_ideas | where: "status", "planned" -%}
-          <button class="filter-btn" data-filter="planned">PLANNED ({{ planned.size }})</button>
-          {%- assign completed = sorted_ideas | where: "status", "completed" -%}
-          <button class="filter-btn" data-filter="completed">COMPLETED ({{ completed.size }})</button>
-          {%- assign archived = sorted_ideas | where: "status", "archived" -%}
-          <button class="filter-btn" data-filter="archived">ARCHIVED ({{ archived.size }})</button>
-        </div>
-      {%- endif -%}
     </div>
     
     <aside class="header-sidebar">

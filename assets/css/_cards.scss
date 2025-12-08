@@ -19,7 +19,7 @@
 // Idea Card
 .idea-card {
   padding: var(--spacing-md);
-  border-top: 4px solid var(--color-status-active);
+  border-top: 4px solid var(--color-border-strong);
   background-color: var(--color-surface);
   gap: var(--spacing-sm);
 }
@@ -89,23 +89,6 @@
   font-family: var(--font-mono);
 }
 
-// Status-based border colors
-.idea-card--planned {
-  border-top-color: var(--color-status-planned);
-}
-
-.idea-card--active {
-  border-top-color: var(--color-status-active);
-}
-
-.idea-card--complete,
-.idea-card--completed {
-  border-top-color: var(--color-status-complete);
-}
-
-.idea-card--archived {
-  border-top-color: var(--color-status-archived);
-}
 
 // Story Card
 .story-card {
@@ -441,11 +424,6 @@
   text-decoration: underline;
 }
 
-.idea-card-compact__status {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .idea-card-compact__body {
   display: flex;
   flex-direction: column;
@@ -513,24 +491,6 @@
   height: 100%;
   background: var(--color-status-complete);
   transition: width var(--transition-base);
-}
-
-// Status-based border colors for compact cards
-.idea-card-compact--planned {
-  border-top-color: var(--color-status-planned);
-}
-
-.idea-card-compact--active {
-  border-top-color: var(--color-status-active);
-}
-
-.idea-card-compact--complete,
-.idea-card-compact--completed {
-  border-top-color: var(--color-status-complete);
-}
-
-.idea-card-compact--archived {
-  border-top-color: var(--color-status-archived);
 }
 
 .ideas-cards__empty-message {
@@ -623,21 +583,6 @@
   text-decoration: underline;
 }
 
-.idea-card-flat__status-box {
-  border: 1px solid var(--color-border);
-  padding: 2px 6px;
-  background: var(--color-surface);
-}
-
-.idea-card-flat__status-text {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--color-text-primary);
-  font-family: var(--font-primary);
-}
-
 .idea-card-flat__grid {
   display: flex;
   flex-direction: column;
@@ -712,24 +657,6 @@
   height: 100%;
   background: var(--color-status-complete);
   transition: width var(--transition-base);
-}
-
-// Status-based border colors for flat cards
-.idea-card-flat--planned {
-  border-left-color: var(--color-status-planned);
-}
-
-.idea-card-flat--active {
-  border-left-color: var(--color-status-active);
-}
-
-.idea-card-flat--complete,
-.idea-card-flat--completed {
-  border-left-color: var(--color-status-complete);
-}
-
-.idea-card-flat--archived {
-  border-left-color: var(--color-status-archived);
 }
 
 .ideas-cards-flat__empty-message {

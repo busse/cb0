@@ -1,0 +1,20 @@
+/* Markdown Content Style Overrides
+ * 
+ * This file contains overrides for markdown content rendering.
+ * It loads after main.css, allowing these styles to override the default styles.
+ */
+
+/* Inline Code Styling Override
+ * 
+ * Override the default inline code styling defined in _typography.scss
+ * Current default styles:
+ *   - font-family: var(--font-mono)
+ *   - font-size: max(0.9em, 10px)
+ *   - padding: 2px 4px
+ *   - background: var(--color-surface)
+ *   - border-radius: 0
+ */
+code {
+  /* Add your custom inline code styles here */
+}
+

@@ -80,13 +80,21 @@
   }
   
   function applyFilters(collection, filters) {
-    const cards = document.querySelectorAll('[data-status], [data-priority], [data-sprint]');
+    const cards = document.querySelectorAll('[data-status], [data-priority], [data-sprint], [data-idea]');
     let visibleCount = 0;
     
     cards.forEach(card => {
       let visible = true;
       
+      // Skip status filtering for idea cards (ideas don't have status)
+      const isIdeaCard = card.hasAttribute('data-idea') && !card.hasAttribute('data-status');
+      
       for (const [type, value] of Object.entries(filters)) {
+        // Skip status filter for ideas
+        if (type === 'status' && isIdeaCard) {
+          continue;
+        }
+        
         const cardValue = card.dataset[type];
         if (type === 'sprint') {
           if (value === 'unassigned' && cardValue) {

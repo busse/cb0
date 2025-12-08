@@ -15,8 +15,8 @@
   <div class="filter-bar__group">
     <span class="filter-bar__label">FILTER:</span>
     
-    <!-- Status Filter (always for ideas/stories) -->
-    {%- if include.show_status != false -%}
+    <!-- Status Filter (for stories/sprints, not ideas) -->
+    {%- if include.show_status != false and include.collection != "ideas" -%}
     <div class="filter-bar__dropdown">
       <button class="filter-bar__trigger" 
               aria-expanded="false"
