@@ -8,12 +8,12 @@ import {
   ensureIdeas,
   ensureStories,
   ensureSprints,
-  ensureNotes,
+  ensureMaterials,
   ensureUpdates,
   fetchIdeas,
   fetchStories,
   fetchSprints,
-  fetchNotes,
+  fetchMaterials,
   fetchUpdates,
   fetchFigures,
   getNextFigureNumber,
@@ -37,7 +37,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
     return;
   }
 
-  await Promise.all([ensureIdeas(), ensureStories(), ensureFigures(), ensureSprints(), ensureNotes(), ensureUpdates()]);
+  await Promise.all([ensureIdeas(), ensureStories(), ensureFigures(), ensureSprints(), ensureMaterials(), ensureUpdates()]);
 
   const figureNumber =
     figure?.figure_number ??
@@ -61,17 +61,17 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
     tags: figure?.tags?.join(', ') ?? '',
     body: figure?.body ?? '',
     related_sprints: figure?.related_sprints ?? [],
-    related_notes: figure?.related_notes ?? [],
+    related_materials: figure?.related_materials ?? [],
     related_updates: figure?.related_updates ?? [],
   };
 
   const selectedIdeaSet = new Set(figure?.related_ideas ?? []);
   const selectedStorySet = new Set(figure?.related_stories ?? []);
   const selectedSprintSet = new Set(figure?.related_sprints ?? []);
-  const selectedNoteSet = new Set(figure?.related_notes ?? []);
+  const selectedMaterialSet = new Set(figure?.related_materials ?? []);
   const selectedUpdateSet = new Set(figure?.related_updates ?? []);
   const sprintOptions = state.sprints;
-  const noteOptions = state.notes;
+  const materialOptions = state.materials;
   const updateOptions = state.updates;
 
   // Create multi-select components
@@ -113,19 +113,19 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
     required: false,
   });
 
-  const notesMultiSelect = createMultiSelect({
-    name: 'related_notes',
-    options: noteOptions
-      .filter((note) => (note.slug ?? note.filename)?.length)
-      .map((note) => {
-        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+  const materialsMultiSelect = createMultiSelect({
+    name: 'related_materials',
+    options: materialOptions
+      .filter((material) => (material.slug ?? material.filename)?.length)
+      .map((material) => {
+        const value = material.slug ?? material.filename?.replace(/\.md$/, '') ?? '';
         return {
           value,
-          label: `${note.title || value}`,
+          label: `${material.title || value}`,
         };
       }),
-    selected: Array.from(selectedNoteSet),
-    placeholder: 'Search notes...',
+    selected: Array.from(selectedMaterialSet),
+    placeholder: 'Search materials...',
     required: false,
   });
 
@@ -240,8 +240,8 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
           <div class="helper-text">Link sprints where this figure appears.</div>
         </div>
         <div class="form-field">
-          <label>Notes</label>
-          ${notesMultiSelect.html}
+          <label>Materials</label>
+          ${materialsMultiSelect.html}
           <div class="helper-text">Attach supporting notes or research.</div>
         </div>
         <div class="form-field">
@@ -260,7 +260,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
       ideasMultiSelect.init(form);
       storiesMultiSelect.init(form);
       sprintsMultiSelect.init(form);
-      notesMultiSelect.init(form);
+      materialsMultiSelect.init(form);
       updatesMultiSelect.init(form);
 
       const browseButton = form.querySelector<HTMLButtonElement>('[data-image-browse]');
@@ -333,7 +333,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
 
       const relatedStories = Array.from(new Set((formData.getAll('related_stories') as string[]).filter(Boolean)));
       const relatedSprints = Array.from(new Set((formData.getAll('related_sprints') as string[]).filter(Boolean)));
-      const relatedNotes = Array.from(new Set((formData.getAll('related_notes') as string[]).filter(Boolean)));
+      const relatedMaterials = Array.from(new Set((formData.getAll('related_materials') as string[]).filter(Boolean)));
       const relatedUpdates = Array.from(new Set((formData.getAll('related_updates') as string[]).filter(Boolean)));
 
       const payload: Figure = {
@@ -353,7 +353,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
         related_ideas: relatedIdeas.length ? relatedIdeas : undefined,
         related_stories: relatedStories.length ? relatedStories : undefined,
         related_sprints: relatedSprints.length ? relatedSprints : undefined,
-        related_notes: relatedNotes.length ? relatedNotes : undefined,
+        related_materials: relatedMaterials.length ? relatedMaterials : undefined,
         related_updates: relatedUpdates.length ? relatedUpdates : undefined,
       };
 
@@ -364,7 +364,7 @@ export async function openFigureForm(mode: 'create' | 'edit', figure?: FigureRec
         body: content,
       };
       await syncRelationships('figure', figureRecord);
-      await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchNotes(), fetchUpdates(), fetchFigures()]);
+      await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchMaterials(), fetchUpdates(), fetchFigures()]);
       clearFigureCache();
       await renderFigures();
       refreshRelationshipsSidebar('figures');

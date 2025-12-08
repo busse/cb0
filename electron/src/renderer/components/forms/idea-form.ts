@@ -4,13 +4,13 @@ import { IDEA_STATUSES } from '../../constants';
 import {
   ensureStories,
   ensureSprints,
-  ensureNotes,
+  ensureMaterials,
   ensureFigures,
   ensureUpdates,
   fetchIdeas,
   fetchStories,
   fetchSprints,
-  fetchNotes,
+  fetchMaterials,
   fetchFigures,
   fetchUpdates,
   getNextIdeaNumber,
@@ -46,10 +46,10 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
     return;
   }
 
-  await Promise.all([ensureStories(), ensureSprints(), ensureNotes(), ensureFigures(), ensureUpdates()]);
+  await Promise.all([ensureStories(), ensureSprints(), ensureMaterials(), ensureFigures(), ensureUpdates()]);
   const storyOptions = state.stories;
   const sprintOptions = state.sprints;
-  const noteOptions = state.notes;
+  const materialOptions = state.materials;
   const figureOptions = state.figures;
   const updateOptions = state.updates;
   const resolvedIdeaNumber = ideaNumber as number;
@@ -80,19 +80,19 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
     placeholder: 'Search sprints...',
   });
 
-  const notesMultiSelect = createMultiSelect({
-    name: 'related_notes',
-    options: noteOptions
-      .filter((note) => (note.slug ?? note.filename)?.length)
-      .map((note) => {
-        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+  const materialsMultiSelect = createMultiSelect({
+    name: 'related_materials',
+    options: materialOptions
+      .filter((material) => (material.slug ?? material.filename)?.length)
+      .map((material) => {
+        const value = material.slug ?? material.filename?.replace(/\.md$/, '') ?? '';
         return {
           value,
-          label: `${note.title || value}`,
+          label: `${material.title || value}`,
         };
       }),
-    selected: idea?.related_notes ?? [],
-    placeholder: 'Search notes...',
+    selected: idea?.related_materials ?? [],
+    placeholder: 'Search materials...',
   });
 
   const figuresMultiSelect = createMultiSelect({
@@ -181,9 +181,9 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
             <div class="helper-text">Link sprints that track this idea.</div>
           </div>
           <div class="form-field">
-            <label>Notes</label>
-            ${notesMultiSelect.html}
-            <div class="helper-text">Attach research or planning notes.</div>
+            <label>Materials</label>
+            ${materialsMultiSelect.html}
+            <div class="helper-text">Attach research or planning materials.</div>
           </div>
           <div class="form-field">
             <label>Figures</label>
@@ -201,7 +201,7 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
     onOpen: (form) => {
       storiesMultiSelect.init(form);
       sprintsMultiSelect.init(form);
-      notesMultiSelect.init(form);
+      materialsMultiSelect.init(form);
       figuresMultiSelect.init(form);
       updatesMultiSelect.init(form);
     },
@@ -228,7 +228,7 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
       const relatedStories = getNumberSelections('related_stories');
       const relatedFigures = getNumberSelections('related_figures');
       const relatedSprints = getStringSelections('related_sprints');
-      const relatedNotes = getStringSelections('related_notes');
+      const relatedMaterials = getStringSelections('related_materials');
       const relatedUpdates = getStringSelections('related_updates');
 
       const payload: Idea = {
@@ -242,7 +242,7 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
         related_stories: relatedStories.length ? relatedStories : undefined,
         related_figures: relatedFigures.length ? relatedFigures : undefined,
         related_sprints: relatedSprints.length ? relatedSprints : undefined,
-        related_notes: relatedNotes.length ? relatedNotes : undefined,
+        related_materials: relatedMaterials.length ? relatedMaterials : undefined,
         related_updates: relatedUpdates.length ? relatedUpdates : undefined,
       };
 
@@ -255,7 +255,7 @@ export async function openIdeaForm(mode: 'create' | 'edit', idea?: IdeaRecord): 
       };
 
       await syncRelationships('idea', ideaRecord);
-      await Promise.all([fetchStories(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
+      await Promise.all([fetchStories(), fetchSprints(), fetchMaterials(), fetchFigures(), fetchUpdates()]);
       await fetchIdeas();
       renderIdeas();
       refreshRelationshipsSidebar('ideas');

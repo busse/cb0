@@ -20,33 +20,33 @@
 {%- if record_layout == 'post' -%}
   {%- assign current_slug = record.slug | default: record.filename | replace: '.md', '' -%}
   {%- for idea in site.ideas -%}
-    {%- if idea.related_notes and idea.related_notes contains current_slug -%}
+    {%- if idea.related_materials and idea.related_materials contains current_slug -%}
       {%- assign ids = ids | push: idea.idea_number -%}
     {%- endif -%}
   {%- endfor -%}
   {%- for story in site.stories -%}
-    {%- if story.related_notes and story.related_notes contains current_slug -%}
+    {%- if story.related_materials and story.related_materials contains current_slug -%}
       {%- for idea_id in story.related_ideas -%}
         {%- assign ids = ids | push: idea_id -%}
       {%- endfor -%}
     {%- endif -%}
   {%- endfor -%}
   {%- for sprint in site.sprints -%}
-    {%- if sprint.related_notes and sprint.related_notes contains current_slug -%}
+    {%- if sprint.related_materials and sprint.related_materials contains current_slug -%}
       {%- if sprint.related_ideas -%}
         {%- assign ids = ids | concat: sprint.related_ideas -%}
       {%- endif -%}
     {%- endif -%}
   {%- endfor -%}
   {%- for figure in site.figures -%}
-    {%- if figure.related_notes and figure.related_notes contains current_slug -%}
+    {%- if figure.related_materials and figure.related_materials contains current_slug -%}
       {%- if figure.related_ideas -%}
         {%- assign ids = ids | concat: figure.related_ideas -%}
       {%- endif -%}
     {%- endif -%}
   {%- endfor -%}
   {%- for update in site.updates -%}
-    {%- if update.related_notes and update.related_notes contains current_slug -%}
+    {%- if update.related_materials and update.related_materials contains current_slug -%}
       {%- assign ids = ids | push: update.idea_number -%}
       {%- if update.related_ideas -%}
         {%- assign ids = ids | concat: update.related_ideas -%}

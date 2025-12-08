@@ -211,39 +211,44 @@ export async function renderFigures(): Promise<void> {
     .join('');
 }
 
-export function renderNotes(): void {
-  const listElement = document.getElementById('notes-list');
+export function renderMaterials(): void {
+  const listElement = document.getElementById('materials-list');
   if (!listElement) return;
 
-  if (state.notes.length === 0) {
-    listElement.innerHTML = '<div class="loading">No notes yet. Create one to share updates.</div>';
+  if (state.materials.length === 0) {
+    listElement.innerHTML = '<div class="loading">No materials yet. Create one to share updates.</div>';
     return;
   }
 
-  listElement.innerHTML = state.notes
+  listElement.innerHTML = state.materials
     .map(
-      (note) => `
-        <div class="item-card" data-card-type="notes" data-note-slug="${escapeAttr(note.slug)}" tabindex="0">
+      (material) => `
+        <div class="item-card" data-card-type="materials" data-material-slug="${escapeAttr(material.slug)}" tabindex="0">
           <div class="item-header">
-            <span class="item-title">${escapeHtml(note.title || 'Untitled note')}</span>
-            <span class="item-badge">${escapeHtml(note.slug)}</span>
+            <span class="item-title">${escapeHtml(material.title || 'Untitled material')}</span>
+            <span class="item-badge">${escapeHtml(material.slug)}</span>
           </div>
           <div class="item-meta">
-            <span>Date: ${note.date}</span>
-            ${note.author ? `<span>Author: ${escapeHtml(note.author)}</span>` : ''}
+            <span>Date: ${material.date}</span>
+            ${material.author ? `<span>Author: ${escapeHtml(material.author)}</span>` : ''}
             ${
-              note.tags?.length
-                ? `<span>Tags: ${note.tags.map((tag) => escapeHtml(tag)).join(', ')}</span>`
+              material.canonical_source_url
+                ? `<span><a href="${escapeAttr(material.canonical_source_url)}" target="_blank" rel="noopener noreferrer">Source</a></span>`
+                : ''
+            }
+            ${
+              material.tags?.length
+                ? `<span>Tags: ${material.tags.map((tag) => escapeHtml(tag)).join(', ')}</span>`
                 : ''
             }
           </div>
-          <div class="item-description">${escapeHtml(note.excerpt || note.body?.slice(0, 140) || '')}</div>
+          <div class="item-description">${escapeHtml(material.excerpt || material.body?.slice(0, 140) || '')}</div>
           <div class="item-actions">
-            <button class="btn btn-secondary" type="button" data-action="edit-note" data-note="${escapeAttr(
-              note.filename
+            <button class="btn btn-secondary" type="button" data-action="edit-material" data-material="${escapeAttr(
+              material.filename
             )}">Edit</button>
-            <button class="btn btn-danger" type="button" data-action="delete-note" data-note="${escapeAttr(
-              note.filename
+            <button class="btn btn-danger" type="button" data-action="delete-material" data-material="${escapeAttr(
+              material.filename
             )}">Delete</button>
           </div>
         </div>

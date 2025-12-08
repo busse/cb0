@@ -19,7 +19,7 @@ export interface Idea {
   tags?: string[];
   related_stories?: number[];
   related_sprints?: string[];
-  related_notes?: string[];
+  related_materials?: string[];
   related_figures?: number[];
   related_updates?: string[];
 }
@@ -34,7 +34,7 @@ export interface Story {
   created: string; // ISO date
   related_ideas: number[];
   related_sprints?: string[];
-  related_notes?: string[];
+  related_materials?: string[];
   related_figures?: number[];
   related_updates?: string[];
 }
@@ -50,7 +50,7 @@ export interface Sprint {
   goals?: string[];
   related_ideas?: number[];
   related_stories?: number[];
-  related_notes?: string[];
+  related_materials?: string[];
   related_figures?: number[];
   related_updates?: string[];
 }
@@ -66,7 +66,7 @@ export interface Update {
   related_ideas?: number[];
   related_stories?: number[];
   related_figures?: number[];
-  related_notes?: string[];
+  related_materials?: string[];
   related_sprints?: string[];
 }
 
@@ -80,7 +80,7 @@ export interface Figure {
   related_ideas?: number[];
   related_stories?: string[];
   related_sprints?: string[];
-  related_notes?: string[];
+  related_materials?: string[];
   related_updates?: string[];
   created: string;
   uploaded_date?: string;
@@ -95,7 +95,7 @@ export type MarkdownDocument = {
   body?: string;
 };
 
-export interface Note {
+export interface Material {
   layout: 'post';
   title: string;
   date: string; // YYYY-MM-DD
@@ -103,6 +103,7 @@ export interface Note {
   tags?: string[];
   excerpt?: string;
   slug?: string;
+  canonical_source_url?: string;
   related_ideas?: number[];
   related_stories?: number[];
   related_sprints?: string[];
@@ -115,7 +116,7 @@ export type StoryRecord = Story & MarkdownDocument;
 export type SprintRecord = Sprint & MarkdownDocument;
 export type UpdateRecord = Update & MarkdownDocument;
 export type FigureRecord = Figure & MarkdownDocument;
-export type NoteRecord = Note &
+export type MaterialRecord = Material &
   MarkdownDocument & {
     filename: string;
     slug: string;
@@ -127,6 +128,6 @@ export interface TaxonomyData {
   sprints: SprintRecord[];
   updates: UpdateRecord[];
   figures: FigureRecord[];
-  notes: NoteRecord[];
+  materials: MaterialRecord[];
 }
 

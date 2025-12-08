@@ -1,6 +1,6 @@
 {%- assign record = include.record | default: page -%}
 {%- assign sidebar_title = include.title | default: record.title | default: record.notation -%}
-{%- assign relationship_order = "ideas|stories|sprints|notes|figures|updates" | split: "|" -%}
+{%- assign relationship_order = "ideas|stories|sprints|materials|figures|updates" | split: "|" -%}
 {%- assign record_layout = include.layout | default: record.layout -%}
 {%- assign section_limit = include.limit | default: 0 -%}
 
@@ -10,7 +10,7 @@
       {%- when 'idea' -%}Idea i{{ record.idea_number }}
       {%- when 'story' -%}Story s{{ record.story_number }}
       {%- when 'sprint' -%}Sprint {{ record.sprint_id }}
-      {%- when 'post' -%}Note {{ record.slug }}
+      {%- when 'post' -%}Material {{ record.slug }}
       {%- when 'figure' -%}{{ record.figure_number | prepend: "Figure " }}
       {%- when 'update' -%}Update {{ record.notation }}
       {%- else -%}{{ sidebar_title }}
@@ -33,8 +33,8 @@
         {%- include helpers/relationships/stories.html record=record layout=record_layout -%}
       {%- when 'sprints' -%}
         {%- include helpers/relationships/sprints.html record=record layout=record_layout -%}
-      {%- when 'notes' -%}
-        {%- include helpers/relationships/notes.html record=record layout=record_layout -%}
+      {%- when 'materials' -%}
+        {%- include helpers/relationships/materials.html record=record layout=record_layout -%}
       {%- when 'figures' -%}
         {%- include helpers/relationships/figures.html record=record layout=record_layout -%}
       {%- when 'updates' -%}

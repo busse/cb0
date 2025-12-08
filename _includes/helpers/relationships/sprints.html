@@ -18,7 +18,7 @@
 {%- if record_layout == 'post' -%}
   {%- assign current_slug = record.slug | default: record.filename | replace: '.md', '' -%}
   {%- for sprint in site.sprints -%}
-    {%- if sprint.related_notes and sprint.related_notes contains current_slug -%}
+    {%- if sprint.related_materials and sprint.related_materials contains current_slug -%}
       {%- assign ids = ids | push: sprint.sprint_id -%}
     {%- endif -%}
   {%- endfor -%}

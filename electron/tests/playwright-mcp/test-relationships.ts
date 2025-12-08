@@ -271,7 +271,7 @@ test.describe('Many-to-Many Relationships', () => {
       // Select the idea card
       await clickCard(page, 'ideas', testIdeaNumber.toString());
       
-      // Verify sidebar shows relationships in correct order: Ideas, Stories, Sprints, Notes, Figures, Updates
+      // Verify sidebar shows relationships in correct order: Ideas, Stories, Sprints, Materials, Figures, Updates
       const sidebarContent = await getSidebarContent(page, 'ideas');
       
       // Find positions of each section
@@ -362,7 +362,7 @@ test.describe('Many-to-Many Relationships', () => {
       await openCreateModal(page, 'idea');
       await expect(page.locator('[data-multi-select="related_stories"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_sprints"]')).toBeVisible();
-      await expect(page.locator('[data-multi-select="related_notes"]')).toBeVisible();
+      await expect(page.locator('[data-multi-select="related_materials"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_figures"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_updates"]')).toBeVisible();
       await closeModal(page);
@@ -371,7 +371,7 @@ test.describe('Many-to-Many Relationships', () => {
       await navigateToTab(page, 'stories');
       await openCreateModal(page, 'story');
       await expect(page.locator('[data-multi-select="related_sprints"]')).toBeVisible();
-      await expect(page.locator('[data-multi-select="related_notes"]')).toBeVisible();
+      await expect(page.locator('[data-multi-select="related_materials"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_figures"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_updates"]')).toBeVisible();
       await closeModal(page);
@@ -381,7 +381,7 @@ test.describe('Many-to-Many Relationships', () => {
       await openCreateModal(page, 'sprint');
       await expect(page.locator('[data-multi-select="related_ideas"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_stories"]')).toBeVisible();
-      await expect(page.locator('[data-multi-select="related_notes"]')).toBeVisible();
+      await expect(page.locator('[data-multi-select="related_materials"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_figures"]')).toBeVisible();
       await expect(page.locator('[data-multi-select="related_updates"]')).toBeVisible();
       await closeModal(page);

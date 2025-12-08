@@ -31,7 +31,7 @@ export async function navigateToTab(
  */
 export async function openCreateModal(
   page: Page,
-  entityType: 'idea' | 'note' | 'story' | 'sprint' | 'update'
+  entityType: 'idea' | 'material' | 'story' | 'sprint' | 'update'
 ): Promise<void> {
   await navigateToTab(page, `${entityType}s` as any);
   const newButton = page.locator(`button[data-action="new-${entityType}"]`);
@@ -44,7 +44,7 @@ export async function openCreateModal(
  */
 export async function openEditModal(
   page: Page,
-  entityType: 'idea' | 'note' | 'story' | 'sprint' | 'update',
+  entityType: 'idea' | 'material' | 'story' | 'sprint' | 'update',
   identifier: string | { idea: number } | { idea: number; story: number } | { sprint: string } | { sprint: string; idea: number; story: number }
 ): Promise<void> {
   await navigateToTab(page, `${entityType}s` as any);
@@ -52,8 +52,8 @@ export async function openEditModal(
   let editButton;
   if (entityType === 'idea') {
     editButton = page.locator(`button[data-action="edit-idea"][data-idea="${identifier}"]`);
-  } else if (entityType === 'note') {
-    editButton = page.locator(`button[data-action="edit-note"][data-note="${identifier}"]`);
+  } else if (entityType === 'material') {
+    editButton = page.locator(`button[data-action="edit-material"][data-material="${identifier}"]`);
   } else if (entityType === 'story') {
     const id = identifier as { idea: number; story: number };
     editButton = page.locator(`button[data-action="edit-story"][data-idea="${id.idea}"][data-story="${id.story}"]`);
@@ -255,7 +255,7 @@ export async function verifyItemInList(
  */
 export async function deleteItem(
   page: Page,
-  entityType: 'idea' | 'note' | 'story' | 'sprint' | 'update',
+  entityType: 'idea' | 'material' | 'story' | 'sprint' | 'update',
   identifier: string | { idea: number } | { idea: number; story: number } | { sprint: string } | { sprint: string; idea: number; story: number }
 ): Promise<void> {
   await navigateToTab(page, `${entityType}s` as any);
@@ -263,8 +263,8 @@ export async function deleteItem(
   let deleteButton;
   if (entityType === 'idea') {
     deleteButton = page.locator(`button[data-action="delete-idea"][data-idea="${identifier}"]`);
-  } else if (entityType === 'note') {
-    deleteButton = page.locator(`button[data-action="delete-note"][data-note="${identifier}"]`);
+  } else if (entityType === 'material') {
+    deleteButton = page.locator(`button[data-action="delete-material"][data-material="${identifier}"]`);
   } else if (entityType === 'story') {
     const id = identifier as { idea: number; story: number };
     deleteButton = page.locator(`button[data-action="delete-story"][data-idea="${id.idea}"][data-story="${id.story}"]`);

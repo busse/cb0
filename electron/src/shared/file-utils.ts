@@ -12,13 +12,13 @@ import type {
   Sprint,
   Update,
   Figure,
-  Note,
+  Material,
   IdeaRecord,
   StoryRecord,
   SprintRecord,
   UpdateRecord,
   FigureRecord,
-  NoteRecord,
+  MaterialRecord,
   StoryPriority,
   StoryStatus,
 } from './types';
@@ -50,7 +50,7 @@ export const PATHS = {
   sprints: path.join(CONTENT_DIR, '_sprints'),
   updates: path.join(CONTENT_DIR, '_updates'),
   figures: path.join(CONTENT_DIR, '_figures'),
-  notes: path.join(CONTENT_DIR, '_posts'),
+  materials: path.join(CONTENT_DIR, '_materials'),
   figureImages: path.join(CONTENT_DIR, 'assets', 'figures'),
 };
 
@@ -181,21 +181,21 @@ export async function readFigures(): Promise<FigureRecord[]> {
 }
 
 /**
- * Read all notes (blog posts)
+ * Read all materials
  */
-export async function readNotes(): Promise<NoteRecord[]> {
-  const files = await safeReaddir(PATHS.notes);
-  const notes: NoteRecord[] = [];
+export async function readMaterials(): Promise<MaterialRecord[]> {
+  const files = await safeReaddir(PATHS.materials);
+  const materials: MaterialRecord[] = [];
 
   for (const file of files) {
     if (!file.endsWith('.md')) continue;
-    const filePath = path.join(PATHS.notes, file);
+    const filePath = path.join(PATHS.materials, file);
     const content = await fs.readFile(filePath, 'utf-8');
     const parsed = matter(content);
-    const data = parsed.data as Note;
+    const data = parsed.data as Material;
     const dateFromFile = extractDateFromFilename(file);
     const slugFromFile = extractSlugFromFilename(file);
-    notes.push({
+    materials.push({
       layout: data.layout ?? 'post',
       title: data.title ?? '',
       date: data.date ?? dateFromFile,
@@ -203,6 +203,7 @@ export async function readNotes(): Promise<NoteRecord[]> {
       tags: data.tags,
       excerpt: data.excerpt,
       slug: data.slug ?? slugFromFile,
+      canonical_source_url: data.canonical_source_url,
       body: parsed.content?.trim() ?? '',
       filename: file,
       related_ideas: normalizeNumberArray(data.related_ideas),
@@ -213,7 +214,7 @@ export async function readNotes(): Promise<NoteRecord[]> {
     });
   }
 
-  return notes.sort((a, b) => b.date.localeCompare(a.date));
+  return materials.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 async function safeReaddir(dir: string): Promise<string[]> {
@@ -259,7 +260,8 @@ function normalizeStoryRecord(parsed: matter.GrayMatterFile<string>): StoryRecor
   const relatedSprints =
     normalizeStringArray(data.related_sprints) ??
     (data.assigned_sprint ? [String(data.assigned_sprint)] : undefined);
-  const relatedNotes = normalizeStringArray(data.related_notes);
+  // Support both old (related_notes) and new (related_materials) field names during migration
+  const relatedMaterials = normalizeStringArray((data as any).related_materials ?? (data as any).related_notes);
   const relatedFigures = normalizeNumberArray(data.related_figures);
   const relatedUpdates = normalizeStringArray(data.related_updates);
 
@@ -273,7 +275,7 @@ function normalizeStoryRecord(parsed: matter.GrayMatterFile<string>): StoryRecor
     created: data.created ?? '',
     related_ideas: relatedIdeas,
     related_sprints: relatedSprints,
-    related_notes: relatedNotes,
+    related_materials: relatedMaterials,
     related_figures: relatedFigures,
     related_updates: relatedUpdates,
   };
@@ -289,7 +291,7 @@ function normalizeIdeaData(data: Idea): Idea {
     ...data,
     related_stories: normalizeNumberArray(data.related_stories),
     related_sprints: normalizeStringArray(data.related_sprints),
-    related_notes: normalizeStringArray(data.related_notes),
+    related_materials: normalizeStringArray(data.related_materials),
     related_figures: normalizeNumberArray(data.related_figures),
     related_updates: normalizeStringArray(data.related_updates),
   };
@@ -301,7 +303,7 @@ function normalizeSprintData(data: Sprint): Sprint {
     sprint_id: String(data.sprint_id),
     related_ideas: normalizeNumberArray(data.related_ideas),
     related_stories: normalizeNumberArray(data.related_stories),
-    related_notes: normalizeStringArray(data.related_notes),
+    related_materials: normalizeStringArray(data.related_materials),
     related_figures: normalizeNumberArray(data.related_figures),
     related_updates: normalizeStringArray(data.related_updates),
   };
@@ -314,7 +316,7 @@ function normalizeUpdateData(data: Update): Update {
     related_ideas: normalizeNumberArray(data.related_ideas),
     related_stories: normalizeNumberArray(data.related_stories),
     related_figures: normalizeNumberArray(data.related_figures),
-    related_notes: normalizeStringArray(data.related_notes),
+    related_materials: normalizeStringArray(data.related_materials),
     related_sprints: normalizeStringArray(data.related_sprints),
   };
 }
@@ -325,7 +327,7 @@ function normalizeFigureData(data: Figure): Figure {
     related_ideas: normalizeNumberArray(data.related_ideas),
     related_stories: normalizeStringArray(data.related_stories),
     related_sprints: normalizeStringArray(data.related_sprints),
-    related_notes: normalizeStringArray(data.related_notes),
+    related_materials: normalizeStringArray(data.related_materials),
     related_updates: normalizeStringArray(data.related_updates),
   };
 }
@@ -397,19 +399,19 @@ export async function writeFigure(figure: Figure, content: string): Promise<void
 }
 
 /**
- * Write note file (create or update)
+ * Write material file (create or update)
  */
-export async function writeNote(notePayload: Note & { filename?: string }, content: string): Promise<string> {
-  await fs.mkdir(PATHS.notes, { recursive: true });
-  const { filename: existingFilename, ...frontMatterNote } = notePayload;
-  const normalizedDate = normalizeDate(frontMatterNote.date);
-  const resolvedSlug = frontMatterNote.slug?.trim() || slugify(frontMatterNote.title || 'note');
+export async function writeMaterial(materialPayload: Material & { filename?: string }, content: string): Promise<string> {
+  await fs.mkdir(PATHS.materials, { recursive: true });
+  const { filename: existingFilename, ...frontMatterMaterial } = materialPayload;
+  const normalizedDate = normalizeDate(frontMatterMaterial.date);
+  const resolvedSlug = frontMatterMaterial.slug?.trim() || slugify(frontMatterMaterial.title || 'material');
   const filename = `${normalizedDate}-${resolvedSlug}.md`;
-  const filePath = path.join(PATHS.notes, filename);
+  const filePath = path.join(PATHS.materials, filename);
 
   const cleaned = removeUndefined({
-    ...frontMatterNote,
-    layout: frontMatterNote.layout ?? 'post',
+    ...frontMatterMaterial,
+    layout: frontMatterMaterial.layout ?? 'post',
     date: normalizedDate,
     slug: resolvedSlug,
   });
@@ -417,7 +419,7 @@ export async function writeNote(notePayload: Note & { filename?: string }, conte
   await fs.writeFile(filePath, frontMatter, 'utf-8');
 
   if (existingFilename && existingFilename !== filename) {
-    await fs.unlink(path.join(PATHS.notes, existingFilename)).catch(() => undefined);
+    await fs.unlink(path.join(PATHS.materials, existingFilename)).catch(() => undefined);
   }
 
   return filename;
@@ -465,10 +467,10 @@ export async function deleteFigure(figureNumber: number): Promise<void> {
 }
 
 /**
- * Delete note file
+ * Delete material file
  */
-export async function deleteNote(filename: string): Promise<void> {
-  const filePath = path.join(PATHS.notes, filename);
+export async function deleteMaterial(filename: string): Promise<void> {
+  const filePath = path.join(PATHS.materials, filename);
   await fs.unlink(filePath);
 }
 

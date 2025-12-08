@@ -1,0 +1,14 @@
+{%- comment -%}
+  Material item for sidebar display
+  Parameters:
+    - material: The material object from site.materials
+{%- endcomment -%}
+{%- assign material = include.material | default: include.post -%}
+
+<article class="material-item">
+  <time class="material-item__date" datetime="{{ material.date | date_to_xmlschema }}">{{ material.date | date: "%Y-%m-%d" }}</time>
+  <h5 class="material-item__title">
+    <a href="{{ material.url | relative_url }}">{{ material.title }}</a>
+  </h5>
+</article>
+

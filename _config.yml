@@ -24,6 +24,9 @@ collections:
   figures:
     output: true
     permalink: /fig/:slug/
+  materials:
+    output: true
+    permalink: /materials/:slug/
 
 # Collection defaults
 defaults:
@@ -54,7 +57,7 @@ defaults:
       layout: "figure"
   - scope:
       path: ""
-      type: "posts"
+      type: "materials"
     values:
       layout: "post"
 

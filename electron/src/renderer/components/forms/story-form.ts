@@ -4,12 +4,12 @@ import { STORY_PRIORITIES, STORY_STATUSES } from '../../constants';
 import {
   ensureIdeas,
   ensureSprints,
-  ensureNotes,
+  ensureMaterials,
   ensureFigures,
   ensureUpdates,
   fetchIdeas,
   fetchSprints,
-  fetchNotes,
+  fetchMaterials,
   fetchFigures,
   fetchUpdates,
   fetchStories,
@@ -31,10 +31,10 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
     return;
   }
 
-  await Promise.all([ensureIdeas(), ensureSprints(), ensureNotes(), ensureFigures(), ensureUpdates()]);
+  await Promise.all([ensureIdeas(), ensureSprints(), ensureMaterials(), ensureFigures(), ensureUpdates()]);
 
   const ideaOptions = state.ideas;
-  const noteOptions = state.notes;
+  const materialOptions = state.materials;
   const figureOptions = state.figures;
   const updateOptions = state.updates;
   if (!ideaOptions.length) {
@@ -63,7 +63,7 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         ? story.related_ideas
         : [ideaOptions[0].idea_number],
     related_sprints: story?.related_sprints ?? [],
-    related_notes: story?.related_notes ?? [],
+    related_materials: story?.related_materials ?? [],
     related_figures: story?.related_figures ?? [],
     related_updates: story?.related_updates ?? [],
     body: story?.body ?? '',
@@ -92,19 +92,19 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
     required: false,
   });
 
-  const notesMultiSelect = createMultiSelect({
-    name: 'related_notes',
-    options: noteOptions
-      .filter((note) => (note.slug ?? note.filename)?.length)
-      .map((note) => {
-        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+  const materialsMultiSelect = createMultiSelect({
+    name: 'related_materials',
+    options: materialOptions
+      .filter((material) => (material.slug ?? material.filename)?.length)
+      .map((material) => {
+        const value = material.slug ?? material.filename?.replace(/\.md$/, '') ?? '';
         return {
           value,
-          label: `${note.title || value}`,
+          label: `${material.title || value}`,
         };
       }),
-    selected: defaults.related_notes,
-    placeholder: 'Search notes...',
+    selected: defaults.related_materials,
+    placeholder: 'Search materials...',
     required: false,
   });
 
@@ -192,9 +192,9 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         <h2 class="form-section__title">Relationships</h2>
         <div class="form-grid">
           <div class="form-field">
-            <label>Notes</label>
-            ${notesMultiSelect.html}
-            <div class="helper-text">Reference supporting notes.</div>
+            <label>Materials</label>
+            ${materialsMultiSelect.html}
+            <div class="helper-text">Reference supporting materials.</div>
           </div>
           <div class="form-field">
             <label>Figures</label>
@@ -212,7 +212,7 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
     onOpen: (form) => {
       ideasMultiSelect.init(form);
       sprintsMultiSelect.init(form);
-      notesMultiSelect.init(form);
+      materialsMultiSelect.init(form);
       figuresMultiSelect.init(form);
       updatesMultiSelect.init(form);
     },
@@ -238,7 +238,7 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
 
       const relatedIdeas = getNumberSelections('related_ideas');
       const relatedSprints = getStringSelections('related_sprints');
-      const relatedNotes = getStringSelections('related_notes');
+      const relatedMaterials = getStringSelections('related_materials');
       const relatedFigures = getNumberSelections('related_figures');
       const relatedUpdates = getStringSelections('related_updates');
       const payload: Story = {
@@ -251,7 +251,7 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         created: formData.get('created') as string,
         related_ideas: relatedIdeas,
         related_sprints: relatedSprints.length ? relatedSprints : undefined,
-        related_notes: relatedNotes.length ? relatedNotes : undefined,
+        related_materials: relatedMaterials.length ? relatedMaterials : undefined,
         related_figures: relatedFigures.length ? relatedFigures : undefined,
         related_updates: relatedUpdates.length ? relatedUpdates : undefined,
       };
@@ -263,7 +263,7 @@ export async function openStoryForm(mode: 'create' | 'edit', story?: StoryRecord
         body: content,
       };
       await syncRelationships('story', storyRecord);
-      await Promise.all([fetchIdeas(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
+      await Promise.all([fetchIdeas(), fetchSprints(), fetchMaterials(), fetchFigures(), fetchUpdates()]);
       await fetchStories();
       renderStories();
       refreshRelationshipsSidebar('stories');

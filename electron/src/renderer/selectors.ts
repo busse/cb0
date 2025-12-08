@@ -1,7 +1,7 @@
 import type {
   FigureRecord,
   IdeaRecord,
-  NoteRecord,
+  MaterialRecord,
   SprintRecord,
   StoryRecord,
   UpdateRecord,
@@ -46,10 +46,10 @@ export function getFigureFromDataset(el: HTMLElement): FigureRecord | undefined 
   return state.figures.find((figure) => figure.figure_number === figureNumber);
 }
 
-export function getNoteFromDataset(el: HTMLElement): NoteRecord | undefined {
-  const filename = el.dataset.note;
+export function getMaterialFromDataset(el: HTMLElement): MaterialRecord | undefined {
+  const filename = el.dataset.material;
   if (!filename) return undefined;
-  return state.notes.find((note) => note.filename === filename);
+  return state.materials.find((material) => material.filename === filename);
 }
 
 

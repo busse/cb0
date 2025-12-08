@@ -5,12 +5,12 @@ import {
   ensureIdeas,
   ensureSprints,
   ensureStories,
-  ensureNotes,
+  ensureMaterials,
   ensureFigures,
   fetchIdeas,
   fetchSprints,
   fetchStories,
-  fetchNotes,
+  fetchMaterials,
   fetchFigures,
   fetchUpdates,
   saveUpdate,
@@ -35,7 +35,7 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
   await ensureSprints();
   await ensureIdeas();
   await ensureStories();
-  await ensureNotes();
+  await ensureMaterials();
   await ensureFigures();
 
   if (!state.sprints.length) {
@@ -65,14 +65,14 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
     related_ideas: update?.related_ideas ?? [],
     related_stories: update?.related_stories ?? [],
     related_sprints: update?.related_sprints ?? [],
-    related_notes: update?.related_notes ?? [],
+    related_materials: update?.related_materials ?? [],
     related_figures: update?.related_figures ?? [],
   };
 
   const ideaOptions = state.ideas;
   const storyOptions = state.stories;
   const sprintOptions = state.sprints;
-  const noteOptions = state.notes;
+  const materialOptions = state.materials;
   const figureOptions = state.figures;
 
   const relatedIdeasMultiSelect = createMultiSelect({
@@ -108,19 +108,19 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
     required: false,
   });
 
-  const relatedNotesMultiSelect = createMultiSelect({
-    name: 'related_notes',
-    options: noteOptions
-      .filter((note) => (note.slug ?? note.filename)?.length)
-      .map((note) => {
-        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+  const relatedMaterialsMultiSelect = createMultiSelect({
+    name: 'related_materials',
+    options: materialOptions
+      .filter((material) => (material.slug ?? material.filename)?.length)
+      .map((material) => {
+        const value = material.slug ?? material.filename?.replace(/\.md$/, '') ?? '';
         return {
           value,
-          label: `${note.title || value}`,
+          label: `${material.title || value}`,
         };
       }),
-    selected: defaults.related_notes,
-    placeholder: 'Attach notes...',
+    selected: defaults.related_materials,
+    placeholder: 'Attach materials...',
     required: false,
   });
 
@@ -214,8 +214,8 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
             ${relatedSprintsMultiSelect.html}
           </div>
           <div class="form-field">
-            <label>Notes</label>
-            ${relatedNotesMultiSelect.html}
+            <label>Materials</label>
+            ${relatedMaterialsMultiSelect.html}
           </div>
           <div class="form-field">
             <label>Figures</label>
@@ -264,7 +264,7 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
       relatedIdeasMultiSelect.init(form);
       relatedStoriesMultiSelect.init(form);
       relatedSprintsMultiSelect.init(form);
-      relatedNotesMultiSelect.init(form);
+      relatedMaterialsMultiSelect.init(form);
       relatedFiguresMultiSelect.init(form);
     },
     onSubmit: async (formData) => {
@@ -312,7 +312,7 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
         related_ideas: getNumberSelections('related_ideas'),
         related_stories: getNumberSelections('related_stories'),
         related_sprints: getStringSelections('related_sprints'),
-        related_notes: getStringSelections('related_notes'),
+        related_materials: getStringSelections('related_materials'),
         related_figures: getNumberSelections('related_figures'),
       };
 
@@ -323,7 +323,7 @@ export async function openUpdateForm(mode: 'create' | 'edit', update?: UpdateRec
         body: content,
       };
       await syncRelationships('update', updateRecord);
-      await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchNotes(), fetchFigures(), fetchUpdates()]);
+      await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchMaterials(), fetchFigures(), fetchUpdates()]);
       renderUpdates();
       refreshRelationshipsSidebar('updates');
       showToast(mode === 'create' ? 'Update created' : 'Update updated');

@@ -37,7 +37,7 @@
 {%- if record_layout == 'post' -%}
   {%- assign current_slug = record.slug | default: record.filename | replace: '.md', '' -%}
   {%- for figure in site.figures -%}
-    {%- if figure.related_notes and figure.related_notes contains current_slug -%}
+    {%- if figure.related_materials and figure.related_materials contains current_slug -%}
       {%- assign ids = ids | push: figure.figure_number -%}
     {%- endif -%}
   {%- endfor -%}

@@ -1,5 +1,5 @@
 import { handleAsyncWithArgs } from '../ipc-factory';
-import { deleteFigure, deleteIdea, deleteNote, deleteSprint, deleteStory, deleteUpdate } from '../../shared/file-utils';
+import { deleteFigure, deleteIdea, deleteMaterial, deleteSprint, deleteStory, deleteUpdate } from '../../shared/file-utils';
 
 export function registerDeleteHandlers(): void {
   handleAsyncWithArgs('delete-idea', async (ideaNumber: number) => {
@@ -22,8 +22,8 @@ export function registerDeleteHandlers(): void {
     await deleteFigure(figureNumber);
   });
 
-  handleAsyncWithArgs('delete-note', async (filename: string) => {
-    await deleteNote(filename);
+  handleAsyncWithArgs('delete-material', async (filename: string) => {
+    await deleteMaterial(filename);
   });
 }
 

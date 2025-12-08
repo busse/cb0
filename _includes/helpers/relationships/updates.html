@@ -35,7 +35,7 @@
 {%- if record_layout == 'post' -%}
   {%- assign current_slug = record.slug | default: record.filename | replace: '.md', '' -%}
   {%- for update in site.updates -%}
-    {%- if update.related_notes and update.related_notes contains current_slug -%}
+    {%- if update.related_materials and update.related_materials contains current_slug -%}
       {%- assign ids = ids | push: update.notation -%}
     {%- endif -%}
   {%- endfor -%}

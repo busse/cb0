@@ -1,4 +1,4 @@
-import type { Note, NoteRecord } from '@shared/types';
+import type { Material, MaterialRecord } from '@shared/types';
 import { slugify } from '@shared/strings';
 
 import {
@@ -12,37 +12,38 @@ import {
   fetchSprints,
   fetchFigures,
   fetchUpdates,
-  fetchNotes,
-  saveNote,
+  fetchMaterials,
+  saveMaterial,
 } from '../../api';
 import { openModal } from '../../modal';
 import { showError, showToast } from '../../toast';
-import { renderNotes } from '../lists';
+import { renderMaterials } from '../lists';
 import { escapeAttr, escapeHtml, parseTags, today } from '../../utils/dom';
 import { state } from '../../state';
 import { createMultiSelect } from '../multi-select';
 import { syncRelationships } from '../../utils/relationships';
 import { refreshRelationshipsSidebar } from '../relationships';
 
-export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): Promise<void> {
-  if (mode === 'edit' && !note) {
-    showError('Unable to find that note.');
+export async function openMaterialForm(mode: 'create' | 'edit', material?: MaterialRecord): Promise<void> {
+  if (mode === 'edit' && !material) {
+    showError('Unable to find that material.');
     return;
   }
 
   const defaults = {
-    title: note?.title ?? '',
-    slug: note?.slug ?? slugify(note?.title ?? ''),
-    date: note?.date ?? today(),
-    author: note?.author ?? '',
-    tags: note?.tags?.join(', ') ?? '',
-    excerpt: note?.excerpt ?? '',
-    body: note?.body ?? '',
-    related_ideas: note?.related_ideas ?? [],
-    related_stories: note?.related_stories ?? [],
-    related_sprints: note?.related_sprints ?? [],
-    related_figures: note?.related_figures ?? [],
-    related_updates: note?.related_updates ?? [],
+    title: material?.title ?? '',
+    slug: material?.slug ?? slugify(material?.title ?? ''),
+    date: material?.date ?? today(),
+    author: material?.author ?? '',
+    tags: material?.tags?.join(', ') ?? '',
+    excerpt: material?.excerpt ?? '',
+    canonical_source_url: material?.canonical_source_url ?? '',
+    body: material?.body ?? '',
+    related_ideas: material?.related_ideas ?? [],
+    related_stories: material?.related_stories ?? [],
+    related_sprints: material?.related_sprints ?? [],
+    related_figures: material?.related_figures ?? [],
+    related_updates: material?.related_updates ?? [],
   };
 
   await Promise.all([ensureIdeas(), ensureStories(), ensureSprints(), ensureFigures(), ensureUpdates()]);
@@ -108,9 +109,9 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
   });
 
   openModal({
-    title: mode === 'create' ? 'Create Note' : `Edit Note ${note?.slug}`,
+    title: mode === 'create' ? 'Create Material' : `Edit Material ${material?.slug}`,
     width: 'lg',
-    submitLabel: mode === 'create' ? 'Create Note' : 'Save Changes',
+    submitLabel: mode === 'create' ? 'Create Material' : 'Save Changes',
     body: `
       <div class="form-grid">
         <div class="form-field">
@@ -119,7 +120,7 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
         </div>
         <div class="form-field">
           <label>Slug</label>
-          <input type="text" name="slug" value="${escapeAttr(defaults.slug)}" required placeholder="note-title" />
+          <input type="text" name="slug" value="${escapeAttr(defaults.slug)}" required placeholder="material-title" />
           <div class="helper-text">Lowercase letters, numbers, and dashes only.</div>
         </div>
       </div>
@@ -134,8 +135,13 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
         </div>
       </div>
       <div class="form-field">
+        <label>Canonical Source URL</label>
+        <input type="url" name="canonical_source_url" value="${escapeAttr(defaults.canonical_source_url)}" placeholder="https://example.com/source" />
+        <div class="helper-text">Optional URL to the original source of this material.</div>
+      </div>
+      <div class="form-field">
         <label>Tags (comma separated)</label>
-        <input type="text" name="tags" value="${escapeAttr(defaults.tags)}" placeholder="note, design" />
+        <input type="text" name="tags" value="${escapeAttr(defaults.tags)}" placeholder="material, design" />
       </div>
       <div class="form-field">
         <label>Excerpt</label>
@@ -151,17 +157,17 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
           <div class="form-field">
             <label>Ideas</label>
             ${ideasMultiSelect.html}
-            <div class="helper-text">Ideas that this note references.</div>
+            <div class="helper-text">Ideas that this material references.</div>
           </div>
           <div class="form-field">
             <label>Stories</label>
             ${storiesMultiSelect.html}
-            <div class="helper-text">Stories informed by this note.</div>
+            <div class="helper-text">Stories informed by this material.</div>
           </div>
           <div class="form-field">
             <label>Sprints</label>
             ${sprintsMultiSelect.html}
-            <div class="helper-text">Sprints where this note is relevant.</div>
+            <div class="helper-text">Sprints where this material is relevant.</div>
           </div>
           <div class="form-field">
             <label>Figures</label>
@@ -171,11 +177,11 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
           <div class="form-field">
             <label>Updates</label>
             ${updatesMultiSelect.html}
-            <div class="helper-text">Connect any updates mentioned in this note.</div>
+            <div class="helper-text">Connect any updates mentioned in this material.</div>
           </div>
         </div>
       </section>
-      ${note?.filename ? `<input type="hidden" name="filename" value="${escapeAttr(note.filename)}" />` : ''}
+      ${material?.filename ? `<input type="hidden" name="filename" value="${escapeAttr(material.filename)}" />` : ''}
     `,
     onOpen: (form) => {
       ideasMultiSelect.init(form);
@@ -204,7 +210,7 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
           )
         );
 
-      const payload: Note & { filename?: string } = {
+      const payload: Material & { filename?: string } = {
         layout: 'post',
         title: (formData.get('title') as string).trim(),
         slug: (formData.get('slug') as string).trim(),
@@ -212,7 +218,8 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
         author: (formData.get('author') as string)?.trim() || undefined,
         tags: parseTags(formData.get('tags') as string),
         excerpt: (formData.get('excerpt') as string)?.trim() || undefined,
-        filename: note?.filename ?? ((formData.get('filename') as string) || undefined),
+        canonical_source_url: (formData.get('canonical_source_url') as string)?.trim() || undefined,
+        filename: material?.filename ?? ((formData.get('filename') as string) || undefined),
         related_ideas: getNumberSelections('related_ideas'),
         related_stories: getNumberSelections('related_stories'),
         related_sprints: getStringSelections('related_sprints'),
@@ -223,11 +230,11 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
       const content = (formData.get('body') as string) ?? '';
 
       try {
-        await saveNote(payload, content);
+        await saveMaterial(payload, content);
         const filenameGuess =
           payload.filename ??
-          `${payload.date}-${payload.slug || slugify(payload.title || 'note')}.md`;
-        const noteRecord: NoteRecord = {
+          `${payload.date}-${payload.slug || slugify(payload.title || 'material')}.md`;
+        const materialRecord: MaterialRecord = {
           layout: 'post',
           title: payload.title,
           date: payload.date,
@@ -235,6 +242,7 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
           tags: payload.tags,
           excerpt: payload.excerpt,
           slug: payload.slug,
+          canonical_source_url: payload.canonical_source_url,
           filename: filenameGuess,
           body: content,
           related_ideas: payload.related_ideas,
@@ -244,11 +252,11 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
           related_updates: payload.related_updates,
         };
 
-        await syncRelationships('note', noteRecord);
-        await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchFigures(), fetchUpdates(), fetchNotes()]);
-        renderNotes();
-        refreshRelationshipsSidebar('notes');
-        showToast(mode === 'create' ? 'Note created' : 'Note updated');
+        await syncRelationships('material', materialRecord);
+        await Promise.all([fetchIdeas(), fetchStories(), fetchSprints(), fetchFigures(), fetchUpdates(), fetchMaterials()]);
+        renderMaterials();
+        refreshRelationshipsSidebar('materials');
+        showToast(mode === 'create' ? 'Material created' : 'Material updated');
         return true;
       } catch (error) {
         showError((error as Error).message);
@@ -257,5 +265,4 @@ export async function openNoteForm(mode: 'create' | 'edit', note?: NoteRecord): 
     },
   });
 }
-
 

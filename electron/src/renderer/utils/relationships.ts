@@ -3,8 +3,8 @@ import type {
   FigureRecord,
   Idea,
   IdeaRecord,
-  Note,
-  NoteRecord,
+  Material,
+  MaterialRecord,
   Sprint,
   SprintRecord,
   Story,
@@ -16,20 +16,20 @@ import type {
 import {
   saveFigure,
   saveIdea,
-  saveNote,
+  saveMaterial,
   saveSprint,
   saveStory,
   saveUpdate,
 } from '../api';
 import { state } from '../state';
 
-type EntityKind = 'idea' | 'story' | 'sprint' | 'note' | 'figure' | 'update';
+type EntityKind = 'idea' | 'story' | 'sprint' | 'material' | 'figure' | 'update';
 
 type EntityRecordMap = {
   idea: IdeaRecord;
   story: StoryRecord;
   sprint: SprintRecord;
-  note: NoteRecord;
+  material: MaterialRecord;
   figure: FigureRecord;
   update: UpdateRecord;
 };
@@ -68,8 +68,8 @@ const RELATION_RULES: RelationRule[] = [
   },
   {
     source: 'idea',
-    target: 'note',
-    sourceField: 'related_notes',
+    target: 'material',
+    sourceField: 'related_materials',
     targetField: 'related_ideas',
     mapSourceValueToTargetId: (value) => normalizeId(value),
     targetValueForSource: (source) => (source as Idea).idea_number,
@@ -114,8 +114,8 @@ const RELATION_RULES: RelationRule[] = [
   },
   {
     source: 'story',
-    target: 'note',
-    sourceField: 'related_notes',
+    target: 'material',
+    sourceField: 'related_materials',
     targetField: 'related_stories',
     mapSourceValueToTargetId: (value) => normalizeId(value),
     targetValueForSource: (source) => (source as Story).story_number,
@@ -158,8 +158,8 @@ const RELATION_RULES: RelationRule[] = [
   },
   {
     source: 'sprint',
-    target: 'note',
-    sourceField: 'related_notes',
+    target: 'material',
+    sourceField: 'related_materials',
     targetField: 'related_sprints',
     mapSourceValueToTargetId: (value) => normalizeId(value),
     targetValueForSource: (source) => (source as Sprint).sprint_id,
@@ -180,46 +180,46 @@ const RELATION_RULES: RelationRule[] = [
     mapSourceValueToTargetId: (value) => normalizeId(value),
     targetValueForSource: (source) => (source as Sprint).sprint_id,
   },
-  // NOTE → *
+  // MATERIAL → *
   {
-    source: 'note',
+    source: 'material',
     target: 'idea',
     sourceField: 'related_ideas',
-    targetField: 'related_notes',
+    targetField: 'related_materials',
     mapSourceValueToTargetId: (value) => normalizeId(value),
-    targetValueForSource: (source) => getNoteSlug(source as NoteRecord),
+    targetValueForSource: (source) => getMaterialSlug(source as MaterialRecord),
   },
   {
-    source: 'note',
+    source: 'material',
     target: 'story',
     sourceField: 'related_stories',
-    targetField: 'related_notes',
+    targetField: 'related_materials',
     mapSourceValueToTargetId: (value) => normalizeId(value),
-    targetValueForSource: (source) => getNoteSlug(source as NoteRecord),
+    targetValueForSource: (source) => getMaterialSlug(source as MaterialRecord),
   },
   {
-    source: 'note',
+    source: 'material',
     target: 'sprint',
     sourceField: 'related_sprints',
-    targetField: 'related_notes',
+    targetField: 'related_materials',
     mapSourceValueToTargetId: (value) => normalizeId(value),
-    targetValueForSource: (source) => getNoteSlug(source as NoteRecord),
+    targetValueForSource: (source) => getMaterialSlug(source as MaterialRecord),
   },
   {
-    source: 'note',
+    source: 'material',
     target: 'figure',
     sourceField: 'related_figures',
-    targetField: 'related_notes',
+    targetField: 'related_materials',
     mapSourceValueToTargetId: (value) => normalizeId(value),
-    targetValueForSource: (source) => getNoteSlug(source as NoteRecord),
+    targetValueForSource: (source) => getMaterialSlug(source as MaterialRecord),
   },
   {
-    source: 'note',
+    source: 'material',
     target: 'update',
     sourceField: 'related_updates',
-    targetField: 'related_notes',
+    targetField: 'related_materials',
     mapSourceValueToTargetId: (value) => normalizeId(value),
-    targetValueForSource: (source) => getNoteSlug(source as NoteRecord),
+    targetValueForSource: (source) => getMaterialSlug(source as MaterialRecord),
   },
   // FIGURE → *
   {
@@ -251,8 +251,8 @@ const RELATION_RULES: RelationRule[] = [
   },
   {
     source: 'figure',
-    target: 'note',
-    sourceField: 'related_notes',
+    target: 'material',
+    sourceField: 'related_materials',
     targetField: 'related_figures',
     mapSourceValueToTargetId: (value) => normalizeId(value),
     targetValueForSource: (source) => (source as Figure).figure_number,
@@ -294,8 +294,8 @@ const RELATION_RULES: RelationRule[] = [
   },
   {
     source: 'update',
-    target: 'note',
-    sourceField: 'related_notes',
+    target: 'material',
+    sourceField: 'related_materials',
     targetField: 'related_updates',
     mapSourceValueToTargetId: (value) => normalizeId(value),
     targetValueForSource: (source) => formatUpdateId(source as Update),
@@ -361,8 +361,8 @@ function getCollection(kind: EntityKind): AnyRecord[] {
       return state.stories;
     case 'sprint':
       return state.sprints;
-    case 'note':
-      return state.notes;
+    case 'material':
+      return state.materials;
     case 'figure':
       return state.figures;
     case 'update':
@@ -380,8 +380,8 @@ function getRecordId(kind: EntityKind, record: AnyRecord): string | null {
       return String((record as StoryRecord).story_number);
     case 'sprint':
       return String((record as SprintRecord).sprint_id);
-    case 'note':
-      return getNoteSlug(record as NoteRecord);
+    case 'material':
+      return getMaterialSlug(record as MaterialRecord);
     case 'figure':
       return String((record as FigureRecord).figure_number);
     case 'update':
@@ -445,9 +445,9 @@ async function persistRecord(kind: EntityKind, record: AnyRecord): Promise<void>
       await saveSprint(data as Sprint, body);
       break;
     }
-    case 'note': {
-      const { body = '', ...data } = record as NoteRecord;
-      await saveNote(data as Note & { filename?: string }, body);
+    case 'material': {
+      const { body = '', ...data } = record as MaterialRecord;
+      await saveMaterial(data as Material & { filename?: string }, body);
       break;
     }
     case 'figure': {
@@ -515,16 +515,16 @@ function formatUpdateId(update: Update | UpdateRecord): string {
   return `${update.sprint_id}.${update.idea_number}.${update.story_number}`;
 }
 
-function getNoteSlug(note: NoteRecord): string {
-  if (note.slug?.trim()) {
-    return note.slug.trim();
+function getMaterialSlug(material: MaterialRecord): string {
+  if (material.slug?.trim()) {
+    return material.slug.trim();
   }
-  if (note.filename?.trim()) {
-    return note.filename.replace(/\.md$/, '');
+  if (material.filename?.trim()) {
+    return material.filename.replace(/\.md$/, '');
   }
-  if (note.title?.trim()) {
-    return note.title.trim().toLowerCase().replace(/\s+/g, '-');
+  if (material.title?.trim()) {
+    return material.title.trim().toLowerCase().replace(/\s+/g, '-');
   }
-  return `note-${note.date ?? Date.now()}`;
+  return `material-${material.date ?? Date.now()}`;
 }
 

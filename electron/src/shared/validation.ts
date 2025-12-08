@@ -2,7 +2,7 @@
  * Validation utilities for taxonomy system
  */
 
-import type { Idea, Story, Sprint, Update, Figure, Note, NoteRecord, StoryStatus } from './types';
+import type { Idea, Story, Sprint, Update, Figure, Material, MaterialRecord, StoryStatus } from './types';
 
 /**
  * Validate sprint ID format (YYSS)
@@ -438,39 +438,39 @@ export function validateSprint(sprint: Partial<Sprint>, existingSprints: Sprint[
 }
 
 /**
- * Validate note (blog post) front matter
+ * Validate material front matter
  */
-export function validateNote(
-  note: Partial<Note> & { filename?: string },
-  existingNotes: NoteRecord[],
+export function validateMaterial(
+  material: Partial<Material> & { filename?: string },
+  existingMaterials: MaterialRecord[],
   currentFilename?: string
 ): string[] {
   const errors: string[] = [];
 
-  if (!note.title || note.title.trim() === '') {
+  if (!material.title || material.title.trim() === '') {
     errors.push('title is required');
   }
 
-  if (!note.date) {
+  if (!material.date) {
     errors.push('date is required');
-  } else if (!isValidDateString(note.date)) {
+  } else if (!isValidDateString(material.date)) {
     errors.push('date must be in YYYY-MM-DD format');
   }
 
-  const slugValue = note.slug?.trim();
+  const slugValue = material.slug?.trim();
   if (!slugValue || slugValue.length === 0) {
     errors.push('slug is required');
   } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slugValue)) {
     errors.push('slug must contain lowercase letters, numbers, and dashes only');
   }
 
-  const targetFilename = note.date && slugValue ? `${note.date}-${slugValue}.md` : undefined;
+  const targetFilename = material.date && slugValue ? `${material.date}-${slugValue}.md` : undefined;
   if (targetFilename) {
-    const collision = existingNotes.find(
+    const collision = existingMaterials.find(
       (existing) => existing.filename === targetFilename && existing.filename !== currentFilename
     );
     if (collision) {
-      errors.push(`A note already exists for ${note.date} with slug "${slugValue}"`);
+      errors.push(`A material already exists for ${material.date} with slug "${slugValue}"`);
     }
   }
 

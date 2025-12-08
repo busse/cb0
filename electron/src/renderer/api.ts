@@ -1,4 +1,4 @@
-import type { Figure, Idea, Note, Sprint, Story, Update } from '@shared/types';
+import type { Figure, Idea, Material, Sprint, Story, Update } from '@shared/types';
 
 import { state } from './state';
 
@@ -57,12 +57,12 @@ export async function fetchFigures(): Promise<void> {
   state.figures = result.data;
 }
 
-export async function fetchNotes(): Promise<void> {
-  const result = await window.electronAPI.readNotes();
+export async function fetchMaterials(): Promise<void> {
+  const result = await window.electronAPI.readMaterials();
   if (!result.success || !result.data) {
-    throw new Error(result.error || 'Failed to load notes');
+    throw new Error(result.error || 'Failed to load materials');
   }
-  state.notes = result.data;
+  state.materials = result.data;
 }
 
 export async function ensureIdeas(): Promise<void> {
@@ -89,9 +89,9 @@ export async function ensureFigures(): Promise<void> {
   }
 }
 
-export async function ensureNotes(): Promise<void> {
-  if (!state.notes.length) {
-    await fetchNotes();
+export async function ensureMaterials(): Promise<void> {
+  if (!state.materials.length) {
+    await fetchMaterials();
   }
 }
 
@@ -136,10 +136,10 @@ export async function saveFigure(figure: Figure, content: string): Promise<void>
   }
 }
 
-export async function saveNote(note: Note & { filename?: string }, content: string): Promise<void> {
-  const result = await window.electronAPI.writeNote(note, content);
+export async function saveMaterial(material: Material & { filename?: string }, content: string): Promise<void> {
+  const result = await window.electronAPI.writeMaterial(material, content);
   if (!result.success) {
-    throw new Error(result.error || 'Unable to save note');
+    throw new Error(result.error || 'Unable to save material');
   }
 }
 
@@ -178,10 +178,10 @@ export async function deleteFigureRemote(figureNumber: number): Promise<void> {
   }
 }
 
-export async function deleteNoteRemote(filename: string): Promise<void> {
-  const result = await window.electronAPI.deleteNote(filename);
+export async function deleteMaterialRemote(filename: string): Promise<void> {
+  const result = await window.electronAPI.deleteMaterial(filename);
   if (!result.success) {
-    throw new Error(result.error || 'Unable to delete note');
+    throw new Error(result.error || 'Unable to delete material');
   }
 }
 

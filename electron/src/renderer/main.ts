@@ -3,7 +3,7 @@ import { Action } from './constants';
 import {
   fetchFigures,
   fetchIdeas,
-  fetchNotes,
+  fetchMaterials,
   fetchSprints,
   fetchStories,
   fetchUpdates,
@@ -11,7 +11,7 @@ import {
 import {
   renderFigures,
   renderIdeas,
-  renderNotes,
+  renderMaterials,
   renderSprints,
   renderStories,
   renderUpdates,
@@ -19,7 +19,7 @@ import {
 import {
   openFigureForm,
   openIdeaForm,
-  openNoteForm,
+  openMaterialForm,
   openSprintForm,
   openStoryForm,
   openUpdateForm,
@@ -27,7 +27,7 @@ import {
 import {
   deleteFigure,
   deleteIdea,
-  deleteNote,
+  deleteMaterial,
   deleteSprint,
   deleteStory,
   deleteUpdate,
@@ -35,7 +35,7 @@ import {
 import {
   getFigureFromDataset,
   getIdeaFromDataset,
-  getNoteFromDataset,
+  getMaterialFromDataset,
   getSprintFromDataset,
   getStoryFromDataset,
   getUpdateFromDataset,
@@ -48,7 +48,7 @@ const tabButtons = document.querySelectorAll<HTMLButtonElement>('.tab');
 const panels = document.querySelectorAll<HTMLDivElement>('.panel');
 const listIdToTab: Record<string, Tab> = {
   'ideas-list': 'ideas',
-  'notes-list': 'notes',
+  'materials-list': 'materials',
   'stories-list': 'stories',
   'sprints-list': 'sprints',
   'updates-list': 'updates',
@@ -93,10 +93,10 @@ async function loadTabData(tab: Tab): Promise<void> {
         renderIdeas();
         clearRelationshipsSidebar('ideas');
         break;
-      case 'notes':
-        await fetchNotes();
-        renderNotes();
-        clearRelationshipsSidebar('notes');
+      case 'materials':
+        await fetchMaterials();
+        renderMaterials();
+        clearRelationshipsSidebar('materials');
         break;
       case 'stories':
         await fetchStories();
@@ -154,17 +154,17 @@ function handleActionClick(event: Event): void {
     case 'refresh-ideas':
       void loadTabData('ideas');
       break;
-    case 'new-note':
-      void openNoteForm('create');
+    case 'new-material':
+      void openMaterialForm('create');
       break;
-    case 'edit-note':
-      void openNoteForm('edit', getNoteFromDataset(target));
+    case 'edit-material':
+      void openMaterialForm('edit', getMaterialFromDataset(target));
       break;
-    case 'delete-note':
-      void deleteNote(target.dataset.note);
+    case 'delete-material':
+      void deleteMaterial(target.dataset.material);
       break;
-    case 'refresh-notes':
-      void loadTabData('notes');
+    case 'refresh-materials':
+      void loadTabData('materials');
       break;
     case 'new-story':
       void openStoryForm('create');
@@ -280,9 +280,9 @@ function getRecordForCard(tab: Tab, card: HTMLElement): any | undefined {
       const ideaNumber = Number(card.dataset.ideaNumber);
       return state.ideas.find((idea) => idea.idea_number === ideaNumber);
     }
-    case 'notes': {
-      const slug = card.dataset.noteSlug;
-      return state.notes.find((note) => note.slug === slug);
+    case 'materials': {
+      const slug = card.dataset.materialSlug;
+      return state.materials.find((material) => material.slug === slug);
     }
     case 'stories': {
       const storyNumber = Number(card.dataset.storyNumber);

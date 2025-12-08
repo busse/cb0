@@ -1,7 +1,7 @@
 import type {
   FigureRecord,
   IdeaRecord,
-  NoteRecord,
+  MaterialRecord,
   SprintRecord,
   StoryRecord,
   UpdateRecord,
@@ -11,18 +11,18 @@ import { state, type Tab } from '../state';
 import { escapeHtml } from '../utils/dom';
 import { formatFigureNotation } from '../utils/format';
 
-type RelationshipKind = 'ideas' | 'stories' | 'sprints' | 'notes' | 'figures' | 'updates';
+type RelationshipKind = 'ideas' | 'stories' | 'sprints' | 'materials' | 'figures' | 'updates';
 
 type RecordMap = {
   ideas: IdeaRecord;
-  notes: NoteRecord;
+  materials: MaterialRecord;
   stories: StoryRecord;
   sprints: SprintRecord;
   updates: UpdateRecord;
   figures: FigureRecord;
 };
 
-const RELATION_ORDER: RelationshipKind[] = ['ideas', 'stories', 'sprints', 'notes', 'figures', 'updates'];
+const RELATION_ORDER: RelationshipKind[] = ['ideas', 'stories', 'sprints', 'materials', 'figures', 'updates'];
 
 export function clearRelationshipsSidebar(tab: Tab): void {
   const sidebar = document.getElementById(`${tab}-sidebar`);
@@ -54,9 +54,9 @@ function getRecordForSelectedCard(tab: Tab, card: HTMLElement): RecordMap[Tab] |
       const ideaNumber = Number(card.dataset.ideaNumber);
       return state.ideas.find((idea) => idea.idea_number === ideaNumber) as IdeaRecord | undefined;
     }
-    case 'notes': {
-      const slug = card.dataset.noteSlug;
-      return state.notes.find((note) => note.slug === slug) as NoteRecord | undefined;
+    case 'materials': {
+      const slug = card.dataset.materialSlug;
+      return state.materials.find((material) => material.slug === slug) as MaterialRecord | undefined;
     }
     case 'stories': {
       const storyNumber = Number(card.dataset.storyNumber);
@@ -111,11 +111,11 @@ function renderSidebarHeader(tab: Tab, record: RecordMap[Tab]): string {
         <p class="panel-sidebar__subtitle">${escapeHtml(idea.title || '')}</p>
       </div>`;
     }
-    case 'notes': {
-      const note = record as NoteRecord;
+    case 'materials': {
+      const material = record as MaterialRecord;
       return `<div class="panel-sidebar__header">
-        <h3 class="panel-sidebar__title">Note ${escapeHtml(note.slug)}</h3>
-        <p class="panel-sidebar__subtitle">${escapeHtml(note.title || '')}</p>
+        <h3 class="panel-sidebar__title">Material ${escapeHtml(material.slug)}</h3>
+        <p class="panel-sidebar__subtitle">${escapeHtml(material.title || '')}</p>
       </div>`;
     }
     case 'stories': {
@@ -188,9 +188,9 @@ function getRelationshipIds(tab: Tab, kind: RelationshipKind, record: RecordMap[
       const sprint = record as SprintRecord;
       return extractIdsFromSprint(sprint, kind);
     }
-    case 'notes': {
-      const note = record as NoteRecord;
-      return extractIdsFromNote(note, kind);
+    case 'materials': {
+      const material = record as MaterialRecord;
+      return extractIdsFromMaterial(material, kind);
     }
     case 'figures': {
       const figure = record as FigureRecord;
@@ -209,8 +209,8 @@ function extractIdsFromIdea(idea: IdeaRecord, kind: RelationshipKind): Array<str
       return idea.related_stories ?? [];
     case 'sprints':
       return idea.related_sprints ?? [];
-    case 'notes':
-      return idea.related_notes ?? [];
+    case 'materials':
+      return idea.related_materials ?? [];
     case 'figures':
       return idea.related_figures ?? [];
     case 'updates':
@@ -226,8 +226,8 @@ function extractIdsFromStory(story: StoryRecord, kind: RelationshipKind): Array<
       return story.related_ideas;
     case 'sprints':
       return story.related_sprints ?? [];
-    case 'notes':
-      return story.related_notes ?? [];
+    case 'materials':
+      return story.related_materials ?? [];
     case 'figures':
       return story.related_figures ?? [];
     case 'updates':
@@ -248,8 +248,8 @@ function extractIdsFromSprint(sprint: SprintRecord, kind: RelationshipKind): Arr
           .filter((story) => story.related_sprints?.includes(sprint.sprint_id))
           .map((story) => story.story_number),
       ];
-    case 'notes':
-      return sprint.related_notes ?? [];
+    case 'materials':
+      return sprint.related_materials ?? [];
     case 'figures':
       return sprint.related_figures ?? [];
     case 'updates':
@@ -259,18 +259,18 @@ function extractIdsFromSprint(sprint: SprintRecord, kind: RelationshipKind): Arr
   }
 }
 
-function extractIdsFromNote(note: NoteRecord, kind: RelationshipKind): Array<string | number> {
+function extractIdsFromMaterial(material: MaterialRecord, kind: RelationshipKind): Array<string | number> {
   switch (kind) {
     case 'ideas':
-      return note.related_ideas ?? [];
+      return material.related_ideas ?? [];
     case 'stories':
-      return note.related_stories ?? [];
+      return material.related_stories ?? [];
     case 'sprints':
-      return note.related_sprints ?? [];
+      return material.related_sprints ?? [];
     case 'figures':
-      return note.related_figures ?? [];
+      return material.related_figures ?? [];
     case 'updates':
-      return note.related_updates ?? [];
+      return material.related_updates ?? [];
     default:
       return [];
   }
@@ -286,8 +286,8 @@ function extractIdsFromFigure(figure: FigureRecord, kind: RelationshipKind): Arr
         .filter((value): value is number => typeof value === 'number' && !Number.isNaN(value));
     case 'sprints':
       return figure.related_sprints ?? [];
-    case 'notes':
-      return figure.related_notes ?? [];
+    case 'materials':
+      return figure.related_materials ?? [];
     case 'updates':
       return figure.related_updates ?? [];
     default:
@@ -303,8 +303,8 @@ function extractIdsFromUpdate(update: UpdateRecord, kind: RelationshipKind): Arr
       return [update.story_number, ...(update.related_stories ?? [])];
     case 'sprints':
       return [update.sprint_id, ...(update.related_sprints ?? [])];
-    case 'notes':
-      return update.related_notes ?? [];
+    case 'materials':
+      return update.related_materials ?? [];
     case 'figures':
       return update.related_figures ?? [];
     default:
@@ -331,10 +331,10 @@ function formatRelationship(kind: RelationshipKind, id: string | number): string
         ? `${sprint.sprint_id} — ${escapeHtml(sprint.start_date)} → ${escapeHtml(sprint.end_date)}`
         : sprintId;
     }
-    case 'notes': {
+    case 'materials': {
       const slug = String(id);
-      const note = state.notes.find((item) => item.slug === slug);
-      return note ? `${escapeHtml(note.title || '')} (${escapeHtml(slug)})` : slug;
+      const material = state.materials.find((item) => item.slug === slug);
+      return material ? `${escapeHtml(material.title || '')} (${escapeHtml(slug)})` : slug;
     }
     case 'figures': {
       const figureNumber = Number(id);

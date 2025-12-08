@@ -1,5 +1,5 @@
 import { handleAsync } from '../ipc-factory';
-import { readIdeas, readStories, readSprints, readUpdates, readFigures, readNotes } from '../../shared/file-utils';
+import { readIdeas, readStories, readSprints, readUpdates, readFigures, readMaterials } from '../../shared/file-utils';
 
 export function registerReadHandlers(): void {
   handleAsync('read-ideas', readIdeas);
@@ -7,7 +7,7 @@ export function registerReadHandlers(): void {
   handleAsync('read-sprints', readSprints);
   handleAsync('read-updates', readUpdates);
   handleAsync('read-figures', readFigures);
-  handleAsync('read-notes', readNotes);
+  handleAsync('read-materials', readMaterials);
 }
 
 

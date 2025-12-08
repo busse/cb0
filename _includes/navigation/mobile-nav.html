@@ -28,6 +28,18 @@
         </a>
       </li>
       <li>
+        <a href="{{ '/materials/' | relative_url }}" class="mobile-nav__link">
+          MATERIALS
+          <span class="mobile-nav__count">{{ site.materials | size }}</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ '/figures/' | relative_url }}" class="mobile-nav__link">
+          FIGURES
+          <span class="mobile-nav__count">{{ site.figures | size }}</span>
+        </a>
+      </li>
+      <li>
         <a href="{{ '/backlog/' | relative_url }}" class="mobile-nav__link">
           BACKLOG
           {%- assign backlog_count = site.stories | where_exp: "story", "story.related_sprints == nil or story.related_sprints == empty" | size -%}
@@ -49,7 +61,7 @@
   <nav class="mobile-nav__secondary">
     <ul class="mobile-nav__list mobile-nav__list--secondary">
       <li><a href="{{ '/glossary/' | relative_url }}">Glossary</a></li>
-      <li><a href="{{ '/blog/' | relative_url }}">Notes</a></li>
+      <li><a href="{{ '/materials/' | relative_url }}">Materials</a></li>
       <li><a href="{{ '/i/0/' | relative_url }}">About (i0)</a></li>
     </ul>
   </nav>

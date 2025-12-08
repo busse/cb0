@@ -45,6 +45,15 @@
         </a>
       </li>
       <li role="none">
+        <a href="{{ '/materials/' | relative_url }}"
+           role="menuitem"
+           class="primary-nav__link {% if page.url contains '/materials' or page.url contains '/materials/' or page.layout == 'post' %}is-active{% endif %}"
+           {% if page.url contains '/materials' or page.url contains '/materials/' %}aria-current="page"{% endif %}>
+          MATERIALS
+          <span class="primary-nav__count">{{ site.materials | size }}</span>
+        </a>
+      </li>
+      <li role="none">
         <a href="{{ '/figures/' | relative_url }}"
            role="menuitem"
            class="primary-nav__link {% if page.url contains '/figures' or page.url contains '/fig/' or page.layout == 'figure' %}is-active{% endif %}"

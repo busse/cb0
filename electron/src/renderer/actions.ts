@@ -1,13 +1,13 @@
 import {
   deleteFigureRemote,
   deleteIdeaRemote,
-  deleteNoteRemote,
+  deleteMaterialRemote,
   deleteSprintRemote,
   deleteStoryRemote,
   deleteUpdateRemote,
   fetchFigures,
   fetchIdeas,
-  fetchNotes,
+  fetchMaterials,
   fetchSprints,
   fetchStories,
   fetchUpdates,
@@ -15,7 +15,7 @@ import {
 import {
   renderFigures,
   renderIdeas,
-  renderNotes,
+  renderMaterials,
   renderSprints,
   renderStories,
   renderUpdates,
@@ -103,15 +103,15 @@ export async function deleteFigure(figureNumber?: string): Promise<void> {
   }
 }
 
-export async function deleteNote(filename?: string): Promise<void> {
+export async function deleteMaterial(filename?: string): Promise<void> {
   if (!filename) return;
-  if (!confirm('Delete this note? This cannot be undone.')) return;
+  if (!confirm('Delete this material? This cannot be undone.')) return;
 
   try {
-    await deleteNoteRemote(filename);
-    await fetchNotes();
-    renderNotes();
-    showToast('Note deleted');
+    await deleteMaterialRemote(filename);
+    await fetchMaterials();
+    renderMaterials();
+    showToast('Material deleted');
   } catch (error) {
     showError((error as Error).message);
   }

@@ -1,0 +1,38 @@
+---
+layout: default
+title: Materials
+permalink: /materials/
+---
+
+<main class="page-blog container">
+  <header style="margin-bottom: var(--spacing-xl);">
+    <h1 class="page-title">MATERIALS</h1>
+    <p class="page-description">Traditional material-style posts (separate from the ideas/stories taxonomy)</p>
+  </header>
+
+  {%- if site.materials.size > 0 -%}
+    <div class="post-list">
+      {%- for material in site.materials -%}
+        <article class="post-list__item">
+          <h2 class="post-list__title">
+            <a href="{{ material.url | relative_url }}">{{ material.title | escape }}</a>
+          </h2>
+          <p class="post-list__meta">
+            <time datetime="{{ material.date | date_to_xmlschema }}">{{ material.date | date: "%B %d, %Y" }}</time>
+            {%- if material.author -%} • {{ material.author }}{%- endif -%}
+            {%- if material.canonical_source_url -%} • <a href="{{ material.canonical_source_url }}" target="_blank" rel="noopener noreferrer">Source</a>{%- endif -%}
+          </p>
+          {%- if material.excerpt -%}
+            <p class="post-list__excerpt">{{ material.excerpt | strip_html | truncate: 200 }}</p>
+          {%- endif -%}
+        </article>
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <div class="blog-index__empty">
+      <p>No materials yet.</p>
+      <p>This site primarily uses the Ideas/Stories/Sprints taxonomy. Materials are available for traditional chronological content that doesn't fit the taxonomy structure.</p>
+    </div>
+  {%- endif -%}
+</main>
+

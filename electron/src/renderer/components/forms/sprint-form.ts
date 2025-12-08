@@ -4,13 +4,13 @@ import { SPRINT_STATUSES } from '../../constants';
 import {
   ensureIdeas,
   ensureStories,
-  ensureNotes,
+  ensureMaterials,
   ensureFigures,
   ensureUpdates,
   fetchIdeas,
   fetchSprints,
   fetchStories,
-  fetchNotes,
+  fetchMaterials,
   fetchFigures,
   fetchUpdates,
   saveSprint,
@@ -40,16 +40,16 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
     goals: sprint?.goals?.join('\n') ?? '',
     related_ideas: sprint?.related_ideas ?? [],
     related_stories: sprint?.related_stories ?? [],
-    related_notes: sprint?.related_notes ?? [],
+    related_materials: sprint?.related_materials ?? [],
     related_figures: sprint?.related_figures ?? [],
     related_updates: sprint?.related_updates ?? [],
     body: sprint?.body ?? '',
   };
 
-  await Promise.all([ensureIdeas(), ensureStories(), ensureNotes(), ensureFigures(), ensureUpdates()]);
+  await Promise.all([ensureIdeas(), ensureStories(), ensureMaterials(), ensureFigures(), ensureUpdates()]);
   const ideaOptions = state.ideas;
   const storyOptions = state.stories;
-  const noteOptions = state.notes;
+  const materialOptions = state.materials;
   const figureOptions = state.figures;
   const updateOptions = state.updates;
   const relatedStoryNumbers =
@@ -86,19 +86,19 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
     required: false,
   });
 
-  const notesMultiSelect = createMultiSelect({
-    name: 'related_notes',
-    options: noteOptions
-      .filter((note) => (note.slug ?? note.filename)?.length)
-      .map((note) => {
-        const value = note.slug ?? note.filename?.replace(/\.md$/, '') ?? '';
+  const materialsMultiSelect = createMultiSelect({
+    name: 'related_materials',
+    options: materialOptions
+      .filter((material) => (material.slug ?? material.filename)?.length)
+      .map((material) => {
+        const value = material.slug ?? material.filename?.replace(/\.md$/, '') ?? '';
         return {
           value,
-          label: `${note.title || value}`,
+          label: `${material.title || value}`,
         };
       }),
-    selected: defaults.related_notes,
-    placeholder: 'Search notes...',
+    selected: defaults.related_materials,
+    placeholder: 'Search materials...',
     required: false,
   });
 
@@ -181,8 +181,8 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
             <div class="helper-text">Assign stories to this sprint.</div>
           </div>
           <div class="form-field">
-            <label>Notes</label>
-            ${notesMultiSelect.html}
+            <label>Materials</label>
+            ${materialsMultiSelect.html}
             <div class="helper-text">Link sprint notes or planning docs.</div>
           </div>
           <div class="form-field">
@@ -201,7 +201,7 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
     onOpen: (form) => {
       ideasMultiSelect.init(form);
       storiesMultiSelect.init(form);
-      notesMultiSelect.init(form);
+      materialsMultiSelect.init(form);
       figuresMultiSelect.init(form);
       updatesMultiSelect.init(form);
     },
@@ -236,7 +236,7 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
         goals: parseLines(formData.get('goals') as string),
         related_ideas: getNumberSelections('related_ideas'),
         related_stories: getNumberSelections('related_stories'),
-        related_notes: getStringSelections('related_notes'),
+        related_materials: getStringSelections('related_materials'),
         related_figures: getNumberSelections('related_figures'),
         related_updates: getStringSelections('related_updates'),
       };
@@ -250,7 +250,7 @@ export async function openSprintForm(mode: 'create' | 'edit', sprint?: SprintRec
       };
 
       await syncRelationships('sprint', sprintRecord);
-      await Promise.all([fetchIdeas(), fetchStories(), fetchNotes(), fetchFigures(), fetchUpdates()]);
+      await Promise.all([fetchIdeas(), fetchStories(), fetchMaterials(), fetchFigures(), fetchUpdates()]);
       await fetchSprints();
       renderSprints();
       refreshRelationshipsSidebar('sprints');

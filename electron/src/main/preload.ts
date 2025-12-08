@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { Idea, Story, Sprint, Update, Figure, Note, NoteRecord } from '../shared/types';
+import type { Idea, Story, Sprint, Update, Figure, Material, MaterialRecord } from '../shared/types';
 import type { IpcResult } from './ipc-factory';
 
 // Expose protected methods that allow the renderer process to use
@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readSprints: () => ipcRenderer.invoke('read-sprints'),
   readUpdates: () => ipcRenderer.invoke('read-updates'),
   readFigures: () => ipcRenderer.invoke('read-figures'),
-  readNotes: () => ipcRenderer.invoke('read-notes'),
+  readMaterials: () => ipcRenderer.invoke('read-materials'),
 
   // Write operations
   writeIdea: (idea: Idea, content: string) => ipcRenderer.invoke('write-idea', idea, content),
@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeSprint: (sprint: Sprint, content: string) => ipcRenderer.invoke('write-sprint', sprint, content),
   writeUpdate: (update: Update, content: string) => ipcRenderer.invoke('write-update', update, content),
   writeFigure: (figure: Figure, content: string) => ipcRenderer.invoke('write-figure', figure, content),
-  writeNote: (note: Note & { filename?: string }, content: string) => ipcRenderer.invoke('write-note', note, content),
+  writeMaterial: (material: Material & { filename?: string }, content: string) => ipcRenderer.invoke('write-material', material, content),
 
   // Delete operations
   deleteIdea: (ideaNumber: number) => ipcRenderer.invoke('delete-idea', ideaNumber),
@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteUpdate: (sprintId: string, ideaNumber: number, storyNumber: number) =>
     ipcRenderer.invoke('delete-update', sprintId, ideaNumber, storyNumber),
   deleteFigure: (figureNumber: number) => ipcRenderer.invoke('delete-figure', figureNumber),
-  deleteNote: (filename: string) => ipcRenderer.invoke('delete-note', filename),
+  deleteMaterial: (filename: string) => ipcRenderer.invoke('delete-material', filename),
 
   // Utility operations
   getNextIdeaNumber: () => ipcRenderer.invoke('get-next-idea-number'),
@@ -60,19 +60,19 @@ type ElectronAPI = {
   readSprints: () => Promise<IpcResult<Sprint[]>>;
   readUpdates: () => Promise<IpcResult<Update[]>>;
   readFigures: () => Promise<IpcResult<Figure[]>>;
-  readNotes: () => Promise<IpcResult<NoteRecord[]>>;
+  readMaterials: () => Promise<IpcResult<MaterialRecord[]>>;
   writeIdea: (idea: Idea, content: string) => Promise<IpcResult<void>>;
   writeStory: (story: Story, content: string) => Promise<IpcResult<void>>;
   writeSprint: (sprint: Sprint, content: string) => Promise<IpcResult<void>>;
   writeUpdate: (update: Update, content: string) => Promise<IpcResult<void>>;
   writeFigure: (figure: Figure, content: string) => Promise<IpcResult<void>>;
-  writeNote: (note: Note & { filename?: string }, content: string) => Promise<IpcResult<void>>;
+  writeMaterial: (material: Material & { filename?: string }, content: string) => Promise<IpcResult<void>>;
   deleteIdea: (ideaNumber: number) => Promise<IpcResult<void>>;
   deleteStory: (storyNumber: number) => Promise<IpcResult<void>>;
   deleteSprint: (sprintId: string) => Promise<IpcResult<void>>;
   deleteUpdate: (sprintId: string, ideaNumber: number, storyNumber: number) => Promise<IpcResult<void>>;
   deleteFigure: (figureNumber: number) => Promise<IpcResult<void>>;
-  deleteNote: (filename: string) => Promise<IpcResult<void>>;
+  deleteMaterial: (filename: string) => Promise<IpcResult<void>>;
   getNextIdeaNumber: () => Promise<IpcResult<number>>;
   getNextStoryNumber: () => Promise<IpcResult<number>>;
   getNextFigureNumber: () => Promise<IpcResult<number>>;

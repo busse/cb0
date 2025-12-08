@@ -16,16 +16,16 @@ permalink: /ideas/
     </div>
     
     <aside class="header-sidebar">
-      <h2 class="sidebar-heading">NOTES</h2>
-      {%- if site.posts.size > 0 -%}
-        <div class="note-list">
-          {%- for post in site.posts limit:5 -%}
-            {% include note-item.html post=post %}
+      <h2 class="sidebar-heading">MATERIALS</h2>
+      {%- if site.materials.size > 0 -%}
+        <div class="material-list">
+          {%- for material in site.materials limit:5 -%}
+            {% include material-item.html material=material %}
           {%- endfor -%}
         </div>
-        <a href="{{ '/blog/' | relative_url }}" class="sidebar-more">ALL NOTES →</a>
+        <a href="{{ '/materials/' | relative_url }}" class="sidebar-more">ALL MATERIALS →</a>
       {%- else -%}
-        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No notes yet.</p>
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">No materials yet.</p>
       {%- endif -%}
     </aside>
   </section>
