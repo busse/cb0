@@ -40,3 +40,5 @@ The current design system is documented in:
 - Operational code has been updated to reflect the current design system
 - See `.cursor/rules/ui-design.mdc` for the active specification
 
+
+
