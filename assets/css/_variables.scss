@@ -7,30 +7,30 @@
   --font-serif: 'Georgia', 'Times New Roman', serif; /* Reserved, not used */
   --font-mono: 'SF Mono', Consolas, 'Liberation Mono', monospace;
   
-  --font-size-base: 14px;
-  --line-height-base: 1.4;
+  --font-size-base: 16px;
+  --line-height-base: 1.5;
   
-  /* Type Scale (minimum 10px, ratio 1.25) */
-  --text-xs: 0.714rem;    /* 10px */
-  --text-sm: 0.75rem;     /* 12px */
-  --text-base: 0.875rem;  /* 14px */
-  --text-md: 1.094rem;    /* ~15px */
-  --text-lg: 1.367rem;    /* ~19px */
-  --text-xl: 1.709rem;    /* ~24px */
-  --text-2xl: 2.136rem;   /* ~30px */
-  --text-3xl: 2.67rem;    /* ~37px */
+  /* Type Scale (Just the Docs inspired, 16px base) */
+  --text-xs: 0.8125rem;   /* 13px - made larger for readability */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-md: 1.125rem;    /* 18px */
+  --text-lg: 1.25rem;    /* 20px */
+  --text-xl: 1.5rem;     /* 24px */
+  --text-2xl: 2rem;      /* 32px */
+  --text-3xl: 2.5rem;    /* 40px */
   
   /* Colors - Base */
   --color-background: #FFFFFF;
-  --color-background-muted: #FAFAFA;
+  --color-background-muted: #fafafa;
   --color-surface: #FFFFFF;
-  --color-surface-alt: #FAFAFA;
+  --color-surface-alt: #fafafa;
   --color-surface-muted: #F5F5F5;
   --color-surface-bright: #FFFFFF;
-  --color-surface-highlight: #FAFAFA;
+  --color-surface-highlight: #fafafa;
   --color-text-primary: #1A1A1A;
-  --color-text-secondary: #666666;
-  --color-border: #E0E0E0;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
   --color-border-strong: #CCCCCC;
   --color-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.05);
   --color-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -47,12 +47,12 @@
   --color-accent-secondary: #1A1A1A;
   --color-accent-tertiary: #000000;
   
-  /* Colors - Dark Blue (Functional Distinction) */
-  --color-blue-dark: #1E3A5F;        /* Very dark blue - strong emphasis, active states */
-  --color-blue-base: #2C4A6F;        /* Dark blue - interactive elements, hover states */
-  --color-blue-medium: #3A5F8F;      /* Medium-dark blue - borders, subtle emphasis */
-  --color-blue-light: #E8EDF5;       /* Light blue tint - backgrounds, subtle highlights */
-  --color-blue-border: #4A6FA5;      /* Blue border - card hovers, interactive borders */
+  /* Colors - Blue (Just the Docs inspired) */
+  --color-blue-dark: #1d4ed8;        /* Darker blue - strong emphasis, active states */
+  --color-blue-base: #2563eb;       /* Just the Docs blue - interactive elements, hover states */
+  --color-blue-medium: #3b82f6;       /* Medium blue - borders, subtle emphasis */
+  --color-blue-light: #eff6ff;       /* Light blue tint - backgrounds, subtle highlights */
+  --color-blue-border: #60a5fa;      /* Lighter blue - card hovers, interactive borders */
   
   /* Colors - Notation Badge */
   --color-notation-bg: #1A1A1A;
@@ -87,14 +87,14 @@
   --color-chip-neutral-text: #1A1A1A;
   /* Utility colors intentionally flat – gradients avoided */
   
-  /* Spacing (Dense, Grid-Based) */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-  --spacing-3xl: 64px;
+  /* Spacing (rem-based, Just the Docs style) */
+  --spacing-xs: 0.25rem;  /* 4px at 16px base */
+  --spacing-sm: 0.5rem;   /* 8px at 16px base */
+  --spacing-md: 1rem;     /* 16px at 16px base */
+  --spacing-lg: 1.5rem;   /* 24px at 16px base */
+  --spacing-xl: 2rem;     /* 32px at 16px base */
+  --spacing-2xl: 3rem;    /* 48px at 16px base */
+  --spacing-3xl: 4rem;    /* 64px at 16px base */
   
   /* Grid System (Strong, Visible) */
   --grid-columns: 12;
@@ -134,16 +134,16 @@
     --color-surface-bright: #1F1F1F;
     --color-surface-highlight: #242424;
     --color-text-primary: #FFFFFF;
-    --color-text-secondary: #CCCCCC;
-    --color-border: #333333;
-    --color-border-strong: #444444;
+    --color-text-secondary: #d1d5db;
+    --color-border: #374151;
+    --color-border-strong: #4b5563;
     --color-chip-neutral-bg: #2A2A2A;
     --color-chip-neutral-text: #E0E0E0;
-    --color-blue-dark: #5B8FC7;      /* Lighter blue for dark mode - strong emphasis */
-    --color-blue-base: #6BA3D9;      /* Lighter blue for dark mode - interactive elements */
-    --color-blue-medium: #7BB3E8;    /* Lighter blue for dark mode - borders */
-    --color-blue-light: #1A2A3A;     /* Dark blue tint for dark mode backgrounds */
-    --color-blue-border: #8BC4F0;    /* Lighter blue for dark mode borders */
+    --color-blue-dark: #3b82f6;      /* Medium blue for dark mode - strong emphasis */
+    --color-blue-base: #60a5fa;      /* Lighter blue for dark mode - interactive elements */
+    --color-blue-medium: #93c5fd;    /* Light blue for dark mode - borders */
+    --color-blue-light: #1e3a8a;     /* Dark blue tint for dark mode backgrounds */
+    --color-blue-border: #93c5fd;    /* Light blue for dark mode borders */
     --color-notation-bg: #E3120B;
     --color-notation-text: #FFFFFF;
     --color-badge-active-bg: rgba(86, 101, 255, 0.22);
